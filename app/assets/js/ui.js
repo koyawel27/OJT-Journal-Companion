@@ -50,9 +50,20 @@
     }
   }
 
+  function updateWeeksSummary(weeks) {
+    const count = weeks.length;
+    const label = count === 1 ? "1 week" : `${count} weeks`;
+    setText("summary-week-count", label);
+    setText(
+      "summary-week-detail",
+      count > 0 ? "Saved OJT weeks are ready for future daily logs." : "Create OJT weeks to organize future daily logs."
+    );
+  }
+
   window.OJTUI = {
     showFormMessage,
     clearFormMessage,
-    updateDashboardSummary
+    updateDashboardSummary,
+    updateWeeksSummary
   };
 })();

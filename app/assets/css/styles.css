@@ -431,7 +431,7 @@ h1 {
 
 .dashboard-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 14px;
   margin-bottom: 16px;
 }
@@ -615,3 +615,154 @@ h1 {
     width: 100%;
   }
 }
+
+.weeks-layout {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.week-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 20px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.panel-header h3 {
+  margin: 5px 0 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.panel-header p,
+.phase-note,
+.empty-state {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.weeks-list,
+.day-slots {
+  display: grid;
+  gap: 12px;
+}
+
+.week-item,
+.day-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+}
+
+.week-item h4 {
+  margin: 5px 0 3px;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.week-item p,
+.day-slot p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.day-slot strong {
+  display: block;
+  line-height: 1.25;
+}
+
+.week-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.secondary-button,
+.danger-button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.secondary-button:hover {
+  background: #f2f6f3;
+}
+
+.danger-button {
+  border-color: #e6cbc8;
+  color: #a43d35;
+}
+
+.danger-button:hover {
+  background: #fff4f2;
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.secondary-button:focus-visible,
+.danger-button:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 2px;
+}
+
+.phase-note {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .weeks-layout {
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .week-panel {
+    padding: 15px;
+  }
+
+  .panel-header,
+  .week-item,
+  .day-slot {
+    display: block;
+  }
+
+  .panel-header p,
+  .week-actions,
+  .day-slot .secondary-button {
+    margin-top: 10px;
+  }
+
+  .week-actions {
+    justify-content: stretch;
+  }
+
+  .week-actions button,
+  .day-slot .secondary-button {
+    width: 100%;
+  }
+}
+

@@ -104,6 +104,10 @@
               <span class="card-label">Settings</span>
               <strong id="summary-settings">Default setup</strong>
               <p id="summary-required-hours">Required OJT hours will appear after saving.</p>
+            </article>            <article class="summary-card">
+              <span class="card-label">Weeks</span>
+              <strong id="summary-week-count">0 weeks</strong>
+              <p id="summary-week-detail">Create OJT weeks to organize future daily logs.</p>
             </article>
           </div>
           <div class="placeholder-grid" aria-label="Future dashboard summaries">
@@ -244,17 +248,69 @@
           </div>
         </section>
 
-        <section class="app-section" id="weeks" aria-labelledby="weeks-title" hidden>
+                <section class="app-section" id="weeks" aria-labelledby="weeks-title" hidden>
           <p class="section-kicker">Journal periods</p>
           <h2 id="weeks-title">Weeks</h2>
           <p>
-            This section will later help the student create and manage weekly OJT journal periods
-            with inclusive dates.
+            Create weekly OJT journal periods with inclusive start and end dates. Daily logs are
+            still placeholders in this phase and will be added later.
           </p>
-          <div class="placeholder-card">
-            <span class="card-label">Planned</span>
-            <h3>Week list</h3>
-            <p>Future controls will create weeks, edit date ranges, and group daily logs by week.</p>
+
+          <div class="weeks-layout">
+            <form class="profile-form" id="week-form" novalidate>
+              <div class="form-header">
+                <div>
+                  <span class="card-label">OJT week</span>
+                  <h3 id="week-form-title">Create week</h3>
+                </div>
+                <p>Use one week number and a clear date range for each journal period.</p>
+              </div>
+
+              <input type="hidden" id="week-id">
+              <div class="form-grid">
+                <label class="field">
+                  <span>Week number</span>
+                  <input type="number" id="week-number" min="1" step="1" inputmode="numeric" required>
+                </label>
+                <label class="field">
+                  <span>Inclusive start date</span>
+                  <input type="date" id="inclusive-start-date" required>
+                </label>
+                <label class="field">
+                  <span>Inclusive end date</span>
+                  <input type="date" id="inclusive-end-date" required>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button class="primary-button" type="submit" id="save-week-button">Save week</button>
+                <button class="secondary-button" type="button" id="cancel-week-edit-button" hidden>Cancel edit</button>
+                <p class="form-message" id="week-form-message" hidden></p>
+              </div>
+            </form>
+
+            <section class="week-panel" aria-labelledby="weeks-list-title">
+              <div class="panel-header">
+                <div>
+                  <span class="card-label">Saved weeks</span>
+                  <h3 id="weeks-list-title">Weeks list</h3>
+                </div>
+                <p id="weeks-count-label">No weeks saved yet.</p>
+              </div>
+              <div class="weeks-list" id="weeks-list"></div>
+            </section>
+
+            <section class="week-panel" id="week-detail-panel" aria-labelledby="week-detail-title" hidden>
+              <div class="panel-header">
+                <div>
+                  <span class="card-label">Week detail</span>
+                  <h3 id="week-detail-title">Select a week</h3>
+                </div>
+                <p id="week-detail-range">Choose View from the weeks list.</p>
+              </div>
+              <div class="day-slots" id="day-slots"></div>
+              <p class="phase-note">Daily log creation starts in Phase 4. Deleting a week currently removes only the week record; later phases may need to handle related daily logs first.</p>
+            </section>
           </div>
         </section>
 
@@ -381,6 +437,8 @@
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/profile.js"></script>
+  <script src="assets/js/weeks.js"></script>
 </body>
 </html>
+
 

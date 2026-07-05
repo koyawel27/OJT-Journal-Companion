@@ -1,10 +1,11 @@
 ﻿(function () {
   const DB_NAME = "ojt-journal-companion";
-  const DB_VERSION = 1;
+  const DB_VERSION = 2;
   const stores = {
     studentProfile: "studentProfile",
     companyProfile: "companyProfile",
-    appSettings: "appSettings"
+    appSettings: "appSettings",
+    ojtWeeks: "ojtWeeks"
   };
 
   function createMissingStores(db) {
