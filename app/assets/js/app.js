@@ -1,4 +1,4 @@
-﻿const navButtons = document.querySelectorAll(".nav-button");
+const navButtons = document.querySelectorAll(".nav-button");
 const sections = document.querySelectorAll(".app-section");
 const menuButton = document.querySelector(".menu-button");
 const drawer = document.querySelector(".mobile-drawer");
@@ -47,7 +47,15 @@ function showSection(sectionId) {
       button.removeAttribute("aria-current");
     }
   });
+
+  document.dispatchEvent(new CustomEvent("ojt:section-change", {
+    detail: { sectionId }
+  }));
 }
+
+window.OJTApp = {
+  showSection
+};
 
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {

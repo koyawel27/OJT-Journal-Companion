@@ -1,6 +1,8 @@
-﻿(function () {
+(function () {
   const state = {
     weeks: [],
+    dailyLogs: [],
+    dailyTasks: [],
     selectedWeekId: null
   };
 
@@ -50,6 +52,14 @@
     return `${year}-${month}-${day}`;
   }
 
+  function formatDisplayDate(dateText) {
+    return parseDate(dateText).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
   function sortWeeks(weeks) {
     return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
   }
@@ -57,6 +67,20 @@
   function getCurrentWeek() {
     const weekId = getValue("week-id");
     return state.weeks.find((week) => week.id === weekId) || null;
+  }
+
+  function getDayStatusText(dailyLog, taskCount) {
+    if (!dailyLog) {
+      return "No daily log yet";
+    }
+
+    let status = "Daily log saved";
+
+    if (taskCount > 0) {
+      status += taskCount === 1 ? " · 1 task item" : ` · ${taskCount} task items`;
+    }
+
+    return status;
   }
 
   function buildWeekRecord() {
@@ -135,6 +159,41 @@
     window.OJTUI.clearFormMessage(getElement("week-form-message"));
   }
 
+  function renderDaySlotsHtml(week) {
+    const startDate = parseDate(week.inclusiveStartDate);
+    const endDate = parseDate(week.inclusiveEndDate);
+    let currentDate = startDate;
+    let dayNumber = 1;
+    const slots = [];
+
+    while (currentDate <= endDate) {
+      const dateText = formatDate(currentDate);
+      const dailyLog = state.dailyLogs.find((log) => log.weekId === week.id && log.entryDate === dateText);
+      const taskCount = dailyLog
+        ? state.dailyTasks.filter((task) => task.dailyLogId === dailyLog.id).length
+        : 0;
+      const statusText = getDayStatusText(dailyLog, taskCount);
+
+      slots.push(`
+        <article class="day-slot">
+          <div>
+            <strong>Day ${dayNumber}</strong>
+            <span class="day-slot-date">${formatDisplayDate(dateText)}</span>
+            <p>${statusText}</p>
+          </div>
+          <button class="secondary-button" type="button" data-open-daily-log-week-id="${week.id}" data-open-daily-log-date="${dateText}">
+            ${dailyLog ? "Open Log" : "Create Log"}
+          </button>
+        </article>
+      `);
+
+      currentDate.setDate(currentDate.getDate() + 1);
+      dayNumber += 1;
+    }
+
+    return `<div class="day-slots">${slots.join("")}</div>`;
+  }
+
   function renderWeeksList() {
     const list = getElement("weeks-list");
     const countLabel = getElement("weeks-count-label");
@@ -149,69 +208,39 @@
     }
 
     sortedWeeks.forEach((week) => {
-      const isSelected = state.selectedWeekId === week.id;
-      const detailButtonLabel = isSelected ? "Hide Details" : "View";
+      const isExpanded = state.selectedWeekId === week.id;
+      const detailButtonLabel = isExpanded ? "Collapse" : "View";
+      const logCount = state.dailyLogs.filter((log) => log.weekId === week.id).length;
       const item = document.createElement("article");
-      item.className = "week-item";
+      item.className = `week-item week-accordion${isExpanded ? " is-expanded" : ""}`;
       item.innerHTML = `
-        <div>
-          <span class="card-label">Week ${week.weekNumber}</span>
-          <h4>${week.inclusiveStartDate} to ${week.inclusiveEndDate}</h4>
-          <p>No daily logs yet.</p>
+        <div class="week-item-main">
+          <div>
+            <span class="card-label">Week ${week.weekNumber}</span>
+            <h4>${week.inclusiveStartDate} to ${week.inclusiveEndDate}</h4>
+            <p>${logCount === 1 ? "1 daily log saved." : `${logCount} daily logs saved.`}</p>
+          </div>
+          <div class="week-actions">
+            <button class="secondary-button" type="button" data-week-action="view" data-week-id="${week.id}" aria-expanded="${isExpanded}">${detailButtonLabel}</button>
+            <button class="secondary-button" type="button" data-week-action="edit" data-week-id="${week.id}">Edit</button>
+            <button class="danger-button" type="button" data-week-action="delete" data-week-id="${week.id}">Delete</button>
+          </div>
         </div>
-        <div class="week-actions">
-          <button class="secondary-button" type="button" data-week-action="view" data-week-id="${week.id}" aria-expanded="${isSelected}" aria-controls="week-detail-panel">${detailButtonLabel}</button>
-          <button class="secondary-button" type="button" data-week-action="edit" data-week-id="${week.id}">Edit</button>
-          <button class="danger-button" type="button" data-week-action="delete" data-week-id="${week.id}">Delete</button>
+        <div class="week-accordion-body" ${isExpanded ? "" : "hidden"}>
+          ${isExpanded ? renderDaySlotsHtml(week) : ""}
         </div>
       `;
       list.appendChild(item);
     });
   }
 
-  function renderDaySlots(week) {
-    const daySlots = getElement("day-slots");
-    const startDate = parseDate(week.inclusiveStartDate);
-    const endDate = parseDate(week.inclusiveEndDate);
-    let currentDate = startDate;
-    let dayNumber = 1;
-
-    daySlots.innerHTML = "";
-
-    while (currentDate <= endDate) {
-      const dateText = formatDate(currentDate);
-      const slot = document.createElement("article");
-      slot.className = "day-slot";
-      slot.innerHTML = `
-        <div>
-          <strong>Day ${dayNumber} - ${dateText}</strong>
-          <p>No daily log yet.</p>
-        </div>
-        <button class="secondary-button" type="button" disabled>Coming in Phase 4</button>
-      `;
-      daySlots.appendChild(slot);
-      currentDate.setDate(currentDate.getDate() + 1);
-      dayNumber += 1;
-    }
-  }
-
   function showWeekDetail(week) {
     state.selectedWeekId = week.id;
-    const detailPanel = getElement("week-detail-panel");
-    detailPanel.hidden = false;
-    setText("week-detail-title", `Week ${week.weekNumber}`);
-    setText("week-detail-range", `${week.inclusiveStartDate} to ${week.inclusiveEndDate}`);
-    renderDaySlots(week);
     renderWeeksList();
   }
 
   function hideWeekDetail() {
     state.selectedWeekId = null;
-    const detailPanel = getElement("week-detail-panel");
-    detailPanel.hidden = true;
-    setText("week-detail-title", "Select a week");
-    setText("week-detail-range", "Choose View from the weeks list.");
-    getElement("day-slots").innerHTML = "";
     renderWeeksList();
   }
 
@@ -227,7 +256,25 @@
   }
 
   async function deleteWeek(week) {
-    const confirmed = window.confirm(`Delete Week ${week.weekNumber}? This only removes the week record in Phase 3.`);
+    try {
+      const dailyLogs = await window.OJTStorage.getDailyLogs();
+      const relatedLogs = dailyLogs.filter((dailyLog) => dailyLog.weekId === week.id);
+
+      if (relatedLogs.length > 0) {
+        window.OJTUI.showFormMessage(
+          getElement("week-form-message"),
+          "This week has daily logs. Delete those daily logs first before deleting the week.",
+          "error"
+        );
+        return;
+      }
+    } catch (error) {
+      window.OJTUI.showFormMessage(getElement("week-form-message"), "Related daily logs could not be checked. Please try again.", "error");
+      console.error(error);
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete Week ${week.weekNumber}? This removes the week record.`);
 
     if (!confirmed) {
       return;
@@ -309,9 +356,32 @@
     }
   }
 
+  function handleOpenDailyLog(event) {
+    const button = event.target.closest("button[data-open-daily-log-week-id]");
+
+    if (!button) {
+      return;
+    }
+
+    const detail = {
+      weekId: button.dataset.openDailyLogWeekId,
+      entryDate: button.dataset.openDailyLogDate
+    };
+
+    window.OJTApp?.showSection("daily-logs");
+    document.dispatchEvent(new CustomEvent("ojt:open-daily-log", { detail }));
+  }
+
   async function loadWeeks() {
     try {
-      state.weeks = await window.OJTStorage.getWeeks();
+      const [weeks, dailyLogs, dailyTasks] = await Promise.all([
+        window.OJTStorage.getWeeks(),
+        window.OJTStorage.getDailyLogs(),
+        window.OJTStorage.getDailyTasks()
+      ]);
+      state.weeks = weeks;
+      state.dailyLogs = dailyLogs;
+      state.dailyTasks = dailyTasks;
       renderWeeksList();
       window.OJTUI.updateWeeksSummary(state.weeks);
     } catch (error) {
@@ -324,10 +394,17 @@
     getElement("week-form")?.addEventListener("submit", saveWeek);
     getElement("cancel-week-edit-button")?.addEventListener("click", resetWeekForm);
     getElement("weeks-list")?.addEventListener("click", handleWeekAction);
+    getElement("weeks-list")?.addEventListener("click", handleOpenDailyLog);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     bindWeekEvents();
     loadWeeks();
+  });
+
+  document.addEventListener("ojt:section-change", (event) => {
+    if (event.detail?.sectionId === "weeks") {
+      loadWeeks();
+    }
   });
 })();

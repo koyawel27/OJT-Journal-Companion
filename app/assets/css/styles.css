@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --page: #f6f8f5;
   --panel: #ffffff;
   --ink: #1d2a24;
@@ -213,6 +213,10 @@ h1 {
 
 .app-section {
   max-width: 780px;
+}
+
+#daily-logs.app-section {
+  max-width: 960px;
 }
 
 .app-section:not(.is-visible) {
@@ -652,21 +656,36 @@ h1 {
 }
 
 .weeks-list,
-.day-slots {
+.day-slots,
+.journal-week-accordions {
   display: grid;
   gap: 12px;
 }
 
 .week-item,
+.day-slot,
+.day-accordion {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.week-item-main,
 .day-slot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
   padding: 14px;
+}
+
+.week-accordion-body {
+  border-top: 1px solid var(--line);
+  padding: 14px;
+}
+
+.weeks-list-note {
+  margin-top: 14px;
 }
 
 .week-item h4 {
@@ -684,6 +703,14 @@ h1 {
 
 .day-slot strong {
   display: block;
+  line-height: 1.25;
+}
+
+.day-slot-date {
+  display: block;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 700;
   line-height: 1.25;
 }
 
@@ -745,24 +772,312 @@ h1 {
   }
 
   .panel-header,
-  .week-item,
+  .week-item-main,
   .day-slot {
     display: block;
   }
 
   .panel-header p,
-  .week-actions,
+  .week-item-main .week-actions,
   .day-slot .secondary-button {
     margin-top: 10px;
   }
 
-  .week-actions {
+  .week-item-main .week-actions {
     justify-content: stretch;
   }
 
-  .week-actions button,
+  .week-item-main .week-actions button,
   .day-slot .secondary-button {
     width: 100%;
   }
 }
+.daily-logs-layout {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
 
+.journal-week-summary {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.day-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 14px;
+  text-align: left;
+}
+
+.day-accordion-header:hover {
+  background: #f2f6f3;
+}
+
+.day-accordion-header:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 2px;
+}
+
+.day-accordion-label {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.day-accordion-label strong {
+  line-height: 1.25;
+}
+
+.day-accordion-date {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.day-accordion-status {
+  flex: 1 1 auto;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.day-accordion-chevron {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.day-accordion.is-expanded .day-accordion-chevron {
+  transform: rotate(-135deg);
+  margin-top: 6px;
+}
+
+.day-accordion-body {
+  border-top: 1px solid var(--line);
+  padding: 16px;
+}
+
+.journal-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.35fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.journal-col-time,
+.journal-col-tasks {
+  min-width: 0;
+}
+
+.journal-day-heading {
+  margin: 4px 0 14px;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.journal-col-header h4 {
+  margin: 4px 0 6px;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.journal-col-header .phase-note {
+  margin-bottom: 12px;
+}
+
+.day-record-form {
+  display: grid;
+  gap: 0;
+}
+
+.task-list-display {
+  margin-bottom: 16px;
+}
+
+.photo-placeholder {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.calculation-placeholder {
+  margin-top: 14px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 8px;
+  background: #f2f6f3;
+  padding: 12px;
+}
+
+.calculation-placeholder strong {
+  display: block;
+  color: var(--accent);
+  line-height: 1.25;
+}
+
+.calculation-placeholder p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.task-bullet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-bullet-item {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 12px;
+}
+
+.task-bullet-item:last-child {
+  margin-bottom: 0;
+}
+
+.task-bullet-content {
+  position: relative;
+  min-width: 0;
+  padding-left: 1rem;
+  color: var(--ink);
+}
+
+.task-bullet-content::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.task-bullet-content .status-pill {
+  margin-left: 6px;
+}
+
+.task-bullet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.task-note {
+  color: var(--muted);
+}
+
+.item-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.task-form {
+  display: grid;
+  gap: 0;
+}
+
+.task-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  background: #f2f6f3;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 9px;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled,
+.danger-button:disabled,
+.field input:disabled,
+.field textarea:disabled,
+.field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.primary-button:disabled:hover {
+  background: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .daily-logs-layout {
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .journal-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .day-accordion-header {
+    flex-wrap: wrap;
+  }
+
+  .day-accordion-status {
+    flex: 1 0 100%;
+    text-align: left;
+    padding-left: 0;
+  }
+
+  .task-bullet-item {
+    display: block;
+  }
+
+  .task-bullet-actions {
+    margin-top: 10px;
+    justify-content: stretch;
+  }
+
+  .task-bullet-actions button {
+    flex: 1 1 auto;
+  }
+
+  .week-item-main,
+  .day-slot {
+    display: block;
+  }
+
+  .week-item-main .week-actions,
+  .day-slot .secondary-button {
+    margin-top: 10px;
+  }
+
+  .week-item-main .week-actions button,
+  .day-slot .secondary-button {
+    width: 100%;
+  }
+}

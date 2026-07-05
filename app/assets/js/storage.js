@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const recordIds = {
     studentProfile: "student-profile",
     companyProfile: "company-profile",
@@ -128,6 +128,39 @@
     });
   }
 
+  async function deleteDailyLogWithTasks(dailyLogId) {
+    const db = await window.OJTDB.openDatabase();
+    const dailyLogStore = getStoreName("dailyLogs");
+    const dailyTaskStore = getStoreName("dailyTasks");
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([dailyLogStore, dailyTaskStore], "readwrite");
+      const logs = transaction.objectStore(dailyLogStore);
+      const tasks = transaction.objectStore(dailyTaskStore);
+      const request = tasks.getAll();
+
+      request.onsuccess = () => {
+        (request.result || [])
+          .filter((task) => task.dailyLogId === dailyLogId)
+          .forEach((task) => tasks.delete(task.id));
+        logs.delete(dailyLogId);
+      };
+
+      request.onerror = () => {
+        reject(request.error || new Error("Related task items could not be loaded."));
+      };
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+
+      transaction.onerror = () => {
+        reject(transaction.error || new Error("The daily log could not be deleted."));
+      };
+    });
+  }
+
   window.OJTStorage = {
     getStudentProfile: () => getRecord("studentProfile"),
     saveStudentProfile: (data) => saveRecord("studentProfile", data),
@@ -137,6 +170,12 @@
     saveAppSettings: (data) => saveRecord("appSettings", data),
     getWeeks: () => getAllRecords("ojtWeeks"),
     saveWeek: (week) => saveItem("ojtWeeks", week),
-    deleteWeek: (id) => deleteItem("ojtWeeks", id)
+    deleteWeek: (id) => deleteItem("ojtWeeks", id),
+    getDailyLogs: () => getAllRecords("dailyLogs"),
+    saveDailyLog: (dailyLog) => saveItem("dailyLogs", dailyLog),
+    deleteDailyLog: (id) => deleteDailyLogWithTasks(id),
+    getDailyTasks: () => getAllRecords("dailyTasks"),
+    saveDailyTask: (dailyTask) => saveItem("dailyTasks", dailyTask),
+    deleteDailyTask: (id) => deleteItem("dailyTasks", id)
   };
 })();

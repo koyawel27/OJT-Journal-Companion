@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   function showFormMessage(element, message, type) {
     if (!element) {
       return;
@@ -60,10 +60,21 @@
     );
   }
 
+
+  function updateDailyLogsSummary(dailyLogs) {
+    const count = dailyLogs.length;
+    const label = count === 1 ? "1 log" : `${count} logs`;
+    setText("summary-daily-log-count", label);
+    setText(
+      "summary-daily-log-detail",
+      count > 0 ? "Saved daily logs are grouped by their OJT week." : "Create daily logs after choosing a saved week."
+    );
+  }
   window.OJTUI = {
     showFormMessage,
     clearFormMessage,
     updateDashboardSummary,
-    updateWeeksSummary
+    updateWeeksSummary,
+    updateDailyLogsSummary
   };
 })();

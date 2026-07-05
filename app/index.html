@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -14,7 +14,7 @@
         <h1>OJT Journal Companion</h1>
       </div>
       <div class="header-actions">
-        <p class="header-note">Static Phase 1 shell</p>
+        <p class="header-note">Offline journal workspace</p>
         <button class="menu-button" type="button" aria-label="Open navigation menu" aria-controls="mobile-nav-drawer" aria-expanded="false">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 7h16M4 12h16M4 17h16"></path>
@@ -104,10 +104,16 @@
               <span class="card-label">Settings</span>
               <strong id="summary-settings">Default setup</strong>
               <p id="summary-required-hours">Required OJT hours will appear after saving.</p>
-            </article>            <article class="summary-card">
+            </article>
+            <article class="summary-card">
               <span class="card-label">Weeks</span>
               <strong id="summary-week-count">0 weeks</strong>
               <p id="summary-week-detail">Create OJT weeks to organize future daily logs.</p>
+            </article>
+            <article class="summary-card">
+              <span class="card-label">Daily logs</span>
+              <strong id="summary-daily-log-count">0 logs</strong>
+              <p id="summary-daily-log-detail">Create daily logs after choosing a saved week.</p>
             </article>
           </div>
           <div class="placeholder-grid" aria-label="Future dashboard summaries">
@@ -252,8 +258,7 @@
           <p class="section-kicker">Journal periods</p>
           <h2 id="weeks-title">Weeks</h2>
           <p>
-            Create weekly OJT journal periods with inclusive start and end dates. Daily logs are
-            still placeholders in this phase and will be added later.
+            Create weekly OJT journal periods with inclusive start and end dates. Daily logs can now be managed from the Daily Logs section.
           </p>
 
           <div class="weeks-layout">
@@ -300,17 +305,7 @@
               <div class="weeks-list" id="weeks-list"></div>
             </section>
 
-            <section class="week-panel" id="week-detail-panel" aria-labelledby="week-detail-title" hidden>
-              <div class="panel-header">
-                <div>
-                  <span class="card-label">Week detail</span>
-                  <h3 id="week-detail-title">Select a week</h3>
-                </div>
-                <p id="week-detail-range">Choose View from the weeks list.</p>
-              </div>
-              <div class="day-slots" id="day-slots"></div>
-              <p class="phase-note">Daily log creation starts in Phase 4. Deleting a week currently removes only the week record; later phases may need to handle related daily logs first.</p>
-            </section>
+            <p class="phase-note weeks-list-note">Expand a saved week to review day slots. Daily logs are managed from the Daily Logs section. Delete related daily logs before removing a week.</p>
           </div>
         </section>
 
@@ -318,16 +313,30 @@
           <p class="section-kicker">Daily record keeping</p>
           <h2 id="daily-logs-title">Daily Logs</h2>
           <p>
-            This section will later hold daily OJT entries, time records, activities,
-            accomplishments, learnings, challenges, and notes.
+            Create daily OJT logs under saved weeks, then add structured task/work items for
+            clear accomplishment bullets later. Rendered hour totals will be calculated in Phase 5.
           </p>
-          <div class="placeholder-card">
-            <span class="card-label">Planned</span>
-            <h3>Daily log form</h3>
-            <p>Future fields will support date, time in, time out, break duration, and journal notes.</p>
+
+          <div class="daily-logs-layout">
+            <section class="week-panel" aria-labelledby="daily-log-week-title">
+              <div class="panel-header">
+                <div>
+                  <span class="card-label">Week journal</span>
+                  <h3 id="daily-log-week-title">Choose a saved week</h3>
+                </div>
+                <p id="daily-log-week-help">Select a week to open its journal-style day records.</p>
+              </div>
+
+              <label class="field">
+                <span>OJT week</span>
+                <select id="daily-log-week-select"></select>
+              </label>
+              <p class="journal-week-summary" id="daily-log-count-label" aria-live="polite"></p>
+            </section>
+
+            <div class="journal-week-accordions" id="journal-week-accordions" aria-live="polite"></div>
           </div>
         </section>
-
         <section class="app-section" id="weekly-preview" aria-labelledby="weekly-preview-title" hidden>
           <p class="section-kicker">Prepared journal content</p>
           <h2 id="weekly-preview-title">Weekly Preview</h2>
@@ -438,7 +447,6 @@
   <script src="assets/js/app.js"></script>
   <script src="assets/js/profile.js"></script>
   <script src="assets/js/weeks.js"></script>
+  <script src="assets/js/daily-logs.js"></script>
 </body>
 </html>
-
-
