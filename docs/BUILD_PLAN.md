@@ -203,10 +203,11 @@ Let the student create, edit, and delete daily OJT logs under a selected week an
 - Build daily log form.
 - Allow creating, editing, and deleting daily logs under a selected week or Phase 3 day slot.
 - Preserve the date/day slot connection from Phase 3.
-- Add fields for entry date, time in, time out, break minutes, learnings, challenges, and notes.
+- Keep `DailyLog` focused on day/time fields: week, entry date, time in, time out, break minutes, and rendered time placeholders.
 - Add structured task/work items under a daily log.
 - Allow adding, editing, and deleting task items.
 - Include task description, optional task time spent in minutes, personal task status, optional task notes, and ordering when practical.
+- Display task/work items as bullet-style accomplishments under the related day record.
 - Use task status values: `Pending`, `In Progress`, and `Completed`.
 - Keep task status personal only; it should not represent supervisor approval or official validation.
 - Use `YYYY-MM-DD` for entry date.
@@ -214,6 +215,7 @@ Let the student create, edit, and delete daily OJT logs under a selected week an
 - List logs by selected week.
 - Add edit and delete controls.
 - Add confirmation before deleting a daily log.
+- Show a clear note that rendered hours will be calculated in Phase 5.
 - Prepare for Phase 5 time calculation while keeping official rendered hours based on daily log time fields, not task time totals.
 
 ### Manual Testing Checklist

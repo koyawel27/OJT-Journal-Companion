@@ -96,7 +96,7 @@ Weekly total hours should be calculated from related `DailyLog` records, not man
 
 ## 7. DailyLog
 
-Stores one daily OJT journal entry.
+Stores one day/time record for a daily OJT journal entry. Daily work details and accomplishment bullets belong in related `DailyTask` records.
 
 | Field | Type | Notes |
 | --- | --- | --- |
@@ -108,16 +108,14 @@ Stores one daily OJT journal entry.
 | `breakMinutes` | number | Break duration in minutes. |
 | `renderedMinutes` | number | Calculated rendered time in minutes. |
 | `renderedHours` | number | Calculated rendered hours for the day. |
-| `activitiesOrAccomplishments` | string | Daily activities or accomplishments. |
-| `learnings` | string | Daily learnings or skills practiced. |
-| `challenges` | string | Daily challenges encountered. |
-| `notes` | string | Optional daily notes. |
 | `createdAt` | string | Date and time the record was created. |
 | `updatedAt` | string | Date and time the record was last updated. |
 
 `renderedMinutes` should be the main stored calculated value because it avoids decimal rounding issues. `renderedHours` may be displayed by the app or stored only for convenience, but it should be derived from `renderedMinutes` or recalculated whenever `timeIn`, `timeOut`, or `breakMinutes` changes.
 
 For v1.0, daily logs should assume same-day time records only. Overnight shifts are out of scope unless added later.
+
+If older local test records contain daily text fields such as activities, learnings, challenges, or notes, the app should stop displaying those fields as primary daily log fields. New saves should prefer the simplified `DailyLog` shape above.
 
 ## 8. DailyTask
 

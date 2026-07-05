@@ -34,14 +34,13 @@ The daily log workflow is the main record-keeping flow for the student.
 2. User creates or opens a daily log under that week.
 3. User enters the entry date.
 4. User enters time in, time out, and break minutes.
-5. User writes general daily notes, learnings, and challenges as needed.
-6. User adds one or more structured task/work items under the daily log.
-7. Each task item may include a description, optional time spent, personal status, and notes.
-8. App validates required fields.
-9. App calculates rendered minutes and displayed rendered hours from the daily log time fields.
-10. App saves the daily log and related task items locally using IndexedDB.
+5. User adds one or more structured task/work items under the daily log.
+6. Each task item may include a description, optional time spent, personal status, and notes.
+7. App validates required fields.
+8. App saves the daily log and related task items locally using IndexedDB.
+9. Rendered minutes and rendered hours remain placeholders until the Phase 5 time calculation workflow.
 
-Daily logs should belong to an `OJTWeek` through `weekId`. Daily task/work items should belong to a `DailyLog` through `dailyLogId`.
+Daily logs should belong to an `OJTWeek` through `weekId`. Daily logs are day/time records only. Daily task/work items should belong to a `DailyLog` through `dailyLogId` and should hold the daily work/accomplishment bullet details.
 
 Task items can later be used as bullet-style accomplishments in the weekly preview. Task status is personal progress tracking only; it does not mean supervisor approval or official school validation. Task time spent does not affect official rendered hours in v1.0.
 
