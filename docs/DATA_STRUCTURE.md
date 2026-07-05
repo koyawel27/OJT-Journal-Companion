@@ -18,6 +18,7 @@ Recommended IndexedDB object stores:
 - `companyProfile`
 - `ojtWeeks`
 - `dailyLogs`
+- `dailyTasks`
 - `photoAttachments`
 - `appSettings`
 
@@ -33,6 +34,7 @@ The v1.0 data model should include these main entities:
 - `CompanyProfile`
 - `OJTWeek`
 - `DailyLog`
+- `DailyTask`
 - `PhotoAttachment`
 - `AppSettings`
 - `BackupData`
@@ -117,7 +119,27 @@ Stores one daily OJT journal entry.
 
 For v1.0, daily logs should assume same-day time records only. Overnight shifts are out of scope unless added later.
 
-## 8. PhotoAttachment
+## 8. DailyTask
+
+Stores one structured task, work item, or bullet item under a daily log.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | string | Unique local ID. |
+| `dailyLogId` | string | ID of the related `DailyLog`. |
+| `description` | string | Task or work item description. |
+| `timeSpentMinutes` | number | Optional task-level time spent in minutes. This is documentation detail only. |
+| `status` | string | Personal task status: `Pending`, `In Progress`, or `Completed`. |
+| `notes` | string | Optional notes for the task item. |
+| `sortOrder` | number | Display order within the daily log. |
+| `createdAt` | string | ISO timestamp for when the task record was created. |
+| `updatedAt` | string | ISO timestamp for when the task record was last updated. |
+
+Daily tasks support bullet-style accomplishment records for each daily log. Task status is personal progress tracking only. It is not supervisor approval, official validation, grading, or submission status.
+
+`timeSpentMinutes` may be useful as task-level documentation detail, but official daily rendered hours should still come from the related `DailyLog` time in, time out, and break duration fields.
+
+## 9. PhotoAttachment
 
 Stores basic photo documentation information for a daily log.
 
@@ -134,7 +156,7 @@ Stores basic photo documentation information for a daily log.
 
 Photo storage needs testing because browser storage behavior and size limits vary across browsers and devices. v1.0 should store imported photo data in IndexedDB as a `Blob` or equivalent browser-supported file data, along with related metadata. v1.0 should support basic attach/import, metadata storage, and removal from a daily log. Advanced preview, gallery, compression, and image editing are not required for v1.0.
 
-## 9. AppSettings
+## 10. AppSettings
 
 Stores simple local preferences for the app.
 
@@ -148,7 +170,7 @@ Stores simple local preferences for the app.
 
 Settings should stay minimal in v1.0.
 
-## 10. BackupData Format
+## 11. BackupData Format
 
 JSON export should include all data needed to restore the local app state.
 
@@ -161,6 +183,7 @@ JSON export should include all data needed to restore the local app state.
 | `companyProfile` | object or null | The saved `CompanyProfile` record. |
 | `weeks` | array | List of `OJTWeek` records. |
 | `dailyLogs` | array | List of `DailyLog` records. |
+| `dailyTasks` | array | List of `DailyTask` records. |
 | `photoAttachments` | array | List of `PhotoAttachment` records. |
 | `appSettings` | object or null | The saved `AppSettings` record. |
 
@@ -172,7 +195,7 @@ A future ZIP backup may be better for photo-heavy data because photos can remain
 
 For v1.0, importing a JSON backup should replace the current local app data after user confirmation. The app should not try to merge two backups or resolve import conflicts in v1.0.
 
-## 11. Relationships Between Data
+## 12. Relationships Between Data
 
 The data relationships should stay simple:
 
@@ -182,18 +205,21 @@ The data relationships should stay simple:
 - One app can have many `OJTWeek` records.
 - One `OJTWeek` can have many `DailyLog` records.
 - One `DailyLog` belongs to one `OJTWeek` through `weekId`.
+- One `DailyLog` can have many `DailyTask` records.
+- One `DailyTask` belongs to one `DailyLog` through `dailyLogId`.
 - One `DailyLog` can have many `PhotoAttachment` records.
 - One `PhotoAttachment` belongs to one `DailyLog` through `dailyLogId`.
 
-`OJTWeek` should group daily logs by `weekId`. `PhotoAttachment` should belong to a `DailyLog`.
+`OJTWeek` should group daily logs by `weekId`. `DailyTask` and `PhotoAttachment` should belong to a `DailyLog`.
 
 Deletion behavior should be simple and predictable:
 
-- Deleting an `OJTWeek` should also delete or require deletion of its related `DailyLog` records and `PhotoAttachment` records.
-- Deleting a `DailyLog` should also delete its related `PhotoAttachment` records.
+- Deleting an `OJTWeek` should also delete or require deletion of its related `DailyLog`, `DailyTask`, and `PhotoAttachment` records.
+- Deleting a `DailyLog` should also delete its related `DailyTask` and `PhotoAttachment` records.
+- Deleting a `DailyTask` should not delete the related `DailyLog`.
 - Deleting a `PhotoAttachment` should not delete the related `DailyLog`.
 
-## 12. Required Calculated Values
+## 13. Required Calculated Values
 
 These values should be calculated by the app:
 
@@ -206,12 +232,13 @@ These values should be calculated by the app:
 - Remaining OJT hours, if `requiredOjtHours` is set
 
 Daily rendered minutes should use `timeIn`, `timeOut`, and `breakMinutes`. Daily rendered hours should be derived from rendered minutes for display.
+`DailyTask.timeSpentMinutes` may be summed for reference only. If the task time total differs from the daily log's `renderedMinutes`, the app may show a soft warning later, but it should not block saving in v1.0.
 
 Weekly total hours should be calculated from `DailyLog` records linked to the same `weekId`. It should not be manually typed into the `OJTWeek` record.
 
 Total rendered hours should be calculated from all saved `DailyLog` records.
 
-## 13. Validation Rules
+## 14. Validation Rules
 
 Basic validation should help prevent incomplete or confusing records.
 
@@ -231,6 +258,10 @@ Basic validation should help prevent incomplete or confusing records.
 - v1.0 assumes same-day time logs only; overnight shifts are out of scope unless added later.
 - `renderedMinutes` should not be negative.
 - `renderedHours` should not be negative.
+- `dailyLogId` should refer to an existing `DailyLog` for each daily task.
+- `DailyTask.description` should not be empty.
+- `DailyTask.status` should be one of `Pending`, `In Progress`, or `Completed`.
+- `DailyTask.timeSpentMinutes` should be zero or a positive number.
 - `dailyLogId` should refer to an existing `DailyLog` for each photo attachment.
 - `fileSize` should be zero or a positive number.
 - Photo files should be limited to supported image types such as JPEG, PNG, or WebP.
@@ -238,7 +269,7 @@ Basic validation should help prevent incomplete or confusing records.
 
 Validation should stay beginner-friendly and practical. It should guide the student without adding complex approval workflows.
 
-## 14. Important Storage Notes
+## 15. Important Storage Notes
 
 IndexedDB stores data inside the browser on the local device. Offline-first does not mean automatic cross-device sync.
 
@@ -258,7 +289,7 @@ For v1.0, JSON import/restore should replace the current local app data after us
 
 The data model should avoid unnecessary tables or entities. v1.0 should stay focused on one student's journal records.
 
-## 15. v1.0 Data Boundaries
+## 16. v1.0 Data Boundaries
 
 The v1.0 data structure should not include:
 

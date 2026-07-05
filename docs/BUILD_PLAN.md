@@ -183,7 +183,7 @@ Move on only when weeks can be created, edited, listed, and loaded reliably.
 
 ### Goal
 
-Let the student create, edit, and delete daily OJT logs under a selected week.
+Let the student create, edit, and delete daily OJT logs under a selected week and capture structured task/work items for each daily log.
 
 ### Files Likely Affected
 
@@ -191,6 +191,7 @@ Let the student create, edit, and delete daily OJT logs under a selected week.
 - `app/assets/js/db.js`
 - `app/assets/js/storage.js`
 - `app/assets/js/daily-logs.js`
+- `app/assets/js/daily-tasks.js`
 - `app/assets/js/weeks.js`
 - `app/assets/js/ui.js`
 - `app/assets/css/styles.css`
@@ -198,26 +199,40 @@ Let the student create, edit, and delete daily OJT logs under a selected week.
 ### Tasks
 
 - Add storage functions for `DailyLog`.
+- Add storage functions for `DailyTask`.
 - Build daily log form.
-- Allow selecting a week for the log.
-- Add fields for entry date, time in, time out, break minutes, activities, learnings, challenges, and notes.
+- Allow creating, editing, and deleting daily logs under a selected week or Phase 3 day slot.
+- Preserve the date/day slot connection from Phase 3.
+- Add fields for entry date, time in, time out, break minutes, learnings, challenges, and notes.
+- Add structured task/work items under a daily log.
+- Allow adding, editing, and deleting task items.
+- Include task description, optional task time spent in minutes, personal task status, optional task notes, and ordering when practical.
+- Use task status values: `Pending`, `In Progress`, and `Completed`.
+- Keep task status personal only; it should not represent supervisor approval or official validation.
 - Use `YYYY-MM-DD` for entry date.
 - Use `HH:mm` for time fields.
 - List logs by selected week.
 - Add edit and delete controls.
 - Add confirmation before deleting a daily log.
+- Prepare for Phase 5 time calculation while keeping official rendered hours based on daily log time fields, not task time totals.
 
 ### Manual Testing Checklist
 
-- User can create a daily log under a week.
+- User can create a daily log under a week/day slot.
 - User can edit a daily log.
 - User can delete a daily log.
 - Daily logs remain linked to the correct week.
+- User can add multiple task items under a daily log.
+- User can edit a task item.
+- User can change task status.
+- User can delete a task item.
+- Task items remain after refresh.
+- Task items stay linked to the correct daily log.
 - Saved logs appear after refresh.
 
 ### Stop Condition Before Next Phase
 
-Move on only when daily logs can be created, edited, deleted, and listed by week.
+Move on only when daily logs and related task items can be created, edited, deleted, listed by week/day slot, and loaded reliably after refresh.
 
 ## 8. Phase 5: Time Calculation
 
@@ -461,7 +476,7 @@ v1.0 is ready for broader personal testing when the main workflows work offline,
 | Phase 1 | Static layout, navigation, responsive basics |
 | Phase 2 | Student profile, company profile, settings persistence |
 | Phase 3 | Week creation, editing, uniqueness, date validation |
-| Phase 4 | Daily log create, edit, delete, week linking |
+| Phase 4 | Daily log create, edit, delete, week/day slot linking, and structured task item management |
 | Phase 5 | Daily and weekly rendered time calculations |
 | Phase 6 | Weekly summary save and load |
 | Phase 7 | Weekly preview generation and copy output |

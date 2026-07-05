@@ -31,18 +31,37 @@ No login or account setup should be required.
 The daily log workflow is the main record-keeping flow for the student.
 
 1. User selects an existing week or creates a new week.
-2. User creates a daily log under that week.
+2. User creates or opens a daily log under that week.
 3. User enters the entry date.
 4. User enters time in, time out, and break minutes.
-5. User writes activities or accomplishments.
-6. User may write learnings, challenges, and notes.
-7. App validates required fields.
-8. App calculates rendered minutes and displayed rendered hours.
-9. App saves the daily log locally using IndexedDB.
+5. User writes general daily notes, learnings, and challenges as needed.
+6. User adds one or more structured task/work items under the daily log.
+7. Each task item may include a description, optional time spent, personal status, and notes.
+8. App validates required fields.
+9. App calculates rendered minutes and displayed rendered hours from the daily log time fields.
+10. App saves the daily log and related task items locally using IndexedDB.
 
-Daily logs should belong to an `OJTWeek` through `weekId`.
+Daily logs should belong to an `OJTWeek` through `weekId`. Daily task/work items should belong to a `DailyLog` through `dailyLogId`.
 
-## 4. Time Calculation Workflow
+Task items can later be used as bullet-style accomplishments in the weekly preview. Task status is personal progress tracking only; it does not mean supervisor approval or official school validation. Task time spent does not affect official rendered hours in v1.0.
+
+## 4. Daily Task Item Workflow
+
+The daily task item workflow captures structured work bullets under one daily log.
+
+1. User opens or creates a daily log.
+2. User adds a task or work item description.
+3. User optionally adds task-level time spent in minutes.
+4. User chooses a personal status: `Pending`, `In Progress`, or `Completed`.
+5. User optionally adds task notes.
+6. User may edit task details.
+7. User may change task status.
+8. User may reorder task items if practical.
+9. User may delete a task item.
+10. App saves task items locally using IndexedDB.
+
+Task status is for personal progress tracking only. It is not supervisor approval, official validation, grading, or submission status. Task-level time spent is documentation detail only and should not be used as the official rendered hours calculation source.
+## 5. Time Calculation Workflow
 
 The time calculation workflow keeps daily and weekly rendered hours consistent.
 
@@ -57,7 +76,7 @@ The time calculation workflow keeps daily and weekly rendered hours consistent.
 
 v1.0 assumes same-day time logs only. Overnight shifts are out of scope unless added later.
 
-## 5. Weekly Journal Workflow
+## 6. Weekly Journal Workflow
 
 The weekly journal workflow helps the student prepare the weekly content required for manual transfer into the official school journal template.
 
@@ -72,7 +91,7 @@ The weekly journal workflow helps the student prepare the weekly content require
 
 Weekly total rendered time should be calculated from `DailyLog` records linked to the selected week. It should not be manually typed into the week record.
 
-## 6. Photo Documentation Workflow
+## 7. Photo Documentation Workflow
 
 The photo documentation workflow supports basic local photo documentation for daily logs.
 
@@ -96,7 +115,7 @@ Advanced preview, gallery viewing, compression, and image editing are not requir
 
 Downloading all photos as a ZIP is future work and is not required for v1.0.
 
-## 7. Weekly Preview and Copy Workflow
+## 8. Weekly Preview and Copy Workflow
 
 The weekly preview and copy workflow helps the student prepare content before manually transferring it into the official school template.
 
@@ -105,16 +124,17 @@ The weekly preview and copy workflow helps the student prepare content before ma
 3. App gathers company profile data.
 4. App gathers week details, including inclusive dates.
 5. App gathers daily logs under the week.
-6. App gathers weekly summary fields.
-7. App calculates total rendered hours for the week.
-8. App generates a weekly journal preview.
-9. User reviews the prepared content.
-10. User copies or exports the content.
-11. User manually transfers the content into the official school journal template.
+6. App gathers related daily task/work items for bullet-style accomplishments.
+7. App gathers weekly summary fields.
+8. App calculates total rendered hours for the week.
+9. App generates a weekly journal preview.
+10. User reviews the prepared content.
+11. User copies or exports the content.
+12. User manually transfers the content into the official school journal template.
 
 The app should support copy-ready weekly journal content. It should not submit the journal online or replace the official school template.
 
-## 8. Backup Export Workflow
+## 9. Backup Export Workflow
 
 The backup export workflow helps protect local offline data.
 
@@ -123,16 +143,17 @@ The backup export workflow helps protect local offline data.
 3. App gathers company profile data.
 4. App gathers weeks.
 5. App gathers daily logs.
-6. App gathers photo attachments.
-7. App gathers app settings.
-8. App creates a JSON backup.
-9. User saves the backup file manually.
+6. App gathers daily task items.
+7. App gathers photo attachments.
+8. App gathers app settings.
+9. App creates a JSON backup.
+10. User saves the backup file manually.
 
 The JSON backup should include photo metadata. If photo data is included, it may need to be converted to Base64, which can make the backup file large.
 
 A future ZIP backup may be better for photo-heavy data, but ZIP export is not required for v1.0.
 
-## 9. Backup Restore Workflow
+## 10. Backup Restore Workflow
 
 The backup restore workflow replaces the current local app data with a selected backup.
 
@@ -146,7 +167,7 @@ The backup restore workflow replaces the current local app data with a selected 
 
 Merge behavior and import conflict handling are out of scope for v1.0.
 
-## 10. Edit and Delete Workflow
+## 11. Edit and Delete Workflow
 
 The edit and delete workflow lets the student correct records while keeping related data understandable.
 
@@ -156,18 +177,20 @@ The user can edit:
 - Company profile records
 - Weeks
 - Daily logs
+- Daily task/work items
 - Weekly summary fields
 - Photo captions
 
 Deletion behavior should be simple:
 
 - Deleting a week should also delete or require deletion of related daily logs and photos.
-- Deleting a daily log should also delete related photos.
+- Deleting a daily log should also delete related task items and photos.
+- Deleting a task item should not delete the daily log.
 - Deleting a photo should not delete the daily log.
 
 Before deleting larger records such as weeks or daily logs, the app should warn the user about related records that will also be removed.
 
-## 11. Offline Use Workflow
+## 12. Offline Use Workflow
 
 The offline use workflow describes how the app should behave as a local-first tool.
 
@@ -183,7 +206,7 @@ Data stays on the current device and browser. Offline-first does not mean automa
 
 The user must export backups to protect data, especially before clearing browser storage, changing devices, or doing browser maintenance.
 
-## 12. v1.0 Workflow Boundaries
+## 13. v1.0 Workflow Boundaries
 
 The v1.0 workflows should not include:
 

@@ -18,6 +18,8 @@ These features are required for the first usable version.
 - Automatic weekly rendered hours calculation
 - Weekly grouping for daily logs
 - Daily activities and accomplishments
+- Structured daily task/work items under daily logs
+- Task description, optional task time spent, personal status, optional notes, and task ordering when practical
 - Basic photo documentation support for daily logs
 - Attach or import photo documentation for a daily log
 - Store related photo metadata locally
@@ -50,6 +52,7 @@ These features would improve the experience, but v1.0 can still work without the
 - Photo preview
 - Draft status indicators
 - Export as plain text or Markdown
+- Bullet-style task output in weekly journal previews
 
 ## 5. Future Features
 
@@ -88,6 +91,7 @@ These features are outside the v1.0 direction and should not be built yet.
 | Student profile | Must-have | Required | Used for journal identity and output context. |
 | Company profile | Must-have | Required | Stores OJT placement context. |
 | Daily logs | Must-have | Required | Main record for daily OJT activity. |
+| Daily task/work items | Must-have | Required | Lets the student record multiple task or accomplishment bullets under a daily log, with optional task time, personal status, notes, and ordering when practical. |
 | Time records | Must-have | Required | Includes time in, time out, and break duration. |
 | Daily hours calculation | Must-have | Required | Calculates rendered hours for each daily log. |
 | Weekly hours calculation | Must-have | Required | Totals rendered hours by week. |
@@ -120,11 +124,12 @@ The v1.0 MVP is complete when one student can use the app locally to:
 4. Automatically calculate daily and weekly rendered hours.
 5. Group daily logs by week.
 6. Write daily activities and accomplishments.
-7. Attach or record basic photo documentation for daily logs.
-8. Prepare weekly skills learned, problems encountered, and reflection or points of learning.
-9. Preview and copy weekly journal content for manual transfer to the official school template.
-10. Store data locally using IndexedDB.
-11. Export and restore data using JSON backup files.
+7. Add structured task/work items under a daily log for bullet-style accomplishments.
+8. Attach or record basic photo documentation for daily logs.
+9. Prepare weekly skills learned, problems encountered, and reflection or points of learning.
+10. Preview and copy weekly journal content for manual transfer to the official school template.
+11. Store data locally using IndexedDB.
+12. Export and restore data using JSON backup files.
 
 ## 9. Feature Notes and Boundaries
 
@@ -139,5 +144,12 @@ Photo documentation should be included carefully. Imported photos, photo records
 Advanced photo features such as preview, compression, gallery viewing, or image editing are not required for v1.0. Photo preview may remain a nice-to-have feature, while compression and richer image handling should be treated as future work.
 
 Weekly journal output should focus on helping the student prepare content for manual transfer into the official school journal template. The app should not submit journals online or replace official school forms.
+
+
+Structured daily task/work items should support multiple task or accomplishment bullets under one daily log. Each task item may include a description, optional task-level time spent, personal status (`Pending`, `In Progress`, or `Completed`), optional notes, and display ordering when practical. These task items can later support bullet-style output in the weekly journal preview.
+
+Task status is personal progress tracking only. It is not supervisor approval, official school validation, grading status, or submission status.
+
+Daily rendered hours should still come from the daily log's time in, time out, and break duration. Task-level time spent is only documentation detail and should not become the official rendered hours calculation source in v1.0.
 
 The project should remain lightweight and personal-first. Avoid features that require user accounts, servers, supervisors, administrators, coordinators, attendance tracking systems, or school-wide deployment.
