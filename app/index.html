@@ -89,6 +89,23 @@
             This area will later show a quick overview of OJT progress, recent journal activity,
             and helpful reminders for keeping records complete.
           </p>
+          <div class="dashboard-summary" aria-live="polite">
+            <article class="summary-card">
+              <span class="card-label">Student</span>
+              <strong id="summary-student-name">Not set yet</strong>
+              <p id="summary-student-detail">Save your student profile to show it here.</p>
+            </article>
+            <article class="summary-card">
+              <span class="card-label">Company</span>
+              <strong id="summary-company-name">Not set yet</strong>
+              <p id="summary-company-detail">Save your company profile to show it here.</p>
+            </article>
+            <article class="summary-card">
+              <span class="card-label">Settings</span>
+              <strong id="summary-settings">Default setup</strong>
+              <p id="summary-required-hours">Required OJT hours will appear after saving.</p>
+            </article>
+          </div>
           <div class="placeholder-grid" aria-label="Future dashboard summaries">
             <article class="placeholder-card">
               <span class="card-label">Planned</span>
@@ -103,17 +120,127 @@
           </div>
         </section>
 
-        <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
-          <p class="section-kicker">Student and company details</p>
+                <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
+          <p class="section-kicker">Student, company, and settings</p>
           <h2 id="profile-title">Profile</h2>
           <p>
-            This section will later contain student profile and company placement fields used
-            for journal identity and weekly output context.
+            Save the basic details that identify your OJT journal. This phase stores only your
+            student profile, company profile, and simple app settings on this browser.
           </p>
-          <div class="placeholder-card">
-            <span class="card-label">Coming in Phase 2</span>
-            <h3>Profile setup</h3>
-            <p>Student name, school details, company information, and required OJT hours will be added here.</p>
+
+          <div class="form-stack">
+            <form class="profile-form" id="student-profile-form" novalidate>
+              <div class="form-header">
+                <div>
+                  <span class="card-label">Student profile</span>
+                  <h3>Student details</h3>
+                </div>
+                <p>Used later for journal identity and prepared output.</p>
+              </div>
+
+              <div class="form-grid">
+                <label class="field">
+                  <span>Student name</span>
+                  <input type="text" id="student-name" autocomplete="name" required>
+                </label>
+                <label class="field">
+                  <span>Course or program</span>
+                  <input type="text" id="course-or-program">
+                </label>
+                <label class="field">
+                  <span>School or institution</span>
+                  <input type="text" id="school-or-institution">
+                </label>
+                <label class="field">
+                  <span>Section or year level</span>
+                  <input type="text" id="section-or-year-level">
+                </label>
+                <label class="field">
+                  <span>Required OJT hours</span>
+                  <input type="number" id="required-ojt-hours" min="0" step="1" inputmode="decimal" placeholder="0">
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button class="primary-button" type="submit">Save student profile</button>
+                <p class="form-message" id="student-profile-message" hidden></p>
+              </div>
+            </form>
+
+            <form class="profile-form" id="company-profile-form" novalidate>
+              <div class="form-header">
+                <div>
+                  <span class="card-label">Company profile</span>
+                  <h3>OJT placement</h3>
+                </div>
+                <p>Stores the company context for this personal journal.</p>
+              </div>
+
+              <div class="form-grid">
+                <label class="field field-wide">
+                  <span>Company name</span>
+                  <input type="text" id="company-name" required>
+                </label>
+                <label class="field field-wide">
+                  <span>Company address</span>
+                  <textarea id="company-address" rows="3"></textarea>
+                </label>
+                <label class="field">
+                  <span>Department or assigned area</span>
+                  <input type="text" id="department-or-assigned-area">
+                </label>
+                <label class="field">
+                  <span>Supervisor name</span>
+                  <input type="text" id="supervisor-name">
+                </label>
+                <label class="field">
+                  <span>Supervisor contact</span>
+                  <input type="text" id="supervisor-contact">
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button class="primary-button" type="submit">Save company profile</button>
+                <p class="form-message" id="company-profile-message" hidden></p>
+              </div>
+            </form>
+
+            <form class="profile-form" id="app-settings-form" novalidate>
+              <div class="form-header">
+                <div>
+                  <span class="card-label">Settings</span>
+                  <h3>Simple preferences</h3>
+                </div>
+                <p>Small defaults that will guide future journal organization.</p>
+              </div>
+
+              <div class="form-grid">
+                <label class="field">
+                  <span>Preferred week start day</span>
+                  <select id="preferred-week-start-day">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Time format</span>
+                  <select id="time-format">
+                    <option value="24-hour">24-hour</option>
+                    <option value="12-hour">12-hour</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-actions">
+                <button class="primary-button" type="submit">Save settings</button>
+                <p class="form-message" id="app-settings-message" hidden></p>
+              </div>
+            </form>
           </div>
         </section>
 
@@ -249,6 +376,11 @@
     </nav>
   </aside>
 
+  <script src="assets/js/db.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/ui.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/profile.js"></script>
 </body>
 </html>
+
