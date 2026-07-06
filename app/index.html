@@ -341,13 +341,34 @@
           <p class="section-kicker">Prepared journal content</p>
           <h2 id="weekly-preview-title">Weekly Preview</h2>
           <p>
-            This section will later show copy-ready weekly journal content for manual transfer
+            Select a saved week to review copy-ready weekly journal content for manual transfer
             into the official school journal template.
           </p>
-          <div class="placeholder-card">
-            <span class="card-label">Planned</span>
-            <h3>Preview area</h3>
-            <p>Future output will combine profile details, weekly summaries, daily logs, and rendered hours.</p>
+
+          <div class="weekly-preview-layout">
+            <section class="week-panel" aria-labelledby="weekly-preview-controls-title">
+              <div class="panel-header">
+                <div>
+                  <span class="card-label">Weekly journal</span>
+                  <h3 id="weekly-preview-controls-title">Choose a saved week</h3>
+                </div>
+                <p id="weekly-preview-help">Preview and copy prepared journal text.</p>
+              </div>
+
+              <label class="field">
+                <span>OJT week</span>
+                <select id="weekly-preview-week-select"></select>
+              </label>
+
+              <div class="form-actions">
+                <button class="primary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
+                <p class="form-message" id="weekly-preview-message" hidden></p>
+              </div>
+            </section>
+
+            <div class="weekly-preview-output" id="weekly-preview-output" aria-live="polite">
+              <p class="empty-state">Choose a saved week to generate a weekly journal preview.</p>
+            </div>
           </div>
         </section>
 
@@ -449,5 +470,6 @@
   <script src="assets/js/profile.js"></script>
   <script src="assets/js/weeks.js"></script>
   <script src="assets/js/daily-logs.js"></script>
+  <script src="assets/js/journal-preview.js"></script>
 </body>
 </html>
