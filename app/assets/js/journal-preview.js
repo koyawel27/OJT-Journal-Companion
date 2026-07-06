@@ -5,7 +5,6 @@
     weeks: [],
     dailyLogs: [],
     dailyTasks: [],
-    photoAttachments: [],
     selectedWeekId: "",
     copyText: ""
   };
@@ -77,32 +76,8 @@
     return sortTasks(state.dailyTasks.filter((task) => task.dailyLogId === dailyLogId));
   }
 
-  function getPhotoCountForLog(dailyLogId) {
-    return state.photoAttachments.filter((photo) => photo.dailyLogId === dailyLogId).length;
-  }
-
-  function getPhotosForLog(dailyLogId) {
-    return state.photoAttachments.filter((photo) => photo.dailyLogId === dailyLogId);
-  }
-
   function normalizeDayStatus(value) {
     return window.OJTCalculations.normalizeDayStatus(value);
-  }
-
-  function normalizePhotoCategory(value) {
-    return window.OJTPhotos.normalizePhotoCategory(value);
-  }
-
-  function getPhotoCategorySummary(dailyLogId) {
-    const categoryCounts = getPhotosForLog(dailyLogId).reduce((summary, photo) => {
-      const category = normalizePhotoCategory(photo.photoCategory);
-      summary[category] = (summary[category] || 0) + 1;
-      return summary;
-    }, {});
-
-    return Object.entries(categoryCounts)
-      .map(([category, count]) => `${category}: ${count}`)
-      .join(", ");
   }
 
   function getWeekDates(week) {
@@ -122,22 +97,43 @@
     return dates;
   }
 
-  function getTaskText(task) {
-    const parts = [task.description];
+  function formatTaskDuration(minutesValue) {
+    const minutes = Number(minutesValue);
 
-    if (Number(task.timeSpentMinutes) > 0) {
-      parts.push(`${task.timeSpentMinutes} min`);
+    if (!Number.isFinite(minutes) || minutes <= 0) {
+      return "";
     }
 
-    if (task.status) {
-      parts.push(task.status);
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours > 0 && remainingMinutes > 0) {
+      return `${hours}h ${remainingMinutes}m`;
     }
 
-    if (task.notes) {
-      parts.push(task.notes);
+    if (hours > 0) {
+      return `${hours}h`;
     }
 
-    return parts.filter(Boolean).join(" - ");
+    return `${remainingMinutes}m`;
+  }
+
+  function getTaskBulletText(task) {
+    const description = String(task?.description || "").trim();
+
+    if (!description) {
+      return "";
+    }
+
+    const duration = formatTaskDuration(task.timeSpentMinutes);
+    const status = String(task?.status || "").trim();
+    let text = duration ? `${description} (${duration})` : description;
+
+    if (status) {
+      text += ` - ${status}`;
+    }
+
+    return text;
   }
 
   function renderProfileWarnings() {
@@ -163,15 +159,37 @@
   }
 
   function renderTaskBullets(tasks) {
-    if (tasks.length === 0) {
-      return '<p class="empty-state">No task/work items recorded.</p>';
+    const taskBullets = tasks.map(getTaskBulletText).filter(Boolean);
+
+    if (taskBullets.length === 0) {
+      return '<p class="empty-state">No task items recorded for this day.</p>';
     }
 
     return `
       <ul class="preview-task-list">
-        ${tasks.map((task) => `<li>${escapeHtml(getTaskText(task))}</li>`).join("")}
+        ${taskBullets
+          .map((taskText) => `<li>${escapeHtml(taskText)}</li>`)
+          .join("")}
       </ul>
     `;
+  }
+
+  function renderDailyAccomplishment(dailyLog, tasks) {
+    if (!dailyLog) {
+      return '<p class="empty-state">No daily log recorded.</p>';
+    }
+
+    const dayStatus = normalizeDayStatus(dailyLog.dayStatus);
+    const remarks = String(dailyLog.dayRemarks || "").trim();
+
+    if (dayStatus === "Absent" || dayStatus === "No OJT / Rest Day") {
+      return `
+        <p class="preview-status-line">${escapeHtml(dayStatus)}</p>
+        ${remarks ? `<p class="preview-day-remarks">${escapeHtml(remarks)}</p>` : ""}
+      `;
+    }
+
+    return renderTaskBullets(tasks);
   }
 
   function renderDailyRows(week) {
@@ -189,18 +207,7 @@
     return dates.map((dateText, index) => {
       const dailyLog = getDailyLogForDate(week.id, dateText);
       const tasks = dailyLog ? getTasksForLog(dailyLog.id) : [];
-      const photoCount = dailyLog ? getPhotoCountForLog(dailyLog.id) : 0;
       const dayStatus = dailyLog ? normalizeDayStatus(dailyLog.dayStatus) : "";
-      const categorySummary = dailyLog ? getPhotoCategorySummary(dailyLog.id) : "";
-      const workHtml = dailyLog
-        ? renderTaskBullets(tasks)
-        : '<p class="empty-state">No daily log recorded.</p>';
-      const photoText = dailyLog
-        ? `<p class="preview-photo-count">Photo documentation: ${photoCount === 1 ? "1 attached" : `${photoCount} attached`}.${categorySummary ? ` ${escapeHtml(categorySummary)}.` : ""}</p>`
-        : "";
-      const remarksText = dailyLog?.dayRemarks
-        ? `<p class="preview-day-remarks">Remarks: ${escapeHtml(dailyLog.dayRemarks)}</p>`
-        : "";
 
       return `
         <div class="preview-table-row">
@@ -209,10 +216,18 @@
             <span>${escapeHtml(dateText)}</span>
             ${dayStatus ? `<span>${escapeHtml(dayStatus)}</span>` : ""}
           </div>
-          <div class="preview-work-cell">${workHtml}${remarksText}${photoText}</div>
+          <div class="preview-work-cell">${renderDailyAccomplishment(dailyLog, tasks)}</div>
         </div>
       `;
     }).join("");
+  }
+
+  function renderDailyLogEmptyNote(week) {
+    if (getLogsForWeek(week.id).length > 0) {
+      return "";
+    }
+
+    return '<p class="empty-state preview-empty-note">No daily logs are saved for this week yet.</p>';
   }
 
   function getWeekTotalText(week) {
@@ -220,12 +235,19 @@
   }
 
   function renderSummarySection(title, content) {
+    const summaryText = getSummaryText(content);
+    const isEmpty = !String(content || "").trim();
+
     return `
       <section class="preview-section-block">
         <h4>${escapeHtml(title)}</h4>
-        <p>${escapeHtml(content || "Not filled in yet.")}</p>
+        <p class="${isEmpty ? "empty-state" : ""}">${escapeHtml(summaryText)}</p>
       </section>
     `;
+  }
+
+  function getSummaryText(value) {
+    return String(value || "").trim() || "Not filled in yet.";
   }
 
   function buildPlainText(week) {
@@ -237,7 +259,7 @@
     lines.push(`Week Number: ${week.weekNumber || "Not set"}`);
     lines.push(`Inclusive Dates: ${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
     lines.push("");
-    lines.push("Daily Accomplishments:");
+    lines.push("DAILY ACCOMPLISHMENTS");
 
     if (dates.length === 0) {
       lines.push("No inclusive date range saved for this week.");
@@ -246,9 +268,8 @@
     dates.forEach((dateText, index) => {
       const dailyLog = getDailyLogForDate(week.id, dateText);
       const tasks = dailyLog ? getTasksForLog(dailyLog.id) : [];
-      const photoCount = dailyLog ? getPhotoCountForLog(dailyLog.id) : 0;
-      const categorySummary = dailyLog ? getPhotoCategorySummary(dailyLog.id) : "";
 
+      lines.push("");
       lines.push(`Day ${index + 1} - ${dateText}`);
 
       if (!dailyLog) {
@@ -256,40 +277,36 @@
         return;
       }
 
-      lines.push(`Status: ${normalizeDayStatus(dailyLog.dayStatus)}`);
+      const dayStatus = normalizeDayStatus(dailyLog.dayStatus);
+      const remarks = String(dailyLog.dayRemarks || "").trim();
 
-      if (tasks.length === 0) {
-        lines.push("- No task/work items recorded.");
+      if (dayStatus === "Absent" || dayStatus === "No OJT / Rest Day") {
+        lines.push(`- ${dayStatus}${remarks ? ` - ${remarks}` : ""}`);
+        return;
+      }
+
+      const taskBullets = tasks.map(getTaskBulletText).filter(Boolean);
+
+      if (taskBullets.length === 0) {
+        lines.push("- No task items recorded for this day.");
       } else {
-        tasks.forEach((task) => {
-          lines.push(`- ${getTaskText(task)}`);
+        taskBullets.forEach((taskText) => {
+          lines.push(`- ${taskText}`);
         });
       }
-
-      if (dailyLog.dayRemarks) {
-        lines.push(`Remarks: ${dailyLog.dayRemarks}`);
-      }
-
-      lines.push(`Photo documentation: ${photoCount === 1 ? "1 attached" : `${photoCount} attached`}.${categorySummary ? ` ${categorySummary}.` : ""}`);
     });
 
     lines.push("");
-    lines.push(`Total Weekly Hours Rendered: ${getWeekTotalText(week)}`);
+    lines.push(`Total weekly Hours Rendered: ${getWeekTotalText(week)}`);
     lines.push("");
     lines.push("Skills Learned:");
-    lines.push(week.weeklySkillsLearned || "Not filled in yet.");
+    lines.push(getSummaryText(week.weeklySkillsLearned));
     lines.push("");
     lines.push("Problems Encountered:");
-    lines.push(week.problemsEncountered || "Not filled in yet.");
+    lines.push(getSummaryText(week.problemsEncountered));
     lines.push("");
-    lines.push("Reflection / Points of Learning:");
-    lines.push(week.reflectionOrPointsOfLearning || "Not filled in yet.");
-
-    if (week.additionalNotes) {
-      lines.push("");
-      lines.push("Additional Notes:");
-      lines.push(week.additionalNotes);
-    }
+    lines.push("Reflection (Points of Learning):");
+    lines.push(getSummaryText(week.reflectionOrPointsOfLearning));
 
     return lines.join("\n");
   }
@@ -312,7 +329,6 @@
       return;
     }
 
-    const hasAdditionalNotes = Boolean(String(week.additionalNotes || "").trim());
     state.copyText = buildPlainText(week);
     copyButton.disabled = false;
 
@@ -338,26 +354,26 @@
           </div>
         </div>
 
-        <section class="preview-section-block">
+        <section class="preview-section-block preview-accomplishments-section">
           <h4>Daily Accomplishments</h4>
+          ${renderDailyLogEmptyNote(week)}
           <div class="preview-table">
             <div class="preview-table-header">
-              <div>Day / Date</div>
-              <div>Task / Work / Accomplishment Bullets</div>
+              <div>Day</div>
+              <div>Daily Accomplishments</div>
             </div>
             ${renderDailyRows(week)}
           </div>
         </section>
 
         <section class="preview-total-row">
-          <span>Total Weekly Hours Rendered</span>
+          <span>Total weekly Hours Rendered</span>
           <strong>${escapeHtml(getWeekTotalText(week))}</strong>
         </section>
 
         ${renderSummarySection("Skills Learned", week.weeklySkillsLearned)}
         ${renderSummarySection("Problems Encountered", week.problemsEncountered)}
-        ${renderSummarySection("Reflection / Points of Learning", week.reflectionOrPointsOfLearning)}
-        ${hasAdditionalNotes ? renderSummarySection("Additional Notes", week.additionalNotes) : ""}
+        ${renderSummarySection("Reflection (Points of Learning)", week.reflectionOrPointsOfLearning)}
       </article>
     `;
   }
@@ -435,13 +451,12 @@
 
   async function loadPreviewData() {
     try {
-      const [studentProfile, companyProfile, weeks, dailyLogs, dailyTasks, photoAttachments] = await Promise.all([
+      const [studentProfile, companyProfile, weeks, dailyLogs, dailyTasks] = await Promise.all([
         window.OJTStorage.getStudentProfile(),
         window.OJTStorage.getCompanyProfile(),
         window.OJTStorage.getWeeks(),
         window.OJTStorage.getDailyLogs(),
-        window.OJTStorage.getDailyTasks(),
-        window.OJTStorage.getPhotoAttachments()
+        window.OJTStorage.getDailyTasks()
       ]);
 
       state.studentProfile = studentProfile;
@@ -449,7 +464,6 @@
       state.weeks = weeks;
       state.dailyLogs = dailyLogs;
       state.dailyTasks = dailyTasks;
-      state.photoAttachments = photoAttachments;
 
       setWeekOptions();
       renderPreview();

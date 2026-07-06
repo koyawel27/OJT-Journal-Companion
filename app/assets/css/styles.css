@@ -773,23 +773,24 @@ h1 {
 }
 
 .journal-preview-card {
-  border: 1px solid var(--line);
+  border: 1px solid #cfd9d1;
   border-radius: 8px;
   background: var(--panel);
-  padding: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 28px rgba(24, 47, 37, 0.08);
 }
 
 .preview-info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid #cfd9d1;
+  border-radius: 6px;
   overflow: hidden;
 }
 
 .preview-info-grid div {
   min-width: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #cfd9d1;
   padding: 12px;
 }
 
@@ -798,7 +799,7 @@ h1 {
 }
 
 .preview-info-grid div:nth-child(odd) {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid #cfd9d1;
 }
 
 .preview-info-grid span,
@@ -824,8 +825,10 @@ h1 {
 
 .preview-section-block h4 {
   margin: 0 0 8px;
-  font-size: 1.05rem;
+  color: var(--accent);
+  font-size: 1.02rem;
   line-height: 1.25;
+  text-transform: uppercase;
 }
 
 .preview-section-block p {
@@ -834,9 +837,13 @@ h1 {
   white-space: pre-wrap;
 }
 
+.preview-empty-note {
+  margin-bottom: 10px;
+}
+
 .preview-table {
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid #cfd9d1;
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -862,11 +869,11 @@ h1 {
 
 .preview-table-header div:first-child,
 .preview-day-cell {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid #cfd9d1;
 }
 
 .preview-table-row + .preview-table-row {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid #cfd9d1;
 }
 
 .preview-day-cell strong,
@@ -889,10 +896,9 @@ h1 {
   margin-top: 6px;
 }
 
-.preview-photo-count {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
+.preview-status-line {
+  margin: 0;
+  color: var(--ink);
   font-weight: 700;
 }
 
