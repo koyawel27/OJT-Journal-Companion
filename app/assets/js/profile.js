@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const defaultSettings = {
     preferredWeekStartDay: "Monday",
     timeFormat: "24-hour"
@@ -59,11 +59,15 @@
   }
 
   function buildAppSettings() {
-    return {
+    const record = {
       preferredWeekStartDay: getValue("preferred-week-start-day") || defaultSettings.preferredWeekStartDay,
       timeFormat: getValue("time-format") || defaultSettings.timeFormat,
       ...buildTimestampFields(state.appSettings)
     };
+    if (state.appSettings && state.appSettings.lastBackupDate) {
+      record.lastBackupDate = state.appSettings.lastBackupDate;
+    }
+    return record;
   }
 
   function validateStudentProfile(profile) {
@@ -111,7 +115,10 @@
   }
 
   function populateSettingsForm(settings) {
-    const activeSettings = settings || defaultSettings;
+    const activeSettings = {
+      ...defaultSettings,
+      ...settings
+    };
     setValue("preferred-week-start-day", activeSettings.preferredWeekStartDay);
     setValue("time-format", activeSettings.timeFormat);
   }
@@ -209,5 +216,11 @@
   document.addEventListener("DOMContentLoaded", () => {
     bindProfileForms();
     loadProfileData();
+  });
+
+  document.addEventListener("ojt:backup-exported", (event) => {
+    if (event.detail && event.detail.settings) {
+      state.appSettings = event.detail.settings;
+    }
   });
 })();

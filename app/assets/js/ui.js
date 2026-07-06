@@ -107,6 +107,22 @@
       setText("summary-required-hours", "Required OJT hours will appear after saving.");
     }
 
+    const reminderElement = document.getElementById("dashboard-backup-reminder");
+    if (reminderElement) {
+      const lastBackup = appSettings?.lastBackupDate;
+      let showReminder = false;
+      if (!lastBackup) {
+        showReminder = true;
+      } else {
+        const lastBackupTime = new Date(lastBackup).getTime();
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        if (lastBackupTime < sevenDaysAgo) {
+          showReminder = true;
+        }
+      }
+      reminderElement.hidden = !showReminder;
+    }
+
     updateRenderedProgressSummary();
   }
 

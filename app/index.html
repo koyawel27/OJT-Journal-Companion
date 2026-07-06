@@ -116,6 +116,12 @@
               <p id="summary-daily-log-detail">Create daily logs after choosing a saved week.</p>
             </article>
           </div>
+          <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
+            <p class="reminder-text">
+              <strong>Backup Reminder:</strong> You haven't exported a backup in over 7 days. Your data is stored only in this browser.
+            </p>
+            <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
+          </div>
           <div class="placeholder-grid" aria-label="Future dashboard summaries">
             <article class="placeholder-card">
               <span class="card-label">Rendered time</span>

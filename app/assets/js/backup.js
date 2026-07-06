@@ -185,9 +185,40 @@
     window.OJTUI.clearFormMessage(messageElement);
 
     try {
+      const photoAttachments = await window.OJTStorage.getPhotoAttachments();
+      const totalRawBytes = photoAttachments.reduce((sum, photo) => sum + (photo.fileSize || 0), 0);
+      const estimatedBase64Bytes = totalRawBytes * 1.37;
+
+      if (estimatedBase64Bytes > 10 * 1024 * 1024) {
+        const formattedSize = window.OJTPhotos.formatFileSize(estimatedBase64Bytes);
+        const confirmed = window.confirm(
+          `This backup includes ${photoAttachments.length} photos (~${formattedSize} estimated). Large backups may take a moment. Continue?`
+        );
+        if (!confirmed) {
+          window.OJTUI.showFormMessage(messageElement, "Backup export cancelled.", "error");
+          return;
+        }
+      }
+
       const backupData = await buildBackupData();
       const fileName = `ojt-journal-companion-backup-${todayText()}.json`;
-      downloadTextFile(fileName, JSON.stringify(backupData, null, 2));
+      downloadTextFile(fileName, JSON.stringify(backupData));
+      
+      try {
+        const settings = await window.OJTStorage.getAppSettings() || {};
+        settings.lastBackupDate = new Date().toISOString();
+        const savedSettings = await window.OJTStorage.saveAppSettings(settings);
+        const studentProfile = await window.OJTStorage.getStudentProfile();
+        const companyProfile = await window.OJTStorage.getCompanyProfile();
+        window.OJTUI.updateDashboardSummary(studentProfile, companyProfile, savedSettings);
+
+        document.dispatchEvent(new CustomEvent("ojt:backup-exported", {
+          detail: { settings: savedSettings }
+        }));
+      } catch (settingsError) {
+        console.error("Could not save lastBackupDate:", settingsError);
+      }
+
       window.OJTUI.showFormMessage(messageElement, "Backup exported.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Backup could not be exported. Please try again.", "error");
@@ -236,7 +267,7 @@
       }
 
       const confirmed = window.confirm(
-        "Restore this backup? This will replace all current local OJT Journal Companion data in this browser."
+        "Restore this backup? This will replace ALL current local data.\n\nWe recommend exporting a backup of your current data first.\n\nContinue with restore?"
       );
 
       if (!confirmed) {
