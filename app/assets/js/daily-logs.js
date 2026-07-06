@@ -114,6 +114,40 @@
     return normalizeDayStatus(dailyLog?.dayStatus);
   }
 
+  function getDayStatusClass(dayStatus) {
+    const normalizedStatus = normalizeDayStatus(dayStatus);
+
+    if (normalizedStatus === "Worked") {
+      return "is-worked";
+    }
+
+    if (normalizedStatus === "Absent") {
+      return "is-absent";
+    }
+
+    return "is-rest";
+  }
+
+  function renderDayStatusBadge(dayStatus) {
+    const normalizedStatus = normalizeDayStatus(dayStatus);
+    return `<span class="day-status-badge ${getDayStatusClass(normalizedStatus)}">${escapeHtml(normalizedStatus)}</span>`;
+  }
+
+  function getRenderedTimeText(dailyLog) {
+    const dayStatus = getDailyLogStatus(dailyLog);
+    const renderedMinutes = Number(dailyLog?.renderedMinutes);
+
+    if (dayStatus !== "Worked") {
+      return formatRenderedTime(0);
+    }
+
+    if (Number.isFinite(renderedMinutes)) {
+      return formatRenderedTime(renderedMinutes);
+    }
+
+    return "Not calculated";
+  }
+
   function normalizePhotoCategory(value) {
     return window.OJTPhotos.normalizePhotoCategory(value);
   }
@@ -257,13 +291,20 @@
     return `
       <ul class="task-bullet-list">
         ${tasks.map((task) => {
-          const timeText = Number(task.timeSpentMinutes) > 0 ? ` (${task.timeSpentMinutes} min)` : "";
-          const notesText = task.notes ? `<span class="task-note"> — ${escapeHtml(task.notes)}</span>` : "";
+          const timeText = Number(task.timeSpentMinutes) > 0 ? `${task.timeSpentMinutes} min` : "No task time";
+          const notesText = task.notes ? `<p class="task-note">${escapeHtml(task.notes)}</p>` : "";
           return `
             <li class="task-bullet-item">
               <div class="task-bullet-content">
-                <strong>${escapeHtml(task.description)}</strong>${escapeHtml(timeText)}
-                <span class="status-pill">${escapeHtml(task.status)}</span>${notesText}
+                <div class="task-title-row">
+                  <strong>${escapeHtml(task.description)}</strong>
+                  <span class="status-pill">${escapeHtml(task.status)}</span>
+                </div>
+                <div class="task-meta-row">
+                  <span>${escapeHtml(timeText)}</span>
+                  <span>Documentation only</span>
+                </div>
+                ${notesText}
               </div>
               <div class="task-bullet-actions">
                 <button class="secondary-button" type="button" data-task-action="edit" data-task-id="${task.id}">Edit</button>
@@ -350,18 +391,21 @@
               ${photo.caption ? `<p class="photo-caption">${escapeHtml(photo.caption)}</p>` : '<p class="photo-caption empty-caption">No caption saved.</p>'}
             </div>
 
-            <form class="photo-caption-form" data-photo-caption-form data-photo-id="${escapeHtml(photo.id)}" novalidate>
-              <label class="field">
-                <span>Caption</span>
-                <textarea name="caption" rows="2">${escapeHtml(photo.caption)}</textarea>
-              </label>
-              <div class="form-actions">
-                <button class="secondary-button" type="submit">Save caption</button>
-                <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
-                <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
-                <p class="form-message" hidden></p>
-              </div>
-            </form>
+            <details class="photo-caption-details">
+              <summary>Edit caption and photo actions</summary>
+              <form class="photo-caption-form" data-photo-caption-form data-photo-id="${escapeHtml(photo.id)}" novalidate>
+                <label class="field">
+                  <span>Caption</span>
+                  <textarea name="caption" rows="2">${escapeHtml(photo.caption)}</textarea>
+                </label>
+                <div class="form-actions">
+                  <button class="secondary-button" type="submit">Save caption</button>
+                  <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
+                  <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
+                  <p class="form-message" hidden></p>
+                </div>
+              </form>
+            </details>
           </li>
         `).join("")}
       </ul>
@@ -530,21 +574,95 @@
     `;
   }
 
+  function renderDayCard(week, dateText, dayNumber, dailyLog) {
+    const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
+    const photos = dailyLog ? getPhotosForDailyLog(dailyLog.id) : [];
+    const dayStatus = dailyLog ? getDailyLogStatus(dailyLog) : "No log yet";
+    const renderedText = dailyLog && getDailyLogStatus(dailyLog) === "Worked"
+      ? getRenderedTimeText(dailyLog)
+      : "";
+    const taskText = tasks.length > 0 ? (tasks.length === 1 ? "1 task" : `${tasks.length} tasks`) : "";
+    const photoText = photos.length > 0 ? (photos.length === 1 ? "1 photo" : `${photos.length} photos`) : "";
+    const metaItems = [renderedText, taskText, photoText].filter(Boolean);
+    const statusMarkup = dailyLog
+      ? renderDayStatusBadge(dayStatus)
+      : '<span class="day-status-badge is-empty">No log yet</span>';
+    const actionText = dailyLog ? "Open / Edit" : "Create Log";
+
+    return `
+      <button class="daily-log-day-card" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
+        <span class="day-card-main">
+          <span class="day-card-label">Day ${escapeHtml(dayNumber)}</span>
+          <strong>${escapeHtml(formatDisplayDate(dateText))}</strong>
+        </span>
+        <span class="day-card-summary">
+          ${statusMarkup}
+          <span class="day-card-meta">${metaItems.length > 0 ? metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("") : "Ready for daily record"}</span>
+        </span>
+        <span class="day-card-action">${escapeHtml(actionText)}</span>
+      </button>
+    `;
+  }
+
+  function renderDayEditorModal(week, dateText, dailyLog) {
+    if (!dateText) {
+      return "";
+    }
+
+    const dayLabel = getDayLabel(week, dateText);
+    const titleId = `daily-log-editor-title-${dateText}`;
+    const statusMarkup = dailyLog
+      ? renderDayStatusBadge(dailyLog.dayStatus)
+      : '<span class="day-status-badge is-empty">No log yet</span>';
+
+    return `
+      <div class="daily-log-editor-overlay" data-editor-close="true">
+        <section class="daily-log-editor-panel" role="dialog" aria-modal="true" aria-labelledby="${escapeHtml(titleId)}">
+          <div class="daily-log-editor-header">
+            <div>
+              <span class="card-label">Daily Log Editor</span>
+              <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} - ${escapeHtml(formatDisplayDate(dateText))}</h3>
+              ${statusMarkup}
+            </div>
+            <button class="secondary-button editor-close-button" type="button" id="daily-log-editor-close" data-editor-close="true">Close</button>
+          </div>
+          <div class="daily-log-editor-body">
+            ${renderDayEditorBody(week, dateText, dailyLog)}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function closeDailyLogEditor() {
+    state.expandedDate = null;
+    state.activeDailyLogId = null;
+    renderJournalWeek();
+  }
+
+  function syncDailyLogEditorState() {
+    document.body.classList.toggle("daily-log-editor-open", Boolean(state.expandedDate));
+  }
   function renderJournalWeek() {
     const container = getElement("journal-week-accordions");
     const week = getSelectedWeek();
 
     if (!container) {
+      syncDailyLogEditorState();
       return;
     }
 
     container.innerHTML = "";
 
     if (!week) {
+      state.expandedDate = null;
+      state.activeDailyLogId = null;
+      syncDailyLogEditorState();
       container.innerHTML = '<p class="empty-state">Choose a saved week to show journal day records.</p>';
       return;
     }
 
+    const dayCards = [];
     let currentDate = parseDate(week.inclusiveStartDate);
     const endDate = parseDate(week.inclusiveEndDate);
     let dayNumber = 1;
@@ -552,59 +670,39 @@
     while (currentDate <= endDate) {
       const dateText = formatDate(currentDate);
       const dailyLog = getDailyLogForDate(dateText);
-      const taskCount = dailyLog ? getTasksForDailyLog(dailyLog.id).length : 0;
-      const photoCount = dailyLog ? getPhotosForDailyLog(dailyLog.id).length : 0;
-      const isExpanded = state.expandedDate === dateText;
-      const dayLabel = `Day ${dayNumber}`;
-      const statusText = getDayStatusText(dailyLog, taskCount, photoCount);
-
-      const accordion = document.createElement("article");
-      accordion.className = `day-accordion${isExpanded ? " is-expanded" : ""}`;
-      accordion.dataset.date = dateText;
-      accordion.innerHTML = `
-        <button class="day-accordion-header" type="button" aria-expanded="${isExpanded}" aria-controls="day-body-${dateText}">
-          <span class="day-accordion-label">
-            <strong>${escapeHtml(dayLabel)}</strong>
-            <span class="day-accordion-date">${escapeHtml(formatDisplayDate(dateText))}</span>
-          </span>
-          <span class="day-accordion-status">${escapeHtml(statusText)}</span>
-          <span class="day-accordion-chevron" aria-hidden="true"></span>
-        </button>
-        <div class="day-accordion-body" id="day-body-${dateText}" ${isExpanded ? "" : "hidden"}>
-          ${isExpanded ? renderDayEditorBody(week, dateText, dailyLog) : ""}
-        </div>
-      `;
-      container.appendChild(accordion);
-
-      if (isExpanded) {
-        state.activeDailyLogId = dailyLog?.id || null;
-      }
+      dayCards.push(renderDayCard(week, dateText, dayNumber, dailyLog));
 
       currentDate.setDate(currentDate.getDate() + 1);
       dayNumber += 1;
     }
+
+    const activeDailyLog = state.expandedDate ? getDailyLogForDate(state.expandedDate) : null;
+    state.activeDailyLogId = activeDailyLog?.id || null;
+
+    container.innerHTML = `
+      <div class="daily-log-day-list" aria-label="Daily log days">
+        ${dayCards.join("")}
+      </div>
+      ${state.expandedDate ? renderDayEditorModal(week, state.expandedDate, activeDailyLog) : ""}
+    `;
+    syncDailyLogEditorState();
   }
 
   function expandDay(dateText) {
-    window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
-
-    if (state.expandedDate === dateText) {
-      state.expandedDate = null;
-      state.activeDailyLogId = null;
-    } else {
-      state.expandedDate = dateText;
-      const dailyLog = getDailyLogForDate(dateText);
-      state.activeDailyLogId = dailyLog?.id || null;
-    }
-
-    renderJournalWeek();
+    openDay(dateText);
   }
 
   function openDay(dateText) {
+    if (!dateText) {
+      return;
+    }
+
+    window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
     state.expandedDate = dateText;
     const dailyLog = getDailyLogForDate(dateText);
     state.activeDailyLogId = dailyLog?.id || null;
     renderJournalWeek();
+    getElement("daily-log-editor-close")?.focus();
   }
 
   function buildDailyLogRecord() {
@@ -850,6 +948,7 @@
       state.dailyLogs = state.dailyLogs.filter((log) => log.id !== dailyLog.id);
       state.dailyTasks = state.dailyTasks.filter((task) => task.dailyLogId !== dailyLog.id);
       state.photoAttachments = state.photoAttachments.filter((photo) => photo.dailyLogId !== dailyLog.id);
+      state.expandedDate = null;
       state.activeDailyLogId = null;
       renderJournalWeek();
       updateWeekSummary();
@@ -1017,11 +1116,14 @@
       return;
     }
 
-    const accordionHeader = event.target.closest(".day-accordion-header");
+    if (event.target.matches("[data-editor-close]") || event.target.closest("button[data-editor-close]")) {
+      closeDailyLogEditor();
+      return;
+    }
 
-    if (accordionHeader && !event.target.closest("button[data-log-action], button[data-task-action]")) {
-      const accordion = accordionHeader.closest(".day-accordion");
-      expandDay(accordion?.dataset.date);
+    const dayButton = event.target.closest("button[data-day-action='open']");
+    if (dayButton) {
+      openDay(dayButton.dataset.date);
       return;
     }
 
@@ -1147,7 +1249,12 @@
   document.addEventListener("ojt:section-change", (event) => {
     if (event.detail?.sectionId === "daily-logs") {
       loadDailyLogData();
+      return;
     }
+
+    state.expandedDate = null;
+    state.activeDailyLogId = null;
+    syncDailyLogEditorState();
   });
 
   document.addEventListener("ojt:open-daily-log", async (event) => {

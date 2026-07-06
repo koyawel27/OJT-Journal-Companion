@@ -1571,3 +1571,297 @@ h1 {
     width: 100%;
   }
 }
+
+/* Daily Logs modal/panel polish */
+body.daily-log-editor-open {
+  overflow: hidden;
+}
+
+.daily-log-day-list {
+  display: grid;
+  gap: 12px;
+}
+
+.daily-log-day-card {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.65fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 76px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 14px;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(41, 62, 50, 0.06);
+}
+
+.daily-log-day-card:hover {
+  border-color: var(--accent-soft);
+  background: #f8fbf8;
+}
+
+.daily-log-day-card:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 2px;
+}
+
+.day-card-main,
+.day-card-summary,
+.day-card-meta {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.day-card-label {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.day-card-main strong {
+  line-height: 1.25;
+}
+
+.day-card-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.day-card-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 6px;
+  background: #f2f6f3;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.day-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 26px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  background: #f2f6f3;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+}
+
+.day-status-badge.is-absent {
+  border-color: #e6cbc8;
+  background: #fff4f2;
+  color: #a43d35;
+}
+
+.day-status-badge.is-rest {
+  border-color: #efd9a8;
+  background: #fff8e8;
+  color: #7a5512;
+}
+
+.day-status-badge.is-empty {
+  border-color: var(--line);
+  background: #f7f8f6;
+  color: var(--muted);
+}
+
+.daily-log-editor-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgba(29, 42, 36, 0.42);
+  padding: 24px;
+}
+
+.daily-log-editor-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(980px, 100%);
+  max-height: calc(100vh - 48px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 24px 70px rgba(24, 47, 37, 0.28);
+  overflow: hidden;
+}
+
+.daily-log-editor-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcfa;
+  padding: 16px 18px;
+}
+
+.daily-log-editor-header h3 {
+  margin: 4px 0 8px;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.editor-close-button {
+  flex: 0 0 auto;
+}
+
+.daily-log-editor-body {
+  overflow: auto;
+  padding: 18px;
+}
+
+.daily-log-editor-body .journal-row {
+  grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
+}
+
+.daily-log-editor-body .day-record-form,
+.daily-log-editor-body .task-form {
+  gap: 0;
+}
+
+.task-title-row {
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.task-title-row strong {
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.task-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.task-meta-row span + span::before {
+  content: "";
+}
+
+.task-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.task-bullet-content {
+  padding-left: 0;
+}
+
+.task-bullet-content::before {
+  content: none;
+}
+
+.task-bullet-content .status-pill {
+  margin-left: 0;
+}
+
+.photo-caption-details {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.photo-caption-details summary {
+  min-height: 38px;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.photo-caption-details summary:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .daily-log-day-list {
+    gap: 10px;
+  }
+
+  .daily-log-day-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: 112px;
+    padding: 14px;
+  }
+
+  .day-card-action {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .daily-log-editor-overlay {
+    display: block;
+    padding: 0;
+  }
+
+  .daily-log-editor-panel {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .daily-log-editor-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .editor-close-button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .daily-log-editor-body {
+    padding: 14px;
+  }
+
+  .daily-log-editor-body .journal-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .daily-log-editor-body .form-actions .secondary-button,
+  .daily-log-editor-body .form-actions .danger-button {
+    width: 100%;
+  }
+
+  .task-bullet-actions button {
+    min-height: 44px;
+  }
+
+  .photo-caption-details summary {
+    min-height: 44px;
+  }
+}
