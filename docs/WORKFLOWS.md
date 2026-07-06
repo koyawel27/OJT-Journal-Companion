@@ -2,7 +2,9 @@
 
 ## 1. Workflow Overview
 
-This document defines the main user workflows for OJT Journal Companion v1.0 before coding starts.
+This document defines the main user workflows for OJT Journal Companion v1.0.
+
+**v1.0 status:** These workflows are implemented in the current app.
 
 The app is a personal offline-first journal companion for one student. It helps the student record daily OJT activities, calculate rendered time, attach basic photo documentation, prepare weekly journal content, and manually transfer that content into the official school template.
 
@@ -30,17 +32,19 @@ No login or account setup should be required.
 
 The daily log workflow is the main record-keeping flow for the student.
 
-1. User selects an existing week or creates a new week.
-2. User creates or opens a daily log under that week.
-3. User enters the entry date.
+1. User creates an OJT week in Weeks (if none exists yet).
+2. User opens Daily Logs and selects a saved week.
+3. User opens a day from the compact day card list (modal/panel editor on desktop and mobile).
 4. User chooses a day status: `Worked`, `Absent`, or `No OJT / Rest Day`.
 5. If the day status is `Worked`, user enters time in, time out, and break minutes.
 6. If the day status is `Absent` or `No OJT / Rest Day`, user may add optional day remarks.
-7. User adds one or more structured task/work items under the daily log when useful.
-8. Each task item may include a description, optional time spent, personal status, and notes.
-9. App validates required fields.
-10. App saves the daily log and related task items locally using IndexedDB.
-11. Worked days calculate rendered time from the daily log time fields. Absent and rest-day records save `0` rendered minutes.
+7. User saves the day record.
+8. User adds one or more structured task/work items under the daily log when useful.
+9. Each task item may include a description, optional time spent, personal status, and notes.
+10. User may attach photo documentation after the day record is saved.
+11. App validates required fields.
+12. App saves the daily log and related records locally using IndexedDB.
+13. Worked days calculate rendered time from the daily log time fields. Absent and rest-day records save `0` rendered minutes.
 
 Daily logs should belong to an `OJTWeek` through `weekId`. Daily logs are day status and time records. Daily task/work items should belong to a `DailyLog` through `dailyLogId` and should hold the daily work/accomplishment bullet details.
 
@@ -173,7 +177,43 @@ The backup restore workflow replaces the current local app data with a selected 
 
 Merge behavior and import conflict handling are out of scope for v1.0.
 
-## 11. Edit and Delete Workflow
+## 11. Reset Local App Data Workflow
+
+The reset workflow lets the student permanently clear all local journal data from the current browser.
+
+1. User opens the Backup section.
+2. User reads the Reset Local App Data danger-zone panel.
+3. User checks the confirmation checkbox.
+4. User types `RESET` in the confirmation field.
+5. The reset button becomes enabled only after both guardrails are satisfied.
+6. User clicks Reset Local App Data.
+7. App shows a final confirmation dialog explaining that profile, weeks, daily logs, tasks, photos, and settings will be permanently removed.
+8. If the user cancels, nothing is deleted.
+9. If the user confirms, app clears all IndexedDB object stores through `clearAllData()`.
+10. App reloads the page so the UI returns to a fresh empty state.
+
+Reset is irreversible without a JSON backup. Export a backup first if the student may need the data later.
+
+## 12. Dashboard Workflow
+
+The dashboard workflow gives the student a quick starting view.
+
+1. User opens Dashboard (default section on load).
+2. App shows overall OJT progress when required hours are set in Profile.
+3. App shows student and company identity summary cards.
+4. App shows the current or latest week with daily check-in status and weekly summary readiness.
+5. User may jump to Daily Logs, Weekly Preview, or Backup from quick actions.
+6. If no backup was exported in over 7 days, app shows a backup reminder banner.
+
+## 13. Mobile Navigation Workflow
+
+On narrow screens, the app uses bottom tab navigation instead of the sidebar.
+
+1. User taps Home, Weeks, Logs, Preview, or Backup tabs.
+2. App switches the visible section without changing data.
+3. User taps the profile button in the header to open Profile.
+
+## 14. Edit and Delete Workflow
 
 The edit and delete workflow lets the student correct records while keeping related data understandable.
 
@@ -189,14 +229,14 @@ The user can edit:
 
 Deletion behavior should be simple:
 
-- Deleting a week should also delete or require deletion of related daily logs and photos.
-- Deleting a daily log should also delete related task items and photos.
-- Deleting a task item should not delete the daily log.
-- Deleting a photo should not delete the daily log.
+- Deleting a week is blocked while related daily logs still exist. The user must delete daily logs first.
+- Deleting a daily log also deletes related task items and photo attachments.
+- Deleting a task item does not delete the daily log.
+- Deleting a photo does not delete the daily log.
 
-Before deleting larger records such as weeks or daily logs, the app should warn the user about related records that will also be removed.
+Before deleting larger records such as weeks or daily logs, the app warns the user about related records that will also be removed.
 
-## 12. Offline Use Workflow
+## 15. Offline Use Workflow
 
 The offline use workflow describes how the app should behave as a local-first tool.
 
@@ -210,9 +250,9 @@ The app should work without internet once loaded.
 
 Data stays on the current device and browser. Offline-first does not mean automatic sync between a phone and laptop.
 
-The user must export backups to protect data, especially before clearing browser storage, changing devices, or doing browser maintenance.
+The user must export backups to protect data, especially before clearing browser storage, changing devices, doing browser maintenance, or using Reset Local App Data.
 
-## 13. v1.0 Workflow Boundaries
+## 16. v1.0 Workflow Boundaries
 
 The v1.0 workflows should not include:
 

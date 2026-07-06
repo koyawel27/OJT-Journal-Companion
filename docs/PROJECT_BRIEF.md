@@ -43,6 +43,9 @@ Version 1.0 should focus on the core needs of one local user:
 - Preview, copy, or export weekly journal content for manual transfer.
 - Export local data as a simple JSON backup.
 - Import or restore local data from a JSON backup.
+- Reset all local app data from Backup with guardrails when starting fresh.
+- View Dashboard progress and current-week status.
+- Use mobile tab navigation on small screens.
 - Store data locally using IndexedDB.
 - Work without login, cloud sync, or an online backend.
 
@@ -88,6 +91,7 @@ The project is stored inside `C:\xampp-projects` only as a local project locatio
 9. The student previews, copies, or exports the weekly journal content.
 10. The student manually transfers the prepared content into the official school journal template.
 11. The student backs up local data as a JSON export when needed.
+12. The student may reset all local app data from Backup when starting fresh (after export if data is still needed).
 
 ## 9. Journal Fields Supported
 
@@ -138,7 +142,7 @@ Data should be stored locally using IndexedDB. This supports offline-first behav
 
 Photo documentation should use imported photo attachments, photo records stored locally, and photo documentation metadata. Photo handling must be tested because browser storage limits and file behavior vary across browsers and devices.
 
-Version 1.0 should include simple JSON backup/export and JSON import/restore so the student can save and recover local data.
+Version 1.0 should include simple JSON backup/export, JSON import/restore, and a guarded Reset Local App Data utility so the student can save, recover, or clear local data.
 
 ## 11. Important Limitations
 
@@ -197,6 +201,7 @@ The project is successful when one student can use the app locally to:
 - Generate or preview one complete weekly journal.
 - Prepare weekly journal content more easily.
 - Export and restore local data using JSON backup files.
+- Reset all local app data from the Backup screen when needed.
 - Use the app without login, cloud services, or an internet connection.
 
 ## 14. Project Direction

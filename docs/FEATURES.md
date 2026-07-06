@@ -2,9 +2,11 @@
 
 ## 1. Feature Overview
 
-OJT Journal Companion is a personal offline-first journal companion for one student using local offline data. Its features should help the student record daily OJT work, track rendered hours, organize basic photo documentation, and prepare weekly journal content for manual transfer into an official school template.
+OJT Journal Companion is a personal offline-first journal companion for one student using local offline data. Its features help the student record daily OJT work, track rendered hours, organize basic photo documentation, and prepare weekly journal content for manual transfer into an official school template.
 
-The app should stay lightweight. It is not a full internship management system, and v1.0 should not include accounts, approval flows, dashboards for other roles, online submission, or automatic syncing across devices.
+The app stays lightweight. It is not a full internship management system, and v1.0 does not include accounts, approval flows, dashboards for other roles, online submission, or automatic syncing across devices.
+
+**v1.0 status:** Core features listed below are implemented and have passed final manual regression testing.
 
 ## 2. v1.0 Must-Have Features
 
@@ -32,27 +34,32 @@ These features are required for the first usable version.
 - IndexedDB local storage
 - JSON backup/export
 - JSON import/restore
+- Backup reminder on Dashboard (when no recent export)
+- Reset Local App Data (guarded full local clear)
+- Dashboard with OJT progress and current/latest week summary
+- Mobile tab navigation
+- App settings (preferred week start day, time format, required OJT hours)
 
 ## 3. v1.0 Should-Have Features
 
-These features are strongly useful for v1.0, but they can be implemented after the core journal flow works.
+These features were strongly useful for v1.0. Most are now implemented.
 
-- Basic filtering by week or date
-- Simple dashboard summary
-- Required OJT hours progress
-- Basic validation for time records
-- Mobile-friendly layout
+- Basic filtering by week or date — **implemented** (week selectors on Daily Logs and Weekly Preview)
+- Simple dashboard summary — **implemented**
+- Required OJT hours progress — **implemented**
+- Basic validation for time records — **implemented**
+- Mobile-friendly layout — **implemented** (responsive layout plus bottom tab navigation)
 
 ## 4. v1.0 Nice-to-Have Features
 
-These features would improve the experience, but v1.0 can still work without them.
+These features improve the experience but v1.0 works without them.
 
 - Printable weekly journal page
 - Basic search
-- Photo preview
+- Photo preview (inline gallery-style preview is not required; attach, caption, category, and download are implemented)
 - Draft status indicators
-- Export as plain text or Markdown
-- Bullet-style task output in weekly journal previews
+- Export as plain text or Markdown (copy Weekly Journal plain text is implemented)
+- Bullet-style task output in weekly journal previews — **implemented**
 
 ## 5. Future Features
 
@@ -88,31 +95,35 @@ These features are outside the v1.0 direction and should not be built yet.
 
 | Feature | Priority | v1.0 Status | Notes |
 | --- | --- | --- | --- |
-| Student profile | Must-have | Required | Used for journal identity and output context. |
-| Company profile | Must-have | Required | Stores OJT placement context. |
-| Daily logs | Must-have | Required | Main record for daily OJT activity. |
-| Daily task/work items | Must-have | Required | Lets the student record multiple task or accomplishment bullets under a daily log, with optional task time, personal status, notes, and ordering when practical. |
-| Time records | Must-have | Required | Includes time in, time out, and break duration. |
-| Daily hours calculation | Must-have | Required | Calculates rendered hours for each daily log. |
-| Weekly hours calculation | Must-have | Required | Totals rendered hours by week. |
-| Weekly grouping | Must-have | Required | Organizes daily logs into weekly journal periods. |
-| Basic photo documentation support | Must-have | Required | Supports attaching or importing photo documentation to daily logs, with careful testing because browser storage behavior may vary. |
-| Weekly journal content | Must-have | Required | Includes skills learned, problems encountered, and reflection. |
-| Weekly preview | Must-have | Required | Lets the student review the prepared weekly journal. |
-| Copy-ready output | Must-have | Required | Helps the student manually transfer content to the official template. |
-| IndexedDB storage | Must-have | Required | Stores data locally for offline-first use. |
-| JSON backup/export | Must-have | Required | Lets the student save a backup file. |
-| JSON import/restore | Must-have | Required | Lets the student restore local data from a backup file. |
-| Week/date filtering | Should-have | Recommended | Helps review entries faster. |
-| Dashboard summary | Should-have | Recommended | Shows quick progress and recent journal status. |
-| Required hours progress | Should-have | Recommended | Compares rendered hours against required OJT hours. |
-| Time validation | Should-have | Recommended | Helps avoid invalid or incomplete time records. |
-| Mobile-friendly layout | Should-have | Recommended | Supports use on mobile browsers without changing the offline-first scope. |
-| Printable weekly page | Nice-to-have | Optional | Useful for review or manual records. |
-| Basic search | Nice-to-have | Optional | Helps find older entries. |
-| Photo preview | Nice-to-have | Optional | Useful if photo handling is stable in browser storage. |
-| Draft status indicators | Nice-to-have | Optional | Helps show whether a weekly journal is still incomplete. |
-| Plain text or Markdown export | Nice-to-have | Optional | Useful for copying or saving prepared journal content. |
+| Student profile | Must-have | Complete | Used for journal identity and output context. |
+| Company profile | Must-have | Complete | Stores OJT placement context. |
+| App settings | Must-have | Complete | Week start day, time format, required OJT hours. |
+| Daily logs | Must-have | Complete | Compact day cards with modal/panel editor. |
+| Day status (Worked / Absent / Rest) | Must-have | Complete | Drives rendered-hours rules per day. |
+| Daily task/work items | Must-have | Complete | Bullet-style accomplishments under each daily log. |
+| Time records | Must-have | Complete | Time in, time out, and break duration. |
+| Daily hours calculation | Must-have | Complete | Calculates rendered hours from daily log time fields. |
+| Weekly hours calculation | Must-have | Complete | Totals rendered hours by week. |
+| Weekly grouping | Must-have | Complete | OJT weeks organize daily logs and preview. |
+| Basic photo documentation | Must-have | Complete | Attach, caption, category, download, remove. |
+| Weekly journal content | Must-have | Complete | Skills learned, problems encountered, reflection. |
+| Weekly preview | Must-have | Complete | Official journal-like preview layout. |
+| Copy-ready output | Must-have | Complete | Copy Weekly Journal to clipboard. |
+| IndexedDB storage | Must-have | Complete | Local offline-first storage. |
+| JSON backup/export | Must-have | Complete | Includes photos as Base64 in JSON. |
+| JSON import/restore | Must-have | Complete | Replace-style restore with confirmation. |
+| Backup reminder | Must-have | Complete | Dashboard reminder when export is overdue. |
+| Reset Local App Data | Must-have | Complete | Checkbox, type RESET, confirm dialog, full store clear. |
+| Dashboard summary | Should-have | Complete | OJT progress card and current/latest week panel. |
+| Required hours progress | Should-have | Complete | Compared on Dashboard from profile setting. |
+| Time validation | Should-have | Complete | Worked-day time rules and break validation. |
+| Mobile-friendly layout | Should-have | Complete | Responsive CSS and mobile tab navigation. |
+| Week/date filtering | Should-have | Complete | Week pickers on Daily Logs and Weekly Preview. |
+| Printable weekly page | Nice-to-have | Deferred | Not in v1.0. |
+| Basic search | Nice-to-have | Deferred | Not in v1.0. |
+| Photo preview gallery | Nice-to-have | Deferred | Basic attach/download only in v1.0. |
+| Draft status indicators | Nice-to-have | Deferred | Dashboard shows summary fill state partially. |
+| Plain text or Markdown export file | Nice-to-have | Partial | Copy to clipboard implemented; file export deferred. |
 
 ## 8. v1.0 MVP Definition
 
@@ -130,12 +141,14 @@ The v1.0 MVP is complete when one student can use the app locally to:
 10. Preview and copy weekly journal content for manual transfer to the official school template.
 11. Store data locally using IndexedDB.
 12. Export and restore data using JSON backup files.
+13. See OJT progress and current-week status on the Dashboard.
+14. Reset all local app data from Backup when starting fresh (with guardrails).
 
 ## 9. Feature Notes and Boundaries
 
 The app may run on laptop, desktop, and mobile browsers, but v1.0 will not provide automatic cross-device sync. Offline-first means the app should work with local browser data, not that data automatically moves between devices.
 
-IndexedDB should be the main local storage direction for v1.0. JSON backup/export and JSON import/restore are required because local browser storage can be cleared by the user, the browser, or device maintenance.
+IndexedDB should be the main local storage direction for v1.0. JSON backup/export and JSON import/restore are required because local browser storage can be cleared by the user, the browser, or device maintenance. Reset Local App Data on the Backup screen clears all IndexedDB stores after checkbox confirmation, typing `RESET`, and a final confirm dialog — it does not replace the need for JSON export when moving devices.
 
 Basic photo documentation is part of v1.0. The app should let the student attach or import photo documentation for daily logs, store related metadata locally, and remove photo documentation from a daily log.
 
@@ -146,7 +159,7 @@ Advanced photo features such as preview, compression, gallery viewing, or image 
 Weekly journal output should focus on helping the student prepare content for manual transfer into the official school journal template. The app should not submit journals online or replace official school forms.
 
 
-Structured daily task/work items should support multiple task or accomplishment bullets under one daily log. Each task item may include a description, optional task-level time spent, personal status (`Pending`, `In Progress`, or `Completed`), optional notes, and display ordering when practical. These task items can later support bullet-style output in the weekly journal preview.
+Structured daily task/work items support multiple accomplishment bullets under one daily log. Each task item may include a description, optional task-level time spent, personal status (`Pending`, `In Progress`, or `Completed`), optional notes, and display ordering. Task items appear as bullet-style output in the weekly journal preview.
 
 Task status is personal progress tracking only. It is not supervisor approval, official school validation, grading status, or submission status.
 

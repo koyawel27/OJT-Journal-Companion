@@ -2,7 +2,9 @@
 
 ## 1. Data Structure Overview
 
-This document defines the planned local data structure for OJT Journal Companion v1.0 before coding starts.
+This document defines the local data structure for OJT Journal Companion v1.0 as implemented in the app.
+
+**v1.0 status:** IndexedDB schema version 4 with the object stores below is in use.
 
 The app is a personal offline-first journal companion for one student. It should store student details, company details, weekly journal records, daily logs, basic photo documentation, and simple app settings using local browser storage.
 
@@ -168,6 +170,7 @@ Stores simple local preferences for the app.
 | `id` | string | Unique local ID. |
 | `preferredWeekStartDay` | string | Preferred start day for weekly grouping, such as `Monday`. |
 | `timeFormat` | string | Preferred time display format, such as `12-hour` or `24-hour`. |
+| `lastBackupDate` | string | Optional ISO timestamp of the last successful JSON export. Used for the Dashboard backup reminder. |
 | `createdAt` | string | Date and time the record was created. |
 | `updatedAt` | string | Date and time the record was last updated. |
 
@@ -217,10 +220,12 @@ The data relationships should stay simple:
 
 Deletion behavior should be simple and predictable:
 
-- Deleting an `OJTWeek` should also delete or require deletion of its related `DailyLog`, `DailyTask`, and `PhotoAttachment` records.
-- Deleting a `DailyLog` should also delete its related `DailyTask` and `PhotoAttachment` records.
+- Deleting an `OJTWeek` is blocked while related `DailyLog` records exist. The user must delete daily logs first.
+- Deleting a `DailyLog` also deletes its related `DailyTask` and `PhotoAttachment` records.
 - Deleting a `DailyTask` should not delete the related `DailyLog`.
 - Deleting a `PhotoAttachment` should not delete the related `DailyLog`.
+
+Reset Local App Data clears all object stores at once through `OJTStorage.clearAllData()`. This removes profile, settings, weeks, logs, tasks, photos, and `lastBackupDate` metadata. It does not change the IndexedDB schema.
 
 ## 13. Required Calculated Values
 

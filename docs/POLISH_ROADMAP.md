@@ -15,8 +15,14 @@ Current accepted status:
   - Adjustment: official task bullets use `description (duration/time) - status`.
 - Batch 3A Dashboard Current Week Progress: completed and committed.
 - Batch 4 Daily Logs Modal/Panel UI Polish: completed and committed.
-- Batch 4.1 App Shell and Dashboard UI Polish: completed and committed.
+- Batch 4.1 Muted Mid-Tone Theme (no gradients): completed.
+- Batch 4.2 Intern-Focused Microcopy Polish: completed.
+- Batch 4.3 Reset Local App Data Utility: completed.
 - Batch 5 Code Hygiene / Refactor: deferred.
+
+Remaining optional polish (not required for v1.0 release):
+- Batch 3 full dashboard/UX items from the outline below (recent logs card, human-friendly week dates in all selectors, accordion completeness hints) — partially addressed or deferred.
+- Batch 5 shared `utils.js` refactor and IndexedDB connection caching — deferred.
 
 Use this roadmap only as a reference for remaining polish work. Do not apply all batches at once.
 

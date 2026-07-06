@@ -8,6 +8,8 @@ The goal is to build a lightweight offline-first personal journal companion for 
 
 The project should be built in small phases. Each phase should leave the app in a working state before moving forward.
 
+**v1.0 build status:** Phases 1–9 and core Phase 10 polish are complete. The app has passed final manual regression testing. Reset Local App Data was added on the Backup screen after initial Phase 9 completion.
+
 ## 2. Recommended Initial Folder Structure
 
 ```text
@@ -423,6 +425,17 @@ Allow the student to export and restore local data using JSON backup files.
 - Replace current local data after user confirmation.
 - Do not implement merge or conflict handling.
 
+### Tasks (completed)
+
+- Gather student profile, company profile, weeks, daily logs, daily tasks, photo attachments, and app settings.
+- Create JSON backup with `appName`, `backupVersion`, and `exportedAt`.
+- Include photo data as Base64 in JSON when practical.
+- Warn before large photo-heavy exports.
+- Track `lastBackupDate` in app settings after export.
+- Add export and restore controls with replace-style restore.
+- Add Reset Local App Data panel with checkbox, `RESET` text confirmation, final confirm dialog, and `clearAllData()`.
+- Reload the app after successful restore or reset.
+
 ### Manual Testing Checklist
 
 - User can export a JSON backup.
@@ -434,16 +447,23 @@ Allow the student to export and restore local data using JSON backup files.
 - Restore warns before replacing data.
 - Restored data appears correctly after refresh.
 - Invalid backup files are rejected safely.
+- Reset requires checkbox and typing `RESET` before the button enables.
+- Reset shows a final confirm dialog and clears all local data.
+- App reloads after successful reset.
 
 ### Stop Condition Before Next Phase
 
-Move on only when backup export and replace-style restore work consistently for normal app data.
+Move on only when backup export, replace-style restore, and guarded reset work consistently.
 
 ## 13. Phase 10: Offline Polish and Optional PWA Setup
 
 ### Goal
 
 Polish offline behavior and optionally prepare PWA support after the main app works.
+
+### Status
+
+**Mostly complete for v1.0.** Implemented: Dashboard OJT progress, current/latest week panel, backup reminder, mobile tab navigation, muted mid-tone theme, intern-focused microcopy, Daily Logs modal/panel UI, and responsive layout. PWA installability remains deferred.
 
 ### Files Likely Affected
 
@@ -487,8 +507,8 @@ v1.0 is ready for broader personal testing when the main workflows work offline,
 | Phase 6 | Weekly summary save and load |
 | Phase 7 | Weekly preview generation and copy output |
 | Phase 8 | Photo attach/import, metadata, removal, single-photo download |
-| Phase 9 | JSON backup export and replace-style restore |
-| Phase 10 | Offline usability, mobile layout, final polish |
+| Phase 9 | JSON backup export, replace-style restore, guarded reset |
+| Phase 10 | Offline usability, mobile layout, dashboard polish — **mostly complete**; PWA deferred |
 
 ## 15. First Coding Milestone
 
