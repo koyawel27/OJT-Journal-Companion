@@ -415,12 +415,11 @@
   function renderPhotoSection(dailyLog) {
     if (!dailyLog) {
       return `
-        <section class="photo-documentation-panel">
-          <div class="journal-col-header">
-            <span class="card-label">Photo documentation</span>
-            <h4>Attached photos</h4>
-            <p class="phase-note">Save the day record before attaching photo documentation.</p>
-          </div>
+        <section class="editor-section editor-section-photos photo-documentation-panel" aria-labelledby="editor-photo-docs-title">
+          <header class="editor-section-header">
+            <h4 id="editor-photo-docs-title">Photo Documentation</h4>
+            <p class="editor-section-note">Save the day record before attaching photo documentation.</p>
+          </header>
         </section>
       `;
     }
@@ -428,12 +427,11 @@
     const photos = getPhotosForDailyLog(dailyLog.id);
 
     return `
-      <section class="photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
-        <div class="journal-col-header">
-          <span class="card-label">Photo documentation</span>
-          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Attached photos</h4>
-          <p class="phase-note">Attach JPEG, PNG, or WebP photos up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
-        </div>
+      <section class="editor-section editor-section-photos photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
+        <header class="editor-section-header">
+          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Photo Documentation</h4>
+          <p class="editor-section-note">Attach JPEG, PNG, or WebP photos up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
+        </header>
 
         <div class="photo-attachment-list-wrap" id="photo-attachment-list">
           ${renderPhotoList(photos)}
@@ -467,7 +465,6 @@
   }
 
   function renderDayEditorBody(week, dateText, dailyLog) {
-    const dayLabel = getDayLabel(week, dateText);
     const dayStatus = getDailyLogStatus(dailyLog);
     const worked = isWorkedStatus(dayStatus);
     const timeFieldState = worked ? "" : "disabled";
@@ -480,14 +477,16 @@
 
     return `
       <div class="journal-row">
-        <div class="journal-col journal-col-time">
+        <section class="editor-section editor-section-day journal-col journal-col-time" aria-labelledby="editor-day-record-title">
+          <header class="editor-section-header">
+            <h4 id="editor-day-record-title">Day Record</h4>
+            <p class="editor-section-note">Set day status, time fields, and remarks for this date.</p>
+          </header>
+
           <form class="day-record-form" id="daily-log-form" novalidate>
             <input type="hidden" id="daily-log-id" value="${escapeHtml(dailyLog?.id || "")}">
             <input type="hidden" id="daily-log-form-week" value="${escapeHtml(week.id)}">
             <input type="hidden" id="daily-log-entry-date" value="${escapeHtml(dateText)}">
-
-            <span class="card-label">${escapeHtml(dayLabel)}</span>
-            <h4 class="journal-day-heading">${escapeHtml(formatDisplayDate(dateText))}</h4>
 
             <label class="field">
               <span>Day status</span>
@@ -521,14 +520,13 @@
               <p class="form-message" id="daily-log-form-message" hidden></p>
             </div>
           </form>
-        </div>
+        </section>
 
-        <div class="journal-col journal-col-tasks">
-          <div class="journal-col-header">
-            <span class="card-label">Task/work items</span>
-            <h4>Accomplishments</h4>
-            <p class="phase-note">${tasksEnabled ? "Add bullet-style work items for this day." : "Save the day record first, then add task/work items."}</p>
-          </div>
+        <section class="editor-section editor-section-tasks journal-col journal-col-tasks" aria-labelledby="editor-task-items-title">
+          <header class="editor-section-header">
+            <h4 id="editor-task-items-title">Work / Task Items</h4>
+            <p class="editor-section-note">${tasksEnabled ? "Add bullet-style work items for this day." : "Save the day record first, then add task/work items."}</p>
+          </header>
 
           <div class="task-list-display" id="daily-task-list">
             ${tasksEnabled ? renderTaskBullets(tasks) : '<p class="empty-state">Task items appear here after the day record is saved.</p>'}
@@ -567,7 +565,7 @@
               <p class="form-message" id="daily-task-form-message" hidden></p>
             </div>
           </form>
-        </div>
+        </section>
       </div>
 
       ${renderPhotoSection(dailyLog)}
@@ -583,23 +581,28 @@
       : "";
     const taskText = tasks.length > 0 ? (tasks.length === 1 ? "1 task" : `${tasks.length} tasks`) : "";
     const photoText = photos.length > 0 ? (photos.length === 1 ? "1 photo" : `${photos.length} photos`) : "";
-    const metaItems = [renderedText, taskText, photoText].filter(Boolean);
+    const metaMarkup = [
+      renderedText ? `<span class="day-card-stat is-hours">${escapeHtml(renderedText)}</span>` : "",
+      taskText ? `<span class="day-card-stat is-tasks">${escapeHtml(taskText)}</span>` : "",
+      photoText ? `<span class="day-card-stat is-photos">${escapeHtml(photoText)}</span>` : ""
+    ].filter(Boolean).join("");
     const statusMarkup = dailyLog
       ? renderDayStatusBadge(dayStatus)
       : '<span class="day-status-badge is-empty">No log yet</span>';
     const actionText = dailyLog ? "Open / Edit" : "Create Log";
+    const cardStateClass = dailyLog ? "has-log" : "is-empty";
 
     return `
-      <button class="daily-log-day-card" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
+      <button class="daily-log-day-card ${cardStateClass}" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
         <span class="day-card-main">
           <span class="day-card-label">Day ${escapeHtml(dayNumber)}</span>
-          <strong>${escapeHtml(formatDisplayDate(dateText))}</strong>
+          <strong class="day-card-date">${escapeHtml(formatDisplayDate(dateText))}</strong>
         </span>
         <span class="day-card-summary">
           ${statusMarkup}
-          <span class="day-card-meta">${metaItems.length > 0 ? metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("") : "Ready for daily record"}</span>
+          <span class="day-card-meta">${metaMarkup || '<span class="day-card-hint">Ready for daily record</span>'}</span>
         </span>
-        <span class="day-card-action">${escapeHtml(actionText)}</span>
+        <span class="day-card-action" aria-hidden="true">${escapeHtml(actionText)}</span>
       </button>
     `;
   }
@@ -619,10 +622,12 @@
       <div class="daily-log-editor-overlay" data-editor-close="true">
         <section class="daily-log-editor-panel" role="dialog" aria-modal="true" aria-labelledby="${escapeHtml(titleId)}">
           <div class="daily-log-editor-header">
-            <div>
+            <div class="editor-header-main">
               <span class="card-label">Daily Log Editor</span>
-              <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} - ${escapeHtml(formatDisplayDate(dateText))}</h3>
-              ${statusMarkup}
+              <div class="editor-header-title-row">
+                <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} · ${escapeHtml(formatDisplayDate(dateText))}</h3>
+                ${statusMarkup}
+              </div>
             </div>
             <button class="secondary-button editor-close-button" type="button" id="daily-log-editor-close" data-editor-close="true">Close</button>
           </div>

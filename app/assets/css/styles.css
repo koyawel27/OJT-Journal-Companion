@@ -1957,7 +1957,12 @@ h1 {
 }
 
 .task-list-display {
-  margin-bottom: 16px;
+  margin-bottom: 0;
+}
+
+.editor-section-tasks .task-form {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
 }
 
 .photo-placeholder {
@@ -1968,42 +1973,65 @@ h1 {
 }
 
 .photo-documentation-panel {
-  margin-top: 18px;
-  border-top: 1px solid var(--line);
-  padding-top: 16px;
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
 }
 
 .photo-attachment-list {
   display: grid;
   gap: 12px;
-  margin: 12px 0 16px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.photo-attachment-list-wrap {
+  display: grid;
+  gap: 12px;
+}
+
 .photo-attachment-item {
+  display: grid;
+  gap: 0;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: #fbfcfa;
-  padding: 12px;
+  background: var(--panel);
+  padding: 14px;
   box-shadow: var(--shadow-sm);
+}
+
+.photo-attachment-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
 .photo-attachment-main strong {
   display: block;
-  line-height: 1.25;
+  line-height: 1.3;
+  font-size: 0.98rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .photo-category {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.82rem;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .photo-caption {
-  margin: 6px 0 0;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f7f9f8;
   color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
   white-space: pre-wrap;
 }
 
@@ -2017,7 +2045,11 @@ h1 {
 }
 
 .photo-upload-form {
-  margin-top: 14px;
+  margin-top: 0;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: #f7f9f8;
 }
 
 .time-field.is-muted {
@@ -2064,15 +2096,15 @@ h1 {
 }
 
 .task-bullet-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  justify-content: space-between;
   gap: 12px;
   margin: 0 0 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: #fbfcfa;
-  padding: 12px;
+  background: var(--panel);
+  padding: 14px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -2081,22 +2113,17 @@ h1 {
 }
 
 .task-bullet-content {
-  position: relative;
   min-width: 0;
-  padding-left: 1rem;
+  padding-left: 0;
   color: var(--ink);
 }
 
 .task-bullet-content::before {
-  content: "â€¢";
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-weight: 700;
+  content: none;
 }
 
 .task-bullet-content .status-pill {
-  margin-left: 6px;
+  margin-left: 0;
 }
 
 .task-bullet-actions {
@@ -2107,8 +2134,57 @@ h1 {
   flex: 0 0 auto;
 }
 
-.task-note {
+.task-bullet-actions .secondary-button,
+.task-bullet-actions .danger-button {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+}
+
+.task-title-row {
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.task-title-row strong {
+  flex: 1 1 100%;
+  min-width: 0;
+  line-height: 1.35;
+  font-size: 0.98rem;
+}
+
+.task-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
   color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.task-meta-row span + span::before {
+  content: "·";
+  margin-right: 8px;
+  color: var(--line);
+  font-weight: 700;
+}
+
+.task-note {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f7f9f8;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
 }
 
 .item-meta {
@@ -2220,19 +2296,29 @@ body.daily-log-editor-open {
 
 .daily-log-day-card {
   display: grid;
-  grid-template-columns: minmax(130px, 0.65fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(140px, 0.7fr) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
-  min-height: 76px;
+  min-height: 84px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
-  padding: 14px;
+  padding: 16px;
   text-align: left;
   box-shadow: 0 8px 20px rgba(41, 62, 50, 0.06);
+}
+
+.daily-log-day-card.is-empty {
+  border-style: dashed;
+  background: #fbfcfa;
+}
+
+.daily-log-day-card.has-log {
+  border-color: #cfd9d1;
+  background: var(--panel);
 }
 
 .daily-log-day-card:hover {
@@ -2246,10 +2332,9 @@ body.daily-log-editor-open {
 }
 
 .day-card-main,
-.day-card-summary,
-.day-card-meta {
+.day-card-summary {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -2257,16 +2342,45 @@ body.daily-log-editor-open {
   color: var(--accent);
   font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.day-card-main strong {
+.day-card-date {
+  font-size: 1rem;
   line-height: 1.25;
 }
 
 .day-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.day-card-stat {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f7f9f8;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
+
+.day-card-stat.is-hours {
+  border-color: var(--accent-soft);
+  background: #f2f6f3;
+  color: var(--accent);
+}
+
+.day-card-hint {
   color: var(--muted);
   font-size: 0.88rem;
+  font-style: italic;
 }
 
 .day-card-action {
@@ -2282,6 +2396,12 @@ body.daily-log-editor-open {
   font-weight: 700;
   padding: 10px 16px;
   white-space: nowrap;
+}
+
+.daily-log-day-card.is-empty .day-card-action {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .day-status-badge {
@@ -2343,78 +2463,111 @@ body.daily-log-editor-open {
   display: flex;
   align-items: start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   border-bottom: 1px solid var(--line);
   background: #fbfcfa;
-  padding: 16px 18px;
+  padding: 14px 18px;
+}
+
+.editor-header-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.editor-header-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .daily-log-editor-header h3 {
-  margin: 4px 0 8px;
-  font-size: 1.15rem;
+  margin: 0;
+  font-size: 1.08rem;
   line-height: 1.25;
 }
 
 .editor-close-button {
   flex: 0 0 auto;
+  min-height: 44px;
 }
 
 .daily-log-editor-body {
+  display: grid;
+  gap: 16px;
   overflow: auto;
   padding: 18px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .daily-log-editor-body .journal-row {
   grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
+  gap: 16px;
+}
+
+.editor-section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fbfcfa;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.editor-section-photos {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 16px;
+}
+
+.editor-section-header {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.editor-section-header h4 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.editor-section-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .daily-log-editor-body .day-record-form,
 .daily-log-editor-body .task-form {
-  gap: 0;
+  gap: 12px;
 }
 
-.task-title-row {
-  display: flex;
-  align-items: start;
-  flex-wrap: wrap;
-  gap: 8px;
+.daily-log-editor-body .field input,
+.daily-log-editor-body .field textarea,
+.daily-log-editor-body .field select {
+  min-height: 44px;
 }
 
-.task-title-row strong {
-  min-width: 0;
-  line-height: 1.3;
+.daily-log-editor-body .field textarea {
+  min-height: 72px;
 }
 
-.task-meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 700;
+.daily-log-editor-body .form-actions {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
-.task-meta-row span + span::before {
-  content: "";
-}
-
-.task-note {
-  margin: 8px 0 0;
-  color: var(--muted);
-  white-space: pre-wrap;
-}
-
-.task-bullet-content {
-  padding-left: 0;
-}
-
-.task-bullet-content::before {
-  content: none;
-}
-
-.task-bullet-content .status-pill {
-  margin-left: 0;
+.daily-log-editor-body .calculation-result {
+  margin-top: 0;
 }
 
 .photo-caption-details {
@@ -2424,10 +2577,12 @@ body.daily-log-editor-open {
 }
 
 .photo-caption-details summary {
+  display: flex;
+  align-items: center;
   min-height: 44px;
   color: var(--accent);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
 }
 
@@ -2441,13 +2596,42 @@ body.daily-log-editor-open {
     gap: 10px;
   }
 
+  #daily-logs .week-panel {
+    display: grid;
+    gap: 14px;
+  }
+
+  #daily-logs .panel-header {
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #daily-logs .field select {
+    min-height: 48px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .daily-log-day-card {
     grid-template-columns: 1fr;
-    gap: 10px;
-    min-height: 112px;
+    gap: 12px;
+    min-height: 0;
     padding: 14px;
     box-shadow: var(--shadow-sm);
-}
+  }
+
+  .day-card-main {
+    gap: 4px;
+  }
+
+  .day-card-summary {
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
 
   .day-card-action {
     width: 100%;
@@ -2469,32 +2653,64 @@ body.daily-log-editor-open {
   }
 
   .daily-log-editor-header {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 12px;
-    padding: 14px;
+    align-items: start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .editor-header-title-row {
+    gap: 6px;
+  }
+
+  .daily-log-editor-header h3 {
+    font-size: 1rem;
   }
 
   .editor-close-button {
-    width: 100%;
+    width: auto;
+    min-width: 84px;
     min-height: 44px;
+    padding-inline: 14px;
   }
 
   .daily-log-editor-body {
+    gap: 14px;
+    padding: 14px 14px 28px;
+  }
+
+  .editor-section {
     padding: 14px;
+    gap: 12px;
+  }
+
+  .editor-section-header {
+    padding-bottom: 10px;
   }
 
   .daily-log-editor-body .journal-row {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 14px;
   }
 
   .daily-log-editor-body .form-actions .secondary-button,
-  .daily-log-editor-body .form-actions .danger-button {
+  .daily-log-editor-body .form-actions .danger-button,
+  .daily-log-editor-body .form-actions .primary-button {
     width: 100%;
   }
 
+  .task-bullet-item {
+    display: block;
+  }
+
+  .task-bullet-actions {
+    margin-top: 12px;
+    justify-content: stretch;
+  }
+
   .task-bullet-actions button {
+    flex: 1 1 auto;
     min-height: 44px;
   }
 
