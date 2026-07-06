@@ -504,6 +504,28 @@
             </section>
           </div>
 
+          <section class="backup-panel backup-panel-reset backup-danger-zone" aria-labelledby="reset-local-data-title">
+            <header class="backup-panel-header">
+              <span class="card-label">Danger zone</span>
+              <h3 id="reset-local-data-title">Reset local app data</h3>
+            </header>
+            <p class="backup-danger-intro">Permanently erase all journal data stored by this app in this browser. Reset cannot be undone.</p>
+            <p class="backup-danger-note"><strong>Export a backup first</strong> if you may need your profile, weeks, daily logs, tasks, photos, or settings later.</p>
+
+            <div class="backup-reset-guardrails">
+              <label class="backup-reset-checkbox">
+                <input type="checkbox" id="reset-data-confirm-checkbox">
+                <span>I understand this will permanently delete all local app data from this browser.</span>
+              </label>
+              <label class="field backup-reset-text-field">
+                <span>Type RESET to confirm</span>
+                <input type="text" id="reset-data-confirm-text" autocomplete="off" spellcheck="false" placeholder="RESET" aria-describedby="reset-local-data-title">
+              </label>
+            </div>
+
+            <button class="danger-button backup-reset-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
+          </section>
+
           <p class="form-message backup-status-message" id="backup-message" hidden></p>
         </section>
       </main>

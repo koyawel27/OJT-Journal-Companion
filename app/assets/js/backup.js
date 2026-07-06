@@ -288,9 +288,70 @@
     }
   }
 
+  function updateResetButtonState() {
+    const checkbox = getElement("reset-data-confirm-checkbox");
+    const textInput = getElement("reset-data-confirm-text");
+    const button = getElement("reset-local-data-button");
+
+    if (!checkbox || !textInput || !button) {
+      return;
+    }
+
+    const acknowledged = checkbox.checked;
+    const typedReset = textInput.value.trim() === "RESET";
+    button.disabled = !acknowledged || !typedReset;
+  }
+
+  async function resetLocalData() {
+    const messageElement = getElement("backup-message");
+    const checkbox = getElement("reset-data-confirm-checkbox");
+    const textInput = getElement("reset-data-confirm-text");
+    const button = getElement("reset-local-data-button");
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!checkbox?.checked || textInput?.value.trim() !== "RESET") {
+      window.OJTUI.showFormMessage(messageElement, "Complete both confirmation steps before resetting.", "error");
+      updateResetButtonState();
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Reset all local app data?\n\nThis permanently deletes everything stored by OJT Journal Companion in this browser. This cannot be undone.\n\nExport a backup first if you may need your data later.\n\nContinue with reset?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    if (button) {
+      button.disabled = true;
+    }
+
+    try {
+      await window.OJTStorage.clearAllData();
+      window.OJTUI.showFormMessage(messageElement, "Local app data erased. Reloading app...", "success");
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } catch (error) {
+      updateResetButtonState();
+      window.OJTUI.showFormMessage(
+        messageElement,
+        error.message || "Local app data could not be reset. Please try again.",
+        "error"
+      );
+      console.error(error);
+    }
+  }
+
   function bindBackupEvents() {
     getElement("export-backup-button")?.addEventListener("click", exportBackup);
     getElement("restore-backup-file")?.addEventListener("change", restoreBackup);
+    getElement("reset-data-confirm-checkbox")?.addEventListener("change", updateResetButtonState);
+    getElement("reset-data-confirm-text")?.addEventListener("input", updateResetButtonState);
+    getElement("reset-local-data-button")?.addEventListener("click", resetLocalData);
+    updateResetButtonState();
   }
 
   document.addEventListener("DOMContentLoaded", bindBackupEvents);

@@ -1484,6 +1484,90 @@ h1 {
   background: #fff4f2;
 }
 
+#backup .backup-danger-zone {
+  margin-top: 20px;
+  border-color: #e6cbc8;
+  background: #fffdf9;
+}
+
+#backup .backup-panel-reset .backup-panel-header {
+  background: #fff4f2;
+}
+
+#backup .backup-panel-reset .backup-panel-header h3 {
+  color: #a43d35;
+}
+
+#backup .backup-danger-intro {
+  margin: 0;
+  padding: 16px 18px 0;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+#backup .backup-danger-note {
+  margin: 10px 18px 0;
+  padding: 12px 14px;
+  border: 1px solid #e6cbc8;
+  border-radius: var(--radius-sm);
+  background: #fff4f2;
+  color: #7a3a33;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+#backup .backup-reset-guardrails {
+  display: grid;
+  gap: 14px;
+  margin: 16px 18px 0;
+  padding: 14px;
+  border: 1px solid #e6cbc8;
+  border-radius: var(--radius-sm);
+  background: #fffaf9;
+}
+
+#backup .backup-reset-checkbox {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+#backup .backup-reset-checkbox input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+  accent-color: #a43d35;
+  cursor: pointer;
+}
+
+#backup .backup-reset-text-field {
+  margin: 0;
+}
+
+#backup .backup-reset-text-field input {
+  min-height: 44px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#backup .backup-reset-button {
+  margin: 16px 18px 18px;
+  width: calc(100% - 36px);
+  min-height: 48px;
+}
+
+#backup .backup-reset-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 @media (max-width: 760px) {
   .form-stack {
     gap: 14px;
@@ -1580,6 +1664,30 @@ h1 {
 
   #backup .backup-restore-field input[type="file"] {
     width: 100%;
+  }
+
+  #backup .backup-danger-intro,
+  #backup .backup-danger-note,
+  #backup .backup-reset-guardrails {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #backup .backup-danger-note,
+  #backup .backup-reset-guardrails {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  #backup .backup-reset-guardrails {
+    margin-top: 14px;
+    padding: 12px;
+  }
+
+  #backup .backup-reset-button {
+    margin: 14px;
+    width: calc(100% - 28px);
+    min-height: 48px;
   }
 
   .form-actions {

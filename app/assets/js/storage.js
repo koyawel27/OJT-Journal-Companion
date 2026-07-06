@@ -233,6 +233,28 @@
     });
   }
 
+  async function clearAllData() {
+    const db = await window.OJTDB.openDatabase();
+    const storeNames = Object.values(window.OJTDB.stores);
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeNames, "readwrite");
+
+      storeNames.forEach((storeName) => {
+        transaction.objectStore(storeName).clear();
+      });
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+
+      transaction.onerror = () => {
+        reject(transaction.error || new Error("Local app data could not be reset."));
+      };
+    });
+  }
+
   window.OJTStorage = {
     getStudentProfile: () => getRecord("studentProfile"),
     saveStudentProfile: (data) => saveRecord("studentProfile", data),
@@ -252,6 +274,7 @@
     getPhotoAttachments: () => getAllRecords("photoAttachments"),
     savePhotoAttachment: (photoAttachment) => saveItem("photoAttachments", photoAttachment),
     deletePhotoAttachment: (id) => deleteItem("photoAttachments", id),
-    replaceAllData
+    replaceAllData,
+    clearAllData
   };
 })();
