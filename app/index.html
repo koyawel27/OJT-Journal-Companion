@@ -226,25 +226,25 @@
           </section>
         </section>
 
-                <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
+        <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
           <p class="section-kicker">Student, company, and settings</p>
           <h2 id="profile-title">Profile</h2>
-          <p>
+          <p class="profile-intro">
             Save the basic details that identify your OJT journal. This phase stores only your
             student profile, company profile, and simple app settings on this browser.
           </p>
 
-          <div class="form-stack">
-            <form class="profile-form" id="student-profile-form" novalidate>
-              <div class="form-header">
+          <div class="profile-layout form-stack">
+            <form class="profile-form profile-section profile-section-student" id="student-profile-form" novalidate>
+              <header class="form-header profile-form-header">
                 <div>
                   <span class="card-label">Student profile</span>
                   <h3>Student details</h3>
                 </div>
-                <p>Used later for journal identity and prepared output.</p>
-              </div>
+                <p>Used for journal identity and prepared weekly output.</p>
+              </header>
 
-              <div class="form-grid">
+              <div class="profile-form-body form-grid">
                 <label class="field">
                   <span>Student name</span>
                   <input type="text" id="student-name" autocomplete="name" required>
@@ -267,22 +267,22 @@
                 </label>
               </div>
 
-              <div class="form-actions">
+              <div class="form-actions profile-form-actions">
                 <button class="primary-button" type="submit">Save student profile</button>
                 <p class="form-message" id="student-profile-message" hidden></p>
               </div>
             </form>
 
-            <form class="profile-form" id="company-profile-form" novalidate>
-              <div class="form-header">
+            <form class="profile-form profile-section profile-section-company" id="company-profile-form" novalidate>
+              <header class="form-header profile-form-header">
                 <div>
                   <span class="card-label">Company profile</span>
                   <h3>OJT placement</h3>
                 </div>
                 <p>Stores the company context for this personal journal.</p>
-              </div>
+              </header>
 
-              <div class="form-grid">
+              <div class="profile-form-body form-grid">
                 <label class="field field-wide">
                   <span>Company name</span>
                   <input type="text" id="company-name" required>
@@ -305,22 +305,22 @@
                 </label>
               </div>
 
-              <div class="form-actions">
+              <div class="form-actions profile-form-actions">
                 <button class="primary-button" type="submit">Save company profile</button>
                 <p class="form-message" id="company-profile-message" hidden></p>
               </div>
             </form>
 
-            <form class="profile-form" id="app-settings-form" novalidate>
-              <div class="form-header">
+            <form class="profile-form profile-section profile-section-settings" id="app-settings-form" novalidate>
+              <header class="form-header profile-form-header">
                 <div>
-                  <span class="card-label">Settings</span>
+                  <span class="card-label">App settings</span>
                   <h3>Simple preferences</h3>
                 </div>
-                <p>Small defaults that will guide future journal organization.</p>
-              </div>
+                <p>Small defaults that guide journal organization on this device.</p>
+              </header>
 
-              <div class="form-grid">
+              <div class="profile-form-body form-grid">
                 <label class="field">
                   <span>Preferred week start day</span>
                   <select id="preferred-week-start-day">
@@ -342,7 +342,7 @@
                 </label>
               </div>
 
-              <div class="form-actions">
+              <div class="form-actions profile-form-actions">
                 <button class="primary-button" type="submit">Save settings</button>
                 <p class="form-message" id="app-settings-message" hidden></p>
               </div>
@@ -471,31 +471,40 @@
         <section class="app-section" id="backup" aria-labelledby="backup-title" hidden>
           <p class="section-kicker">Manual protection</p>
           <h2 id="backup-title">Backup</h2>
-          <p>
+          <p class="backup-intro">
             Your journal data is stored locally in this browser. Export a backup before clearing
             browser data, changing devices, or doing maintenance. Photo-heavy backups may be large.
           </p>
 
+          <div class="backup-local-notice" role="note">
+            <p><strong>Stored only in this browser.</strong> Nothing is uploaded to a server. Export regularly to keep a safe copy of your journal.</p>
+          </div>
+
           <div class="backup-grid">
-            <section class="backup-panel" aria-labelledby="export-backup-title">
-              <span class="card-label">Export</span>
-              <h3 id="export-backup-title">Save a JSON backup</h3>
+            <section class="backup-panel backup-panel-export" aria-labelledby="export-backup-title">
+              <header class="backup-panel-header">
+                <span class="card-label">Export</span>
+                <h3 id="export-backup-title">Save a JSON backup</h3>
+              </header>
               <p>Download all local app data, including photo documentation converted for JSON backup.</p>
-              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
+              <p class="backup-panel-note">Recommended safe action — keep a personal copy before maintenance or device changes.</p>
+              <button class="primary-button backup-export-button" type="button" id="export-backup-button">Export Backup</button>
             </section>
 
-            <section class="backup-panel" aria-labelledby="restore-backup-title">
-              <span class="card-label">Restore</span>
-              <h3 id="restore-backup-title">Restore from JSON</h3>
-              <p>Restoring replaces the current local data in this browser. It does not merge records.</p>
-              <label class="field">
+            <section class="backup-panel backup-panel-restore" aria-labelledby="restore-backup-title">
+              <header class="backup-panel-header">
+                <span class="card-label">Restore</span>
+                <h3 id="restore-backup-title">Restore from JSON</h3>
+              </header>
+              <p class="backup-caution-note"><strong>Caution:</strong> Restoring replaces the current local data in this browser. It does not merge records.</p>
+              <label class="field backup-restore-field">
                 <span>Backup file</span>
                 <input type="file" id="restore-backup-file" accept="application/json,.json">
               </label>
             </section>
           </div>
 
-          <p class="form-message" id="backup-message" hidden></p>
+          <p class="form-message backup-status-message" id="backup-message" hidden></p>
         </section>
       </main>
     </div>

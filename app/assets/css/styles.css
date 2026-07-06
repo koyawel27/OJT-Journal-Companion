@@ -1290,6 +1290,200 @@ h1 {
   color: #a43d35;
 }
 
+#profile .profile-intro,
+#backup .backup-intro {
+  margin: 0 0 0;
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+#profile .profile-layout {
+  gap: 20px;
+}
+
+#profile .profile-form {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+#profile .profile-form-header {
+  margin-bottom: 0;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcfa;
+}
+
+#profile .profile-form-header h3 {
+  margin: 5px 0 0;
+  color: var(--accent);
+  font-size: 1.05rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+#profile .profile-form-header p {
+  max-width: none;
+  margin: 0;
+  line-height: 1.45;
+}
+
+#profile .profile-form-body {
+  padding: 18px;
+  gap: 16px;
+}
+
+#profile .profile-form-actions {
+  margin-top: 0;
+  padding: 14px 18px 18px;
+  border-top: 1px solid var(--line);
+  background: #fbfcfa;
+}
+
+#profile .profile-form .field input,
+#profile .profile-form .field textarea,
+#profile .profile-form .field select {
+  min-height: 44px;
+}
+
+#profile .profile-form .field textarea {
+  min-height: 96px;
+}
+
+#profile .profile-form-actions .form-message {
+  flex: 1 1 100%;
+}
+
+#backup .backup-local-notice {
+  margin-top: 18px;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-md);
+  background: #f2f6f3;
+  padding: 14px 16px;
+}
+
+#backup .backup-local-notice p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+#backup .backup-grid {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+#backup .backup-panel {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+#backup .backup-panel-header {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcfa;
+}
+
+#backup .backup-panel-header h3 {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+#backup .backup-panel > p:not(.backup-panel-note):not(.backup-caution-note) {
+  margin: 0;
+  padding: 16px 18px 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+#backup .backup-panel-export {
+  border-color: var(--accent-soft);
+}
+
+#backup .backup-panel-export .backup-panel-header {
+  background: #f2f6f3;
+}
+
+#backup .backup-panel-export .backup-panel-header h3 {
+  color: var(--accent);
+}
+
+#backup .backup-panel-note {
+  margin: 10px 18px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-sm);
+  background: #f8fbf9;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+#backup .backup-export-button {
+  margin: 16px 18px 18px;
+  width: calc(100% - 36px);
+}
+
+#backup .backup-panel-restore {
+  border-color: #e8dcc0;
+  background: #fffdf8;
+}
+
+#backup .backup-panel-restore .backup-panel-header {
+  background: #fff8e8;
+}
+
+#backup .backup-panel-restore .backup-panel-header h3 {
+  color: #7a5512;
+}
+
+#backup .backup-caution-note {
+  margin: 16px 18px 0;
+  padding: 12px 14px;
+  border: 1px solid #efd9a8;
+  border-radius: var(--radius-sm);
+  background: #fff8e8;
+  color: #7a5512;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+#backup .backup-restore-field {
+  margin: 14px 18px 18px;
+}
+
+#backup .backup-restore-field input[type="file"] {
+  min-height: 44px;
+  padding: 10px 12px;
+}
+
+#backup .backup-status-message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: #fbfcfa;
+}
+
+#backup .backup-status-message.success {
+  border: 1px solid var(--accent-soft);
+  background: #f2f6f3;
+}
+
+#backup .backup-status-message.error {
+  border: 1px solid #e6cbc8;
+  background: #fff4f2;
+}
+
 @media (max-width: 760px) {
   .form-stack {
     gap: 14px;
@@ -1314,6 +1508,78 @@ h1 {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  #profile .profile-layout {
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  #profile .profile-form-header,
+  #profile .profile-form-body,
+  #profile .profile-form-actions {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #profile .profile-form-body {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    gap: 12px;
+  }
+
+  #profile .profile-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+    padding-bottom: 14px;
+  }
+
+  #profile .profile-form-actions .primary-button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  #backup .backup-local-notice {
+    margin-top: 14px;
+    padding: 12px 14px;
+  }
+
+  #backup .backup-grid {
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  #backup .backup-panel-header,
+  #backup .backup-panel > p:not(.backup-panel-note):not(.backup-caution-note),
+  #backup .backup-panel-note,
+  #backup .backup-caution-note,
+  #backup .backup-restore-field {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #backup .backup-panel-note {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  #backup .backup-caution-note {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  #backup .backup-export-button {
+    margin: 14px;
+    width: calc(100% - 28px);
+    min-height: 48px;
+  }
+
+  #backup .backup-restore-field {
+    margin: 12px 14px 14px;
+  }
+
+  #backup .backup-restore-field input[type="file"] {
+    width: 100%;
   }
 
   .form-actions {
