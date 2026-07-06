@@ -1696,23 +1696,153 @@ h1 {
     width: 100%;
   }
 
-  .preview-info-grid,
-  .preview-table-header,
-  .preview-table-row {
+  .preview-info-grid {
     grid-template-columns: 1fr;
   }
 
   .preview-info-grid div,
   .preview-info-grid div:nth-last-child(-n + 2),
-  .preview-info-grid div:nth-child(odd),
-  .preview-table-header div:first-child,
-  .preview-day-cell {
+  .preview-info-grid div:nth-child(odd) {
     border-right: 0;
   }
 
-  .preview-info-grid div + div,
-  .preview-work-cell {
+  .preview-info-grid div + div {
     border-top: 1px solid var(--line);
+  }
+
+  #weekly-preview .week-panel {
+    display: grid;
+    gap: 14px;
+  }
+
+  #weekly-preview .panel-header {
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #weekly-preview .panel-header p {
+    margin-top: 8px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  #weekly-preview .field {
+    margin-top: 0;
+  }
+
+  #weekly-preview .field select {
+    min-height: 48px;
+    max-width: 100%;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #weekly-preview .form-actions {
+    margin-top: 0;
+    gap: 10px;
+  }
+
+  #weekly-preview #copy-weekly-journal-button {
+    min-height: 48px;
+  }
+
+  .journal-preview-card {
+    padding: 16px;
+  }
+
+  .preview-accomplishments-section h4 {
+    margin-bottom: 12px;
+  }
+
+  .preview-table {
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+    display: grid;
+    gap: 12px;
+    background: transparent;
+  }
+
+  .preview-table-header {
+    display: none;
+  }
+
+  .preview-table-row {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid #cfd9d1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--panel);
+  }
+
+  .preview-table-row + .preview-table-row {
+    border-top: 1px solid #cfd9d1;
+    margin-top: 0;
+  }
+
+  .preview-day-cell {
+    padding: 14px 14px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    background: #f8faf9;
+  }
+
+  .preview-day-cell strong {
+    font-size: 1rem;
+    color: var(--accent);
+  }
+
+  .preview-day-cell span:first-of-type {
+    margin-top: 5px;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .preview-day-cell span + span {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.25;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .preview-work-cell {
+    min-width: 0;
+    padding: 14px;
+    border-top: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+
+  .preview-task-list {
+    padding-left: 1.25rem;
+  }
+
+  .preview-task-list li {
+    line-height: 1.45;
+  }
+
+  .preview-task-list li + li {
+    margin-top: 8px;
+  }
+
+  .preview-status-line,
+  .preview-day-remarks {
+    line-height: 1.45;
   }
 }
 .daily-logs-layout {
