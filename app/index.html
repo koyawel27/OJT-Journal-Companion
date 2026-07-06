@@ -376,14 +376,30 @@
           <p class="section-kicker">Manual protection</p>
           <h2 id="backup-title">Backup</h2>
           <p>
-            This section will later provide JSON backup export and restore tools so local journal
-            data can be saved and recovered manually.
+            Your journal data is stored locally in this browser. Export a backup before clearing
+            browser data, changing devices, or doing maintenance. Photo-heavy backups may be large.
           </p>
-          <div class="placeholder-card">
-            <span class="card-label">Planned</span>
-            <h3>Backup tools</h3>
-            <p>Future controls will export and restore app data after storage is added in later phases.</p>
+
+          <div class="backup-grid">
+            <section class="backup-panel" aria-labelledby="export-backup-title">
+              <span class="card-label">Export</span>
+              <h3 id="export-backup-title">Save a JSON backup</h3>
+              <p>Download all local app data, including photo documentation converted for JSON backup.</p>
+              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
+            </section>
+
+            <section class="backup-panel" aria-labelledby="restore-backup-title">
+              <span class="card-label">Restore</span>
+              <h3 id="restore-backup-title">Restore from JSON</h3>
+              <p>Restoring replaces the current local data in this browser. It does not merge records.</p>
+              <label class="field">
+                <span>Backup file</span>
+                <input type="file" id="restore-backup-file" accept="application/json,.json">
+              </label>
+            </section>
           </div>
+
+          <p class="form-message" id="backup-message" hidden></p>
         </section>
       </main>
     </div>
@@ -472,5 +488,6 @@
   <script src="assets/js/weeks.js"></script>
   <script src="assets/js/daily-logs.js"></script>
   <script src="assets/js/journal-preview.js"></script>
+  <script src="assets/js/backup.js"></script>
 </body>
 </html>

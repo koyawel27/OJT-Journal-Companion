@@ -259,6 +259,30 @@ h1 {
   color: var(--muted);
 }
 
+.backup-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.backup-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 18px;
+}
+
+.backup-panel h3 {
+  margin: 6px 0 6px;
+  font-size: 1.05rem;
+}
+
+.backup-panel p {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
 .drawer-overlay,
 .mobile-drawer {
   display: none;
@@ -331,7 +355,13 @@ h1 {
     gap: 10px;
   }
 
-  .placeholder-card {
+  .backup-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .placeholder-card,
+  .backup-panel {
     padding: 14px;
   }
 

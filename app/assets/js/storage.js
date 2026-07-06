@@ -185,6 +185,54 @@
     });
   }
 
+  async function replaceAllData(data) {
+    const db = await window.OJTDB.openDatabase();
+    const storeNames = Object.values(window.OJTDB.stores);
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeNames, "readwrite");
+
+      storeNames.forEach((storeName) => {
+        transaction.objectStore(storeName).clear();
+      });
+
+      function putSingleRecord(storeKey, record) {
+        if (!record) {
+          return;
+        }
+
+        transaction.objectStore(getStoreName(storeKey)).put({
+          ...record,
+          id: recordIds[storeKey]
+        });
+      }
+
+      function putRecords(storeKey, records) {
+        const store = transaction.objectStore(getStoreName(storeKey));
+        (records || []).forEach((record) => {
+          store.put(record);
+        });
+      }
+
+      putSingleRecord("studentProfile", data.studentProfile);
+      putSingleRecord("companyProfile", data.companyProfile);
+      putSingleRecord("appSettings", data.appSettings);
+      putRecords("ojtWeeks", data.weeks);
+      putRecords("dailyLogs", data.dailyLogs);
+      putRecords("dailyTasks", data.dailyTasks);
+      putRecords("photoAttachments", data.photoAttachments);
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+
+      transaction.onerror = () => {
+        reject(transaction.error || new Error("Backup data could not be restored."));
+      };
+    });
+  }
+
   window.OJTStorage = {
     getStudentProfile: () => getRecord("studentProfile"),
     saveStudentProfile: (data) => saveRecord("studentProfile", data),
@@ -203,6 +251,7 @@
     deleteDailyTask: (id) => deleteItem("dailyTasks", id),
     getPhotoAttachments: () => getAllRecords("photoAttachments"),
     savePhotoAttachment: (photoAttachment) => saveItem("photoAttachments", photoAttachment),
-    deletePhotoAttachment: (id) => deleteItem("photoAttachments", id)
+    deletePhotoAttachment: (id) => deleteItem("photoAttachments", id),
+    replaceAllData
   };
 })();
