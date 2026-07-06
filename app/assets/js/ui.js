@@ -136,8 +136,21 @@
     return (dashboardState.dailyTasks || []).filter((task) => task.dailyLogId === dailyLogId).length;
   }
 
-  function getSummaryStatus(label, value) {
-    return `${label}: ${String(value || "").trim() ? "filled" : "missing"}`;
+  function renderSummaryStatusItem(label, value) {
+    const filled = Boolean(String(value || "").trim());
+    const statusText = filled ? "filled" : "missing";
+    return `<li class="${filled ? "is-filled" : "is-missing"}">${escapeHtml(label)}: ${statusText}</li>`;
+  }
+
+  function setWeeklyPreviewButtonsEnabled(enabled) {
+    document.getElementById("dashboard-action-weekly-preview")?.toggleAttribute("disabled", !enabled);
+  }
+
+  function syncDashboardBackupAction(showReminder) {
+    const backupAction = document.getElementById("dashboard-action-backup");
+    if (backupAction) {
+      backupAction.hidden = !showReminder;
+    }
   }
 
   function normalizeDayStatus(value) {
@@ -148,7 +161,6 @@
     const week = chooseCurrentWeek(dashboardState.weeks);
     const daysElement = document.getElementById("dashboard-week-days");
     const summaryElement = document.getElementById("dashboard-week-summary-status");
-    const openButton = document.getElementById("dashboard-open-weekly-preview");
 
     if (!daysElement || !summaryElement) {
       return;
@@ -163,13 +175,11 @@
       setText("dashboard-week-open-days", "0");
       daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then add daily logs to see progress here.</li>';
       summaryElement.innerHTML = `
-        <li>Skills Learned: missing</li>
-        <li>Problems Encountered: missing</li>
-        <li>Reflection: missing</li>
+        <li class="is-missing">Skills Learned: missing</li>
+        <li class="is-missing">Problems Encountered: missing</li>
+        <li class="is-missing">Reflection: missing</li>
       `;
-      if (openButton) {
-        openButton.disabled = true;
-      }
+      setWeeklyPreviewButtonsEnabled(false);
       return;
     }
 
@@ -179,6 +189,7 @@
     const loggedDayCount = weekDates.filter((dateText) => Boolean(getDailyLogForDate(week.id, dateText))).length;
     const workedDayCount = weekLogs.filter((log) => normalizeDayStatus(log.dayStatus) === "Worked").length;
     const openDayCount = Math.max(weekDates.length - loggedDayCount, 0);
+    const today = todayText();
 
     setText("dashboard-week-title", `Week ${week.weekNumber || "Not set"}`);
     setText("dashboard-week-dates", `${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
@@ -190,11 +201,14 @@
     daysElement.innerHTML = weekDates.length > 0
       ? weekDates.map((dateText, index) => {
         const log = getDailyLogForDate(week.id, dateText);
+        const isToday = dateText === today;
+        const todayClass = isToday ? " is-today" : "";
+        const todayLabel = isToday ? " · Today" : "";
 
         if (!log) {
           return `
-            <li class="dashboard-day-row is-empty">
-              <span class="dashboard-day-main">Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+            <li class="dashboard-day-row is-empty${todayClass}">
+              <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
               <strong class="dashboard-day-result">No log yet</strong>
             </li>
           `;
@@ -206,8 +220,8 @@
         const renderedText = dayStatus === "Worked" ? formatRenderedTime(log.renderedMinutes) : formatRenderedTime(0);
 
         return `
-          <li class="dashboard-day-row">
-            <span class="dashboard-day-main">Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+          <li class="dashboard-day-row${todayClass}">
+            <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
             <strong class="dashboard-day-result">
               <span class="dashboard-day-status">${escapeHtml(dayStatus)}</span>
               <span>${escapeHtml(renderedText)}</span>
@@ -218,15 +232,13 @@
       }).join("")
       : '<li class="empty-state">This week has no inclusive dates saved.</li>';
 
-    summaryElement.innerHTML = `
-      <li>${escapeHtml(getSummaryStatus("Skills Learned", week.weeklySkillsLearned))}</li>
-      <li>${escapeHtml(getSummaryStatus("Problems Encountered", week.problemsEncountered))}</li>
-      <li>${escapeHtml(getSummaryStatus("Reflection", week.reflectionOrPointsOfLearning))}</li>
-    `;
+    summaryElement.innerHTML = [
+      renderSummaryStatusItem("Skills Learned", week.weeklySkillsLearned),
+      renderSummaryStatusItem("Problems Encountered", week.problemsEncountered),
+      renderSummaryStatusItem("Reflection", week.reflectionOrPointsOfLearning)
+    ].join("");
 
-    if (openButton) {
-      openButton.disabled = false;
-    }
+    setWeeklyPreviewButtonsEnabled(true);
   }
 
   async function refreshDashboardWeekProgress() {
@@ -345,6 +357,7 @@
         }
       }
       reminderElement.hidden = !showReminder;
+      syncDashboardBackupAction(showReminder);
     }
 
     updateRenderedProgressSummary();
@@ -405,8 +418,14 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     refreshDashboardWeekProgress();
-    document.getElementById("dashboard-open-weekly-preview")?.addEventListener("click", () => {
+    document.getElementById("dashboard-go-daily-logs")?.addEventListener("click", () => {
+      window.OJTApp?.showSection("daily-logs");
+    });
+    document.getElementById("dashboard-action-weekly-preview")?.addEventListener("click", () => {
       window.OJTApp?.showSection("weekly-preview");
+    });
+    document.getElementById("dashboard-action-backup")?.addEventListener("click", () => {
+      window.OJTApp?.showSection("backup");
     });
   });
 

@@ -96,12 +96,28 @@
 
       <main class="content" id="main-content">
         <section class="app-section is-visible" id="dashboard" aria-labelledby="dashboard-title">
-          <p class="section-kicker">Start here</p>
-          <h2 id="dashboard-title">Dashboard</h2>
-          <p>
-            Review your saved profile details, total rendered time, and the current or latest
-            week progress in one compact view.
-          </p>
+          <header class="dashboard-page-header">
+            <div class="dashboard-intro">
+              <p class="section-kicker">Start here</p>
+              <h2 id="dashboard-title">Dashboard</h2>
+              <p class="dashboard-lead">
+                Your OJT progress overview — hours completed, current week status, and next steps.
+              </p>
+            </div>
+            <div class="dashboard-actions" aria-label="Quick actions">
+              <button class="primary-button dashboard-action-primary" type="button" id="dashboard-go-daily-logs">Go to Daily Logs</button>
+              <button class="secondary-button" type="button" id="dashboard-action-weekly-preview">Open Weekly Preview</button>
+              <button class="secondary-button dashboard-action-backup" type="button" id="dashboard-action-backup" hidden>Go to Backup</button>
+            </div>
+          </header>
+
+          <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
+            <p class="reminder-text">
+              <strong>Backup Reminder:</strong> You haven't exported a backup in over 7 days. Your data is stored only in this browser.
+            </p>
+            <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
+          </div>
+
           <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title" aria-live="polite">
             <div class="dashboard-ojt-progress-header">
               <div>
@@ -140,65 +156,53 @@
               Set your required OJT hours in Profile to track overall progress here.
             </p>
           </section>
-          <div class="dashboard-summary" aria-live="polite">
-            <article class="summary-card">
-              <span class="card-label">Student</span>
-              <strong id="summary-student-name">Not set yet</strong>
-              <p id="summary-student-detail">Save your student profile to show it here.</p>
-            </article>
-            <article class="summary-card">
-              <span class="card-label">Company</span>
-              <strong id="summary-company-name">Not set yet</strong>
-              <p id="summary-company-detail">Save your company profile to show it here.</p>
-            </article>
-            <article class="summary-card">
-              <span class="card-label">Weeks</span>
-              <strong id="summary-week-count">0 weeks</strong>
-              <p id="summary-week-detail">Create OJT weeks to organize future daily logs.</p>
-            </article>
-            <article class="summary-card">
-              <span class="card-label">Daily logs</span>
-              <strong id="summary-daily-log-count">0 logs</strong>
-              <p id="summary-daily-log-detail">Create daily logs after choosing a saved week.</p>
-            </article>
-            <article class="summary-card">
-              <span class="card-label">Rendered time</span>
-              <strong id="summary-rendered-time">0h 0m</strong>
-              <p id="summary-rendered-detail">Save complete daily time records to track OJT progress.</p>
-            </article>
-          </div>
-          <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
-            <div class="dashboard-week-overview">
-              <div class="dashboard-week-header">
-                <div>
-                  <span class="card-label">Current / latest week</span>
-                  <h3 id="dashboard-week-title">No OJT week yet</h3>
-                  <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
-                </div>
-                <div class="dashboard-week-total">
-                  <span>Weekly rendered hours</span>
-                  <strong id="dashboard-week-rendered">0h 0m</strong>
-                </div>
-              </div>
 
-              <div class="dashboard-week-stats" aria-label="Current week progress summary">
-                <div>
-                  <span>Days logged</span>
-                  <strong id="dashboard-week-logged-days">0 of 0</strong>
-                </div>
-                <div>
-                  <span>Worked days</span>
-                  <strong id="dashboard-week-worked-days">0</strong>
-                </div>
-                <div>
-                  <span>Open days</span>
-                  <strong id="dashboard-week-open-days">0</strong>
-                </div>
+          <section class="dashboard-identity-strip" aria-labelledby="dashboard-identity-heading">
+            <h3 class="dashboard-identity-heading" id="dashboard-identity-heading">Journal identity</h3>
+            <div class="dashboard-identity-grid" aria-live="polite">
+              <article class="summary-card summary-card--identity">
+                <span class="card-label">Student</span>
+                <strong id="summary-student-name">Not set yet</strong>
+                <p id="summary-student-detail">Save your student profile to show it here.</p>
+              </article>
+              <article class="summary-card summary-card--identity">
+                <span class="card-label">Company</span>
+                <strong id="summary-company-name">Not set yet</strong>
+                <p id="summary-company-detail">Save your company profile to show it here.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
+            <header class="dashboard-week-band dashboard-week-band--header">
+              <div class="dashboard-week-intro">
+                <span class="card-label">Current / latest week</span>
+                <h3 id="dashboard-week-title">No OJT week yet</h3>
+                <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
+              </div>
+              <div class="dashboard-week-highlight">
+                <span class="dashboard-week-highlight-label">Weekly rendered</span>
+                <strong id="dashboard-week-rendered">0h 0m</strong>
+              </div>
+            </header>
+
+            <div class="dashboard-week-band dashboard-week-band--stats" aria-label="Current week progress summary">
+              <div class="dashboard-week-stat">
+                <span>Days logged</span>
+                <strong id="dashboard-week-logged-days">0 of 0</strong>
+              </div>
+              <div class="dashboard-week-stat">
+                <span>Worked days</span>
+                <strong id="dashboard-week-worked-days">0</strong>
+              </div>
+              <div class="dashboard-week-stat dashboard-week-stat--action">
+                <span>Open days</span>
+                <strong id="dashboard-week-open-days">0</strong>
               </div>
             </div>
 
-            <div class="dashboard-week-grid">
-              <section class="dashboard-week-progress" aria-labelledby="dashboard-week-progress-title">
+            <div class="dashboard-week-body">
+              <section class="dashboard-week-panel dashboard-week-progress" aria-labelledby="dashboard-week-progress-title">
                 <div class="dashboard-block-heading">
                   <span class="card-label">Daily check-in</span>
                   <h4 id="dashboard-week-progress-title">Daily progress</h4>
@@ -207,7 +211,7 @@
                   <li class="empty-state">No current week data to show yet.</li>
                 </ul>
               </section>
-              <section class="dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
+              <section class="dashboard-week-panel dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
                 <div class="dashboard-block-heading">
                   <span class="card-label">Journal readiness</span>
                   <h4 id="dashboard-week-summary-title">Weekly summary</h4>
@@ -217,18 +221,9 @@
                   <li>Problems Encountered: missing</li>
                   <li>Reflection: missing</li>
                 </ul>
-                <div class="dashboard-week-actions">
-                  <button class="secondary-button" type="button" id="dashboard-open-weekly-preview">Open Weekly Preview</button>
-                </div>
               </section>
             </div>
           </section>
-          <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
-            <p class="reminder-text">
-              <strong>Backup Reminder:</strong> You haven't exported a backup in over 7 days. Your data is stored only in this browser.
-            </p>
-            <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
-          </div>
         </section>
 
                 <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
