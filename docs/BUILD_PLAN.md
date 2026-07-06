@@ -203,7 +203,7 @@ Let the student create, edit, and delete daily OJT logs under a selected week an
 - Build daily log form.
 - Allow creating, editing, and deleting daily logs under a selected week or Phase 3 day slot.
 - Preserve the date/day slot connection from Phase 3.
-- Keep `DailyLog` focused on day/time fields: week, entry date, time in, time out, break minutes, and rendered time placeholders.
+- Keep `DailyLog` focused on day status, day/time fields, remarks, and rendered time placeholders.
 - Add structured task/work items under a daily log.
 - Allow adding, editing, and deleting task items.
 - Include task description, optional task time spent in minutes, personal task status, optional task notes, and ordering when practical.
@@ -252,6 +252,8 @@ Calculate daily and weekly rendered time correctly.
 ### Tasks
 
 - Create a function that calculates `renderedMinutes` from `timeIn`, `timeOut`, and `breakMinutes`.
+- Require time in and time out for worked days.
+- Store `0` rendered minutes for absent and rest-day records.
 - Display rendered hours from `renderedMinutes`.
 - Recalculate when time fields change.
 - Store `renderedMinutes` with the daily log.
@@ -368,6 +370,7 @@ Add basic photo documentation support for daily logs.
 - Add storage functions for `PhotoAttachment`.
 - Add photo import control to daily logs.
 - Store file metadata.
+- Store a simple photo category label.
 - Store imported image data in IndexedDB as a `Blob` or equivalent browser-supported file data.
 - Add optional caption field.
 - Allow removing a photo from a daily log.
@@ -379,6 +382,7 @@ Add basic photo documentation support for daily logs.
 
 - User can attach or import a photo to a daily log.
 - Photo metadata saves locally.
+- Photo category saves locally.
 - Photo data remains after refresh if browser storage is intact.
 - User can edit a caption.
 - User can remove a photo.

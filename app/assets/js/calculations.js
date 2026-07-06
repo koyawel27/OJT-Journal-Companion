@@ -1,4 +1,14 @@
 (function () {
+  const dayStatuses = ["Worked", "Absent", "No OJT / Rest Day"];
+
+  function normalizeDayStatus(value) {
+    return dayStatuses.includes(value) ? value : "Worked";
+  }
+
+  function isWorkedDay(log) {
+    return normalizeDayStatus(log?.dayStatus) === "Worked";
+  }
+
   function isValidTime(value) {
     return /^([01]\d|2[0-3]):[0-5]\d$/.test(value || "");
   }
@@ -93,6 +103,10 @@
   }
 
   function getRenderedMinutes(log) {
+    if (!isWorkedDay(log)) {
+      return 0;
+    }
+
     const minutes = Number(log?.renderedMinutes);
     return Number.isFinite(minutes) && minutes >= 0 ? minutes : 0;
   }
@@ -110,9 +124,12 @@
 
   window.OJTCalculations = {
     calculateRenderedTime,
+    dayStatuses,
     formatRenderedTime,
     getRenderedMinutes,
     isValidTime,
+    isWorkedDay,
+    normalizeDayStatus,
     sumRenderedMinutes,
     sumTaskMinutes
   };

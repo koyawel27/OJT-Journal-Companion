@@ -128,26 +128,50 @@
     });
   }
 
-  async function deleteDailyLogWithTasks(dailyLogId) {
+  async function deleteDailyLogWithRelatedRecords(dailyLogId) {
     const db = await window.OJTDB.openDatabase();
     const dailyLogStore = getStoreName("dailyLogs");
     const dailyTaskStore = getStoreName("dailyTasks");
+    const photoAttachmentStore = getStoreName("photoAttachments");
 
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([dailyLogStore, dailyTaskStore], "readwrite");
+      const transaction = db.transaction([dailyLogStore, dailyTaskStore, photoAttachmentStore], "readwrite");
       const logs = transaction.objectStore(dailyLogStore);
       const tasks = transaction.objectStore(dailyTaskStore);
-      const request = tasks.getAll();
+      const photos = transaction.objectStore(photoAttachmentStore);
+      const taskRequest = tasks.getAll();
+      const photoRequest = photos.getAll();
+      let tasksQueued = false;
+      let photosQueued = false;
 
-      request.onsuccess = () => {
-        (request.result || [])
+      function deleteLogWhenReady() {
+        if (tasksQueued && photosQueued) {
+          logs.delete(dailyLogId);
+        }
+      }
+
+      taskRequest.onsuccess = () => {
+        (taskRequest.result || [])
           .filter((task) => task.dailyLogId === dailyLogId)
           .forEach((task) => tasks.delete(task.id));
-        logs.delete(dailyLogId);
+        tasksQueued = true;
+        deleteLogWhenReady();
       };
 
-      request.onerror = () => {
-        reject(request.error || new Error("Related task items could not be loaded."));
+      photoRequest.onsuccess = () => {
+        (photoRequest.result || [])
+          .filter((photo) => photo.dailyLogId === dailyLogId)
+          .forEach((photo) => photos.delete(photo.id));
+        photosQueued = true;
+        deleteLogWhenReady();
+      };
+
+      taskRequest.onerror = () => {
+        reject(taskRequest.error || new Error("Related task items could not be loaded."));
+      };
+
+      photoRequest.onerror = () => {
+        reject(photoRequest.error || new Error("Related photo attachments could not be loaded."));
       };
 
       transaction.oncomplete = () => {
@@ -173,9 +197,12 @@
     deleteWeek: (id) => deleteItem("ojtWeeks", id),
     getDailyLogs: () => getAllRecords("dailyLogs"),
     saveDailyLog: (dailyLog) => saveItem("dailyLogs", dailyLog),
-    deleteDailyLog: (id) => deleteDailyLogWithTasks(id),
+    deleteDailyLog: (id) => deleteDailyLogWithRelatedRecords(id),
     getDailyTasks: () => getAllRecords("dailyTasks"),
     saveDailyTask: (dailyTask) => saveItem("dailyTasks", dailyTask),
-    deleteDailyTask: (id) => deleteItem("dailyTasks", id)
+    deleteDailyTask: (id) => deleteItem("dailyTasks", id),
+    getPhotoAttachments: () => getAllRecords("photoAttachments"),
+    savePhotoAttachment: (photoAttachment) => saveItem("photoAttachments", photoAttachment),
+    deletePhotoAttachment: (id) => deleteItem("photoAttachments", id)
   };
 })();

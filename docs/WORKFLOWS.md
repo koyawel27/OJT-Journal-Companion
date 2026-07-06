@@ -33,14 +33,16 @@ The daily log workflow is the main record-keeping flow for the student.
 1. User selects an existing week or creates a new week.
 2. User creates or opens a daily log under that week.
 3. User enters the entry date.
-4. User enters time in, time out, and break minutes.
-5. User adds one or more structured task/work items under the daily log.
-6. Each task item may include a description, optional time spent, personal status, and notes.
-7. App validates required fields.
-8. App saves the daily log and related task items locally using IndexedDB.
-9. Rendered minutes and rendered hours remain placeholders until the Phase 5 time calculation workflow.
+4. User chooses a day status: `Worked`, `Absent`, or `No OJT / Rest Day`.
+5. If the day status is `Worked`, user enters time in, time out, and break minutes.
+6. If the day status is `Absent` or `No OJT / Rest Day`, user may add optional day remarks.
+7. User adds one or more structured task/work items under the daily log when useful.
+8. Each task item may include a description, optional time spent, personal status, and notes.
+9. App validates required fields.
+10. App saves the daily log and related task items locally using IndexedDB.
+11. Worked days calculate rendered time from the daily log time fields. Absent and rest-day records save `0` rendered minutes.
 
-Daily logs should belong to an `OJTWeek` through `weekId`. Daily logs are day/time records only. Daily task/work items should belong to a `DailyLog` through `dailyLogId` and should hold the daily work/accomplishment bullet details.
+Daily logs should belong to an `OJTWeek` through `weekId`. Daily logs are day status and time records. Daily task/work items should belong to a `DailyLog` through `dailyLogId` and should hold the daily work/accomplishment bullet details.
 
 Task items can later be used as bullet-style accomplishments in the weekly preview. Task status is personal progress tracking only; it does not mean supervisor approval or official school validation. Task time spent does not affect official rendered hours in v1.0.
 
@@ -64,12 +66,14 @@ Task status is for personal progress tracking only. It is not supervisor approva
 
 The time calculation workflow keeps daily and weekly rendered hours consistent.
 
-1. App reads `timeIn`, `timeOut`, and `breakMinutes` from the daily log.
-2. App calculates the total time between `timeIn` and `timeOut`.
-3. App subtracts `breakMinutes`.
-4. App stores the result as `renderedMinutes`.
-5. App displays rendered hours based on `renderedMinutes`.
-6. When time fields change, app recalculates `renderedMinutes` and displayed hours.
+1. App reads `dayStatus` from the daily log.
+2. If `dayStatus` is `Worked`, app reads `timeIn`, `timeOut`, and `breakMinutes`.
+3. App calculates the total time between `timeIn` and `timeOut`.
+4. App subtracts `breakMinutes`.
+5. App stores the result as `renderedMinutes`.
+6. If `dayStatus` is `Absent` or `No OJT / Rest Day`, app stores `0` rendered minutes.
+7. App displays rendered hours based on `renderedMinutes`.
+8. When day status or time fields change, app recalculates `renderedMinutes` and displayed hours.
 
 `renderedMinutes` should be the main stored calculated value because it avoids decimal rounding issues.
 
@@ -96,13 +100,16 @@ The photo documentation workflow supports basic local photo documentation for da
 
 1. User opens or creates a daily log.
 2. User attaches or imports photo documentation for that daily log.
-3. App stores photo metadata locally.
-4. App stores imported image data locally using IndexedDB as a `Blob` or equivalent browser-supported file data.
-5. User may add a caption.
-6. User may remove photo documentation from the daily log.
-7. App saves changes locally.
+3. User chooses a photo category such as `General Documentation`, `Time In Photo`, `Time Out Photo`, `Task/Work Proof`, or `Other`.
+4. App stores photo metadata locally.
+5. App stores imported image data locally using IndexedDB as a `Blob` or equivalent browser-supported file data.
+6. User may add a caption.
+7. User may remove photo documentation from the daily log.
+8. App saves changes locally.
 
-Photo metadata may include file name, file type, file size, caption, related daily log ID, and created timestamp.
+Photo metadata may include file name, file type, file size, category, caption, related daily log ID, and created timestamp.
+
+Photo categories are simple documentation labels. Time in and time out photo categories should not be treated as verified attendance, GPS proof, supervisor validation, or official proof logic.
 
 When a photo is imported into the app and stored in IndexedDB as a `Blob` or equivalent browser-supported file data, the app should treat it as its own local copy. If the original photo is later deleted from the phone or laptop, the app may still retain the imported copy as long as browser storage has not been cleared.
 

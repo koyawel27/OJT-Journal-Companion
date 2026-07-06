@@ -103,15 +103,19 @@ Stores one day/time record for a daily OJT journal entry. Daily work details and
 | `id` | string | Unique local ID. |
 | `weekId` | string | ID of the related `OJTWeek`. |
 | `entryDate` | string | Date of the daily log. |
-| `timeIn` | string | Start time for the OJT day. |
-| `timeOut` | string | End time for the OJT day. |
-| `breakMinutes` | number | Break duration in minutes. |
+| `dayStatus` | string | `Worked`, `Absent`, or `No OJT / Rest Day`. Missing older values should default to `Worked`. |
+| `timeIn` | string | Start time for worked OJT days. Required only when `dayStatus` is `Worked`. |
+| `timeOut` | string | End time for worked OJT days. Required only when `dayStatus` is `Worked`. |
+| `breakMinutes` | number | Break duration in minutes for worked days. Defaults to `0` when empty. |
 | `renderedMinutes` | number | Calculated rendered time in minutes. |
 | `renderedHours` | number | Calculated rendered hours for the day. |
+| `dayRemarks` | string | Optional reason or notes, especially useful for absent or rest days. |
 | `createdAt` | string | Date and time the record was created. |
 | `updatedAt` | string | Date and time the record was last updated. |
 
-`renderedMinutes` should be the main stored calculated value because it avoids decimal rounding issues. `renderedHours` may be displayed by the app or stored only for convenience, but it should be derived from `renderedMinutes` or recalculated whenever `timeIn`, `timeOut`, or `breakMinutes` changes.
+`renderedMinutes` should be the main stored calculated value because it avoids decimal rounding issues. `renderedHours` may be displayed by the app or stored only for convenience, but it should be derived from `renderedMinutes` or recalculated whenever `timeIn`, `timeOut`, `breakMinutes`, or `dayStatus` changes.
+
+If `dayStatus` is `Worked`, official rendered hours should come from `timeIn`, `timeOut`, and `breakMinutes`. If `dayStatus` is `Absent` or `No OJT / Rest Day`, `timeIn` and `timeOut` are not required and `renderedMinutes` should be `0`.
 
 For v1.0, daily logs should assume same-day time records only. Overnight shifts are out of scope unless added later.
 
@@ -149,10 +153,11 @@ Stores basic photo documentation information for a daily log.
 | `fileType` | string | File MIME type, such as `image/jpeg` or `image/png`. |
 | `fileSize` | number | File size in bytes. |
 | `fileBlob` | Blob | Imported image data stored locally in IndexedDB. |
+| `photoCategory` | string | `General Documentation`, `Time In Photo`, `Time Out Photo`, `Task/Work Proof`, or `Other`. Missing older values should default to `General Documentation`. |
 | `caption` | string | Optional caption or description. |
 | `createdAt` | string | ISO timestamp for when the attachment record was created. |
 
-Photo storage needs testing because browser storage behavior and size limits vary across browsers and devices. v1.0 should store imported photo data in IndexedDB as a `Blob` or equivalent browser-supported file data, along with related metadata. v1.0 should support basic attach/import, metadata storage, and removal from a daily log. Advanced preview, gallery, compression, and image editing are not required for v1.0.
+Photo storage needs testing because browser storage behavior and size limits vary across browsers and devices. v1.0 should store imported photo data in IndexedDB as a `Blob` or equivalent browser-supported file data, along with related metadata. v1.0 should support basic attach/import, category labels, metadata storage, and removal from a daily log. Time in and time out photo categories are documentation labels only; they are not verified attendance, GPS proof, supervisor validation, or official proof logic. Advanced preview, gallery, compression, and image editing are not required for v1.0.
 
 ## 10. AppSettings
 
@@ -229,7 +234,7 @@ These values should be calculated by the app:
 - Total rendered hours across all daily logs
 - Remaining OJT hours, if `requiredOjtHours` is set
 
-Daily rendered minutes should use `timeIn`, `timeOut`, and `breakMinutes`. Daily rendered hours should be derived from rendered minutes for display.
+Daily rendered minutes should use `timeIn`, `timeOut`, and `breakMinutes` only when `dayStatus` is `Worked`. Daily rendered hours should be derived from rendered minutes for display. Absent and rest-day records should count as `0` rendered minutes.
 `DailyTask.timeSpentMinutes` may be summed for reference only. If the task time total differs from the daily log's `renderedMinutes`, the app may show a soft warning later, but it should not block saving in v1.0.
 
 Weekly total hours should be calculated from `DailyLog` records linked to the same `weekId`. It should not be manually typed into the `OJTWeek` record.
@@ -249,10 +254,12 @@ Basic validation should help prevent incomplete or confusing records.
 - `OJTWeek` date ranges should not overlap if practical.
 - `entryDate` should not be empty for a daily log.
 - `weekId` should refer to an existing `OJTWeek`.
+- `dayStatus` should be `Worked`, `Absent`, or `No OJT / Rest Day`.
+- If `dayStatus` is `Worked`, `timeIn` and `timeOut` are required.
 - `timeIn` and `timeOut` should be valid time values when provided.
-- `timeOut` should be later than `timeIn` for same-day logs.
+- `timeOut` should be later than `timeIn` for worked same-day logs.
 - `breakMinutes` should be zero or a positive number.
-- `breakMinutes` should not be greater than the total time between `timeIn` and `timeOut`.
+- `breakMinutes` should not be greater than or equal to the total time between `timeIn` and `timeOut` for worked days.
 - v1.0 assumes same-day time logs only; overnight shifts are out of scope unless added later.
 - `renderedMinutes` should not be negative.
 - `renderedHours` should not be negative.
@@ -261,6 +268,7 @@ Basic validation should help prevent incomplete or confusing records.
 - `DailyTask.status` should be one of `Pending`, `In Progress`, or `Completed`.
 - `DailyTask.timeSpentMinutes` should be zero or a positive number.
 - `dailyLogId` should refer to an existing `DailyLog` for each photo attachment.
+- `photoCategory` should be one of the allowed documentation labels.
 - `fileSize` should be zero or a positive number.
 - Photo files should be limited to supported image types such as JPEG, PNG, or WebP.
 - A practical maximum photo file size should be tested before final coding.

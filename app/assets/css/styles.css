@@ -823,6 +823,19 @@ h1 {
   margin-top: 6px;
 }
 
+.preview-photo-count {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.preview-day-remarks {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .preview-total-row {
   margin-top: 18px;
   border: 1px solid var(--accent-soft);
@@ -1105,6 +1118,62 @@ h1 {
   color: var(--muted);
   font-size: 0.88rem;
   font-style: italic;
+}
+
+.photo-documentation-panel {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.photo-attachment-list {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-attachment-item {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 12px;
+}
+
+.photo-attachment-main strong {
+  display: block;
+  line-height: 1.25;
+}
+
+.photo-category {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.photo-caption {
+  margin: 6px 0 0;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.empty-caption {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.photo-caption-form {
+  margin-top: 12px;
+}
+
+.photo-upload-form {
+  margin-top: 14px;
+}
+
+.time-field.is-muted {
+  opacity: 0.62;
 }
 
 .calculation-result {

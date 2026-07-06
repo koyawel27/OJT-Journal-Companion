@@ -1,9 +1,11 @@
 (function () {
   const taskStatuses = ["Pending", "In Progress", "Completed"];
+  const dayStatuses = ["Worked", "Absent", "No OJT / Rest Day"];
   const state = {
     weeks: [],
     dailyLogs: [],
     dailyTasks: [],
+    photoAttachments: [],
     selectedWeekId: "",
     expandedDate: null,
     activeDailyLogId: null
@@ -100,20 +102,50 @@
     return window.OJTCalculations.sumTaskMinutes(tasks);
   }
 
-  function getDayStatusText(dailyLog, taskCount) {
+  function normalizeDayStatus(value) {
+    return window.OJTCalculations.normalizeDayStatus(value);
+  }
+
+  function isWorkedStatus(dayStatus) {
+    return normalizeDayStatus(dayStatus) === "Worked";
+  }
+
+  function getDailyLogStatus(dailyLog) {
+    return normalizeDayStatus(dailyLog?.dayStatus);
+  }
+
+  function normalizePhotoCategory(value) {
+    return window.OJTPhotos.normalizePhotoCategory(value);
+  }
+
+  function renderOptions(options, selectedValue) {
+    return options.map((option) => {
+      const selected = option === selectedValue ? " selected" : "";
+      return `<option value="${escapeHtml(option)}"${selected}>${escapeHtml(option)}</option>`;
+    }).join("");
+  }
+
+  function getDayStatusText(dailyLog, taskCount, photoCount) {
     if (!dailyLog) {
       return "No daily log yet";
     }
 
-    let status = "Daily log saved";
+    const dayStatus = getDailyLogStatus(dailyLog);
+    let status = dayStatus;
     const renderedMinutes = Number(dailyLog.renderedMinutes);
 
-    if (Number.isFinite(renderedMinutes) && renderedMinutes > 0) {
+    if (dayStatus !== "Worked") {
+      status += " - 0h 0m";
+    } else if (Number.isFinite(renderedMinutes) && renderedMinutes > 0) {
       status += ` - ${formatRenderedTime(renderedMinutes)}`;
     }
 
     if (taskCount > 0) {
       status += taskCount === 1 ? " - 1 task item" : ` - ${taskCount} task items`;
+    }
+
+    if (photoCount > 0) {
+      status += photoCount === 1 ? " - 1 photo" : ` - ${photoCount} photos`;
     }
 
     return status;
@@ -151,6 +183,12 @@
 
   function getTasksForDailyLog(dailyLogId) {
     return sortTasks(state.dailyTasks.filter((task) => task.dailyLogId === dailyLogId));
+  }
+
+  function getPhotosForDailyLog(dailyLogId) {
+    return [...state.photoAttachments]
+      .filter((photo) => photo.dailyLogId === dailyLogId)
+      .sort((first, second) => String(first.createdAt || "").localeCompare(String(second.createdAt || "")));
   }
 
   function setSelectOptions(select, weeks) {
@@ -238,19 +276,25 @@
   }
 
   function renderRenderedTimePanel(dailyLog, tasks) {
+    const dayStatus = getDailyLogStatus(dailyLog);
+    const worked = isWorkedStatus(dayStatus);
     const calculation = calculateRenderedTime(
       dailyLog?.timeIn || "",
       dailyLog?.timeOut || "",
       dailyLog?.breakMinutes || 0
     );
     const taskTotalMinutes = getTaskTotalMinutes(tasks);
-    const renderedText = calculation.isComplete
+    const renderedText = !worked
+      ? formatRenderedTime(0)
+      : calculation.isComplete
       ? formatRenderedTime(calculation.renderedMinutes)
       : "Not calculated";
-    const helpText = calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
+    const helpText = !worked
+      ? "Rendered time is 0 for Absent and No OJT / Rest Day records."
+      : calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
     let taskComparison = "";
 
-    if (taskTotalMinutes > 0) {
+    if (worked && taskTotalMinutes > 0) {
       if (calculation.isComplete && taskTotalMinutes !== calculation.renderedMinutes) {
         taskComparison = `
           <p class="time-reference warning">
@@ -276,8 +320,113 @@
     `;
   }
 
+  function formatPhotoCreatedAt(createdAt) {
+    if (!createdAt) {
+      return "No created date";
+    }
+
+    return new Date(createdAt).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+  }
+
+  function renderPhotoList(photos) {
+    if (photos.length === 0) {
+      return '<p class="empty-state">No photo documentation attached yet.</p>';
+    }
+
+    return `
+      <ul class="photo-attachment-list">
+        ${photos.map((photo) => `
+          <li class="photo-attachment-item">
+            <div class="photo-attachment-main">
+              <strong>${escapeHtml(photo.fileName || "Untitled photo")}</strong>
+              <p class="item-meta">
+                ${escapeHtml(photo.fileType || "Unknown type")} - ${escapeHtml(window.OJTPhotos.formatFileSize(photo.fileSize))} - ${escapeHtml(formatPhotoCreatedAt(photo.createdAt))}
+              </p>
+              <p class="photo-category">Category: ${escapeHtml(normalizePhotoCategory(photo.photoCategory))}</p>
+              ${photo.caption ? `<p class="photo-caption">${escapeHtml(photo.caption)}</p>` : '<p class="photo-caption empty-caption">No caption saved.</p>'}
+            </div>
+
+            <form class="photo-caption-form" data-photo-caption-form data-photo-id="${escapeHtml(photo.id)}" novalidate>
+              <label class="field">
+                <span>Caption</span>
+                <textarea name="caption" rows="2">${escapeHtml(photo.caption)}</textarea>
+              </label>
+              <div class="form-actions">
+                <button class="secondary-button" type="submit">Save caption</button>
+                <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
+                <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
+                <p class="form-message" hidden></p>
+              </div>
+            </form>
+          </li>
+        `).join("")}
+      </ul>
+    `;
+  }
+
+  function renderPhotoSection(dailyLog) {
+    if (!dailyLog) {
+      return `
+        <section class="photo-documentation-panel">
+          <div class="journal-col-header">
+            <span class="card-label">Photo documentation</span>
+            <h4>Attached photos</h4>
+            <p class="phase-note">Save the day record before attaching photo documentation.</p>
+          </div>
+        </section>
+      `;
+    }
+
+    const photos = getPhotosForDailyLog(dailyLog.id);
+
+    return `
+      <section class="photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
+        <div class="journal-col-header">
+          <span class="card-label">Photo documentation</span>
+          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Attached photos</h4>
+          <p class="phase-note">Attach JPEG, PNG, or WebP photos up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
+        </div>
+
+        <div class="photo-attachment-list-wrap" id="photo-attachment-list">
+          ${renderPhotoList(photos)}
+        </div>
+
+        <form class="photo-upload-form" id="photo-upload-form" data-daily-log-id="${escapeHtml(dailyLog.id)}" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span>Photo file</span>
+              <input type="file" id="photo-upload-file" accept="image/jpeg,image/png,image/webp">
+            </label>
+            <label class="field">
+              <span>Category</span>
+              <select id="photo-upload-category">
+                ${renderOptions(window.OJTPhotos.photoCategories, "General Documentation")}
+              </select>
+            </label>
+            <label class="field field-wide">
+              <span>Caption</span>
+              <textarea id="photo-upload-caption" rows="2" placeholder="Optional caption"></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-button" type="submit">Attach photo</button>
+            <p class="form-message" id="photo-upload-message" hidden></p>
+          </div>
+        </form>
+      </section>
+    `;
+  }
+
   function renderDayEditorBody(week, dateText, dailyLog) {
     const dayLabel = getDayLabel(week, dateText);
+    const dayStatus = getDailyLogStatus(dailyLog);
+    const worked = isWorkedStatus(dayStatus);
+    const timeFieldState = worked ? "" : "disabled";
+    const timePanelClass = worked ? "" : " is-muted";
     const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
     const tasksEnabled = Boolean(dailyLog);
     const deleteButton = dailyLog
@@ -296,16 +445,27 @@
             <h4 class="journal-day-heading">${escapeHtml(formatDisplayDate(dateText))}</h4>
 
             <label class="field">
+              <span>Day status</span>
+              <select id="daily-log-day-status">
+                ${renderOptions(dayStatuses, dayStatus)}
+              </select>
+            </label>
+
+            <label class="field time-field${timePanelClass}">
               <span>Time in</span>
-              <input type="time" id="daily-log-time-in" value="${escapeHtml(dailyLog?.timeIn || "")}">
+              <input type="time" id="daily-log-time-in" value="${escapeHtml(dailyLog?.timeIn || "")}" ${timeFieldState}>
             </label>
-            <label class="field">
+            <label class="field time-field${timePanelClass}">
               <span>Time out</span>
-              <input type="time" id="daily-log-time-out" value="${escapeHtml(dailyLog?.timeOut || "")}">
+              <input type="time" id="daily-log-time-out" value="${escapeHtml(dailyLog?.timeOut || "")}" ${timeFieldState}>
             </label>
-            <label class="field">
+            <label class="field time-field${timePanelClass}">
               <span>Break minutes</span>
-              <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}">
+              <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}" ${timeFieldState}>
+            </label>
+            <label class="field field-wide">
+              <span>Day remarks</span>
+              <textarea id="daily-log-day-remarks" rows="2" placeholder="Optional reason or notes">${escapeHtml(dailyLog?.dayRemarks || "")}</textarea>
             </label>
 
             ${renderRenderedTimePanel(dailyLog, tasks)}
@@ -365,7 +525,7 @@
         </div>
       </div>
 
-      <p class="photo-placeholder">Photo documentation will be added in Phase 8.</p>
+      ${renderPhotoSection(dailyLog)}
     `;
   }
 
@@ -392,9 +552,10 @@
       const dateText = formatDate(currentDate);
       const dailyLog = getDailyLogForDate(dateText);
       const taskCount = dailyLog ? getTasksForDailyLog(dailyLog.id).length : 0;
+      const photoCount = dailyLog ? getPhotosForDailyLog(dailyLog.id).length : 0;
       const isExpanded = state.expandedDate === dateText;
       const dayLabel = `Day ${dayNumber}`;
-      const statusText = getDayStatusText(dailyLog, taskCount);
+      const statusText = getDayStatusText(dailyLog, taskCount, photoCount);
 
       const accordion = document.createElement("article");
       accordion.className = `day-accordion${isExpanded ? " is-expanded" : ""}`;
@@ -446,11 +607,15 @@
   function buildDailyLogRecord() {
     const existingLog = getActiveDailyLog() || getDailyLogForDate(getValue("daily-log-entry-date"));
     const timestamp = nowIso();
+    const dayStatus = normalizeDayStatus(getValue("daily-log-day-status") || existingLog?.dayStatus);
+    const worked = isWorkedStatus(dayStatus);
     const breakValue = getValue("daily-log-break-minutes");
-    const breakMinutes = breakValue === "" ? 0 : Number(breakValue);
+    const breakMinutes = worked ? (breakValue === "" ? 0 : Number(breakValue)) : 0;
+    const timeIn = worked ? getValue("daily-log-time-in") : "";
+    const timeOut = worked ? getValue("daily-log-time-out") : "";
     const calculation = calculateRenderedTime(
-      getValue("daily-log-time-in"),
-      getValue("daily-log-time-out"),
+      timeIn,
+      timeOut,
       breakMinutes
     );
 
@@ -458,11 +623,13 @@
       id: getValue("daily-log-id") || existingLog?.id || createId("daily-log"),
       weekId: getValue("daily-log-form-week") || state.selectedWeekId,
       entryDate: getValue("daily-log-entry-date") || state.expandedDate,
-      timeIn: getValue("daily-log-time-in"),
-      timeOut: getValue("daily-log-time-out"),
+      dayStatus,
+      timeIn,
+      timeOut,
       breakMinutes,
-      renderedMinutes: calculation.isComplete ? calculation.renderedMinutes : null,
-      renderedHours: calculation.isComplete ? calculation.renderedHours : null,
+      renderedMinutes: worked && calculation.isComplete ? calculation.renderedMinutes : 0,
+      renderedHours: worked && calculation.isComplete ? calculation.renderedHours : 0,
+      dayRemarks: getValue("daily-log-day-remarks"),
       createdAt: existingLog?.createdAt || timestamp,
       updatedAt: timestamp
     };
@@ -487,6 +654,26 @@
       return "Entry date should be within the selected week's inclusive date range.";
     }
 
+    if (!dayStatuses.includes(dailyLog.dayStatus)) {
+      return "Day status must be Worked, Absent, or No OJT / Rest Day.";
+    }
+
+    const duplicateLog = state.dailyLogs.find((log) => {
+      return log.id !== dailyLog.id && log.weekId === dailyLog.weekId && log.entryDate === dailyLog.entryDate;
+    });
+
+    if (duplicateLog) {
+      return "A daily log already exists for this date.";
+    }
+
+    if (!isWorkedStatus(dailyLog.dayStatus)) {
+      return "";
+    }
+
+    if (!dailyLog.timeIn || !dailyLog.timeOut) {
+      return "Time in and time out are required for worked days.";
+    }
+
     if (!isValidTime(dailyLog.timeIn) || !isValidTime(dailyLog.timeOut)) {
       return "Time in and time out should use a valid HH:mm time when entered.";
     }
@@ -505,14 +692,6 @@
       return "Rendered minutes must not be negative.";
     }
 
-    const duplicateLog = state.dailyLogs.find((log) => {
-      return log.id !== dailyLog.id && log.weekId === dailyLog.weekId && log.entryDate === dailyLog.entryDate;
-    });
-
-    if (duplicateLog) {
-      return "A daily log already exists for this date.";
-    }
-
     return "";
   }
 
@@ -521,6 +700,14 @@
     const helpElement = getElement("daily-rendered-time-help");
 
     if (!previewElement || !helpElement) {
+      return;
+    }
+
+    const dayStatus = normalizeDayStatus(getValue("daily-log-day-status"));
+
+    if (!isWorkedStatus(dayStatus)) {
+      previewElement.textContent = formatRenderedTime(0);
+      helpElement.textContent = "Rendered time is 0 for Absent and No OJT / Rest Day records.";
       return;
     }
 
@@ -535,6 +722,26 @@
       ? formatRenderedTime(calculation.renderedMinutes)
       : "Not calculated";
     helpElement.textContent = calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
+  }
+
+  function updateDayStatusControls() {
+    const dayStatus = normalizeDayStatus(getValue("daily-log-day-status"));
+    const worked = isWorkedStatus(dayStatus);
+
+    ["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].forEach((id) => {
+      const input = getElement(id);
+      const field = input?.closest(".time-field");
+
+      if (input) {
+        input.disabled = !worked;
+      }
+
+      if (field) {
+        field.classList.toggle("is-muted", !worked);
+      }
+    });
+
+    updateRenderedPreview();
   }
 
   function buildTaskRecord() {
@@ -629,7 +836,7 @@
   }
 
   async function deleteDailyLog(dailyLog) {
-    const confirmed = window.confirm(`Delete the daily log for ${dailyLog.entryDate}? Its task items will also be deleted.`);
+    const confirmed = window.confirm(`Delete the daily log for ${dailyLog.entryDate}? Its task items and photo attachments will also be deleted.`);
 
     if (!confirmed) {
       return;
@@ -639,6 +846,7 @@
       await window.OJTStorage.deleteDailyLog(dailyLog.id);
       state.dailyLogs = state.dailyLogs.filter((log) => log.id !== dailyLog.id);
       state.dailyTasks = state.dailyTasks.filter((task) => task.dailyLogId !== dailyLog.id);
+      state.photoAttachments = state.photoAttachments.filter((photo) => photo.dailyLogId !== dailyLog.id);
       state.activeDailyLogId = null;
       renderJournalWeek();
       updateWeekSummary();
@@ -707,6 +915,99 @@
     }
   }
 
+  async function savePhotoAttachment(event) {
+    event.preventDefault();
+    const form = event.target;
+    const messageElement = getElement("photo-upload-message");
+    const selectedLog = getActiveDailyLog();
+    const fileInput = getElement("photo-upload-file");
+    const caption = getValue("photo-upload-caption");
+    const photoCategory = normalizePhotoCategory(getValue("photo-upload-category"));
+    const file = fileInput?.files?.[0] || null;
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!selectedLog) {
+      window.OJTUI.showFormMessage(messageElement, "Save the day record before attaching photo documentation.", "error");
+      return;
+    }
+
+    const validationMessage = window.OJTPhotos.validatePhotoFile(file);
+
+    if (validationMessage) {
+      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      return;
+    }
+
+    try {
+      const photoAttachment = window.OJTPhotos.buildPhotoAttachment(file, selectedLog.id, caption, photoCategory);
+      const savedPhoto = await window.OJTStorage.savePhotoAttachment(photoAttachment);
+      state.photoAttachments = state.photoAttachments.filter((photo) => photo.id !== savedPhoto.id).concat(savedPhoto);
+      form.reset();
+      renderJournalWeek();
+      updateWeekSummary();
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo documentation attached.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "Photo documentation could not be saved. Please try again.", "error");
+      console.error(error);
+    }
+  }
+
+  async function savePhotoCaption(form) {
+    const photo = state.photoAttachments.find((attachment) => attachment.id === form.dataset.photoId);
+    const messageElement = form.querySelector(".form-message");
+    const formData = new FormData(form);
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!photo) {
+      window.OJTUI.showFormMessage(messageElement, "Photo attachment could not be found. Please refresh and try again.", "error");
+      return;
+    }
+
+    try {
+      const savedPhoto = await window.OJTStorage.savePhotoAttachment({
+        ...photo,
+        photoCategory: normalizePhotoCategory(photo.photoCategory),
+        caption: String(formData.get("caption") || "").trim()
+      });
+      state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== savedPhoto.id).concat(savedPhoto);
+      renderJournalWeek();
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo caption saved.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "Photo caption could not be saved. Please try again.", "error");
+      console.error(error);
+    }
+  }
+
+  function downloadPhoto(photo) {
+    try {
+      window.OJTPhotos.downloadPhotoAttachment(photo);
+    } catch (error) {
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Stored photo data is not available for download.", "error");
+      console.error(error);
+    }
+  }
+
+  async function deletePhoto(photo) {
+    const confirmed = window.confirm(`Delete ${photo.fileName || "this photo"}? The daily log will stay saved.`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await window.OJTStorage.deletePhotoAttachment(photo.id);
+      state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== photo.id);
+      renderJournalWeek();
+      updateWeekSummary();
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attachment deleted.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attachment could not be deleted. Please try again.", "error");
+      console.error(error);
+    }
+  }
+
   function handleJournalClick(event) {
     if (event.target.id === "cancel-daily-task-edit-button") {
       resetTaskFormFields();
@@ -727,6 +1028,25 @@
       if (dailyLog) {
         deleteDailyLog(dailyLog);
       }
+      return;
+    }
+
+    const photoButton = event.target.closest("button[data-photo-action]");
+    if (photoButton) {
+      const photo = state.photoAttachments.find((attachment) => attachment.id === photoButton.dataset.photoId);
+
+      if (!photo) {
+        return;
+      }
+
+      if (photoButton.dataset.photoAction === "download") {
+        downloadPhoto(photo);
+      }
+
+      if (photoButton.dataset.photoAction === "delete") {
+        deletePhoto(photo);
+      }
+
       return;
     }
 
@@ -751,15 +1071,17 @@
 
   async function loadDailyLogData() {
     try {
-      const [weeks, dailyLogs, dailyTasks] = await Promise.all([
+      const [weeks, dailyLogs, dailyTasks, photoAttachments] = await Promise.all([
         window.OJTStorage.getWeeks(),
         window.OJTStorage.getDailyLogs(),
-        window.OJTStorage.getDailyTasks()
+        window.OJTStorage.getDailyTasks(),
+        window.OJTStorage.getPhotoAttachments()
       ]);
 
       state.weeks = weeks;
       state.dailyLogs = dailyLogs;
       state.dailyTasks = dailyTasks;
+      state.photoAttachments = photoAttachments;
 
       if (!state.selectedWeekId || !state.weeks.some((week) => week.id === state.selectedWeekId)) {
         state.selectedWeekId = sortWeeks(weeks)[0]?.id || "";
@@ -789,6 +1111,11 @@
         updateRenderedPreview();
       }
     });
+    getElement("journal-week-accordions")?.addEventListener("change", (event) => {
+      if (event.target.id === "daily-log-day-status") {
+        updateDayStatusControls();
+      }
+    });
     getElement("journal-week-accordions")?.addEventListener("submit", (event) => {
       if (event.target.id === "daily-log-form") {
         saveDailyLog(event);
@@ -796,6 +1123,15 @@
 
       if (event.target.id === "daily-task-form") {
         saveTask(event);
+      }
+
+      if (event.target.id === "photo-upload-form") {
+        savePhotoAttachment(event);
+      }
+
+      if (event.target.matches("[data-photo-caption-form]")) {
+        event.preventDefault();
+        savePhotoCaption(event.target);
       }
     });
   }
