@@ -86,8 +86,8 @@
           <p class="section-kicker">Start here</p>
           <h2 id="dashboard-title">Dashboard</h2>
           <p>
-            This area will later show a quick overview of OJT progress, recent journal activity,
-            and helpful reminders for keeping records complete.
+            Review your saved profile details, total rendered time, and the current or latest
+            week progress in one compact view.
           </p>
           <div class="dashboard-summary" aria-live="polite">
             <article class="summary-card">
@@ -115,24 +115,50 @@
               <strong id="summary-daily-log-count">0 logs</strong>
               <p id="summary-daily-log-detail">Create daily logs after choosing a saved week.</p>
             </article>
+            <article class="summary-card">
+              <span class="card-label">Rendered time</span>
+              <strong id="summary-rendered-time">0h 0m</strong>
+              <p id="summary-rendered-detail">Save complete daily time records to track OJT progress.</p>
+            </article>
           </div>
+          <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
+            <div class="dashboard-week-header">
+              <div>
+                <span class="card-label">Current / latest week</span>
+                <h3 id="dashboard-week-title">No OJT week yet</h3>
+                <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
+              </div>
+              <div class="dashboard-week-total">
+                <span>Weekly rendered hours</span>
+                <strong id="dashboard-week-rendered">0h 0m</strong>
+              </div>
+            </div>
+
+            <div class="dashboard-week-grid">
+              <div>
+                <h4>Daily progress</h4>
+                <ul class="dashboard-day-list" id="dashboard-week-days">
+                  <li class="empty-state">No current week data to show yet.</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Weekly summary</h4>
+                <ul class="dashboard-summary-status" id="dashboard-week-summary-status">
+                  <li>Skills Learned: missing</li>
+                  <li>Problems Encountered: missing</li>
+                  <li>Reflection: missing</li>
+                </ul>
+              </div>
+            </div>
+            <div class="dashboard-week-actions">
+              <button class="secondary-button" type="button" id="dashboard-open-weekly-preview">Open Weekly Preview</button>
+            </div>
+          </section>
           <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
             <p class="reminder-text">
               <strong>Backup Reminder:</strong> You haven't exported a backup in over 7 days. Your data is stored only in this browser.
             </p>
             <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
-          </div>
-          <div class="placeholder-grid" aria-label="Future dashboard summaries">
-            <article class="placeholder-card">
-              <span class="card-label">Rendered time</span>
-              <h3 id="summary-rendered-time">0h 0m</h3>
-              <p id="summary-rendered-detail">Save complete daily time records to track OJT progress.</p>
-            </article>
-            <article class="placeholder-card">
-              <span class="card-label">Planned</span>
-              <h3>Recent logs</h3>
-              <p>A future list will help the student return to unfinished daily entries.</p>
-            </article>
           </div>
         </section>
 

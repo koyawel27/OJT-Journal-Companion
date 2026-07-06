@@ -498,11 +498,154 @@ h1 {
   flex-shrink: 0;
 }
 
+.dashboard-week-card {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.dashboard-week-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dashboard-week-header h3 {
+  margin: 6px 0 4px;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.dashboard-week-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.dashboard-week-total {
+  min-width: 150px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 8px;
+  background: #f2f6f3;
+  padding: 10px 12px;
+}
+
+.dashboard-week-total span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dashboard-week-total strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.dashboard-week-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
+  gap: 16px;
+}
+
+.dashboard-week-grid h4 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.dashboard-day-list,
+.dashboard-summary-status {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-day-list li,
+.dashboard-summary-status li {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 10px;
+}
+
+.dashboard-day-list li {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dashboard-day-list span,
+.dashboard-day-list strong {
+  display: block;
+  line-height: 1.25;
+}
+
+.dashboard-day-list small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.dashboard-day-list strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+  text-align: right;
+}
+
+.dashboard-summary-status li {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.dashboard-week-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 @media (max-width: 760px) {
   .dashboard-reminder-card {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+  }
+
+  .dashboard-week-header,
+  .dashboard-day-list li {
+    display: grid;
+  }
+
+  .dashboard-week-total {
+    width: 100%;
+  }
+
+  .dashboard-week-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-day-list strong {
+    text-align: left;
+  }
+
+  .dashboard-week-actions {
+    justify-content: stretch;
+  }
+
+  .dashboard-week-actions .secondary-button {
+    width: 100%;
   }
 }
 

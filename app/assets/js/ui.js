@@ -3,7 +3,9 @@
     studentProfile: null,
     companyProfile: null,
     appSettings: null,
-    dailyLogs: []
+    weeks: [],
+    dailyLogs: [],
+    dailyTasks: []
   };
 
   function showFormMessage(element, message, type) {
@@ -50,12 +52,193 @@
     }
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function formatRenderedTime(minutes) {
     return window.OJTCalculations?.formatRenderedTime(minutes) || "0h 0m";
   }
 
   function sumRenderedMinutes(dailyLogs) {
     return window.OJTCalculations?.sumRenderedMinutes(dailyLogs) || 0;
+  }
+
+  function parseDate(dateText) {
+    const [year, month, day] = String(dateText || "").split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function todayText() {
+    return formatDate(new Date());
+  }
+
+  function getWeekDates(week) {
+    if (!week?.inclusiveStartDate || !week?.inclusiveEndDate) {
+      return [];
+    }
+
+    const dates = [];
+    const currentDate = parseDate(week.inclusiveStartDate);
+    const endDate = parseDate(week.inclusiveEndDate);
+
+    while (currentDate <= endDate) {
+      dates.push(formatDate(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  }
+
+  function chooseCurrentWeek(weeks) {
+    const today = todayText();
+    const containingWeek = (weeks || []).find((week) => {
+      return week.inclusiveStartDate <= today && week.inclusiveEndDate >= today;
+    });
+
+    if (containingWeek) {
+      return containingWeek;
+    }
+
+    return [...(weeks || [])].sort((first, second) => {
+      const firstNumber = Number(first.weekNumber);
+      const secondNumber = Number(second.weekNumber);
+
+      if (Number.isFinite(firstNumber) && Number.isFinite(secondNumber) && firstNumber !== secondNumber) {
+        return secondNumber - firstNumber;
+      }
+
+      return String(second.inclusiveStartDate || "").localeCompare(String(first.inclusiveStartDate || ""));
+    })[0] || null;
+  }
+
+  function getLogsForWeek(weekId) {
+    return (dashboardState.dailyLogs || []).filter((log) => log.weekId === weekId);
+  }
+
+  function getDailyLogForDate(weekId, dateText) {
+    return (dashboardState.dailyLogs || []).find((log) => log.weekId === weekId && log.entryDate === dateText) || null;
+  }
+
+  function getTaskCount(dailyLogId) {
+    return (dashboardState.dailyTasks || []).filter((task) => task.dailyLogId === dailyLogId).length;
+  }
+
+  function getSummaryStatus(label, value) {
+    return `${label}: ${String(value || "").trim() ? "filled" : "missing"}`;
+  }
+
+  function normalizeDayStatus(value) {
+    return window.OJTCalculations?.normalizeDayStatus(value) || "Worked";
+  }
+
+  function renderDashboardWeekProgress() {
+    const week = chooseCurrentWeek(dashboardState.weeks);
+    const daysElement = document.getElementById("dashboard-week-days");
+    const summaryElement = document.getElementById("dashboard-week-summary-status");
+    const openButton = document.getElementById("dashboard-open-weekly-preview");
+
+    if (!daysElement || !summaryElement) {
+      return;
+    }
+
+    if (!week) {
+      setText("dashboard-week-title", "No OJT week yet");
+      setText("dashboard-week-dates", "Create an OJT week to show progress here.");
+      setText("dashboard-week-rendered", formatRenderedTime(0));
+      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then add daily logs to see progress here.</li>';
+      summaryElement.innerHTML = `
+        <li>Skills Learned: missing</li>
+        <li>Problems Encountered: missing</li>
+        <li>Reflection: missing</li>
+      `;
+      if (openButton) {
+        openButton.disabled = true;
+      }
+      return;
+    }
+
+    const weekLogs = getLogsForWeek(week.id);
+    const weekDates = getWeekDates(week);
+    const weeklyRenderedMinutes = sumRenderedMinutes(weekLogs);
+
+    setText("dashboard-week-title", `Week ${week.weekNumber || "Not set"}`);
+    setText("dashboard-week-dates", `${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
+    setText("dashboard-week-rendered", formatRenderedTime(weeklyRenderedMinutes));
+
+    daysElement.innerHTML = weekDates.length > 0
+      ? weekDates.map((dateText, index) => {
+        const log = getDailyLogForDate(week.id, dateText);
+
+        if (!log) {
+          return `
+            <li>
+              <span>Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+              <strong>No log yet</strong>
+            </li>
+          `;
+        }
+
+        const dayStatus = normalizeDayStatus(log.dayStatus);
+        const taskCount = getTaskCount(log.id);
+        const taskText = taskCount > 0 ? ` - ${taskCount === 1 ? "1 task" : `${taskCount} tasks`}` : "";
+        const renderedText = dayStatus === "Worked" ? ` - ${formatRenderedTime(log.renderedMinutes)}` : "";
+
+        return `
+          <li>
+            <span>Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+            <strong>${escapeHtml(dayStatus)}${escapeHtml(renderedText)}${escapeHtml(taskText)}</strong>
+          </li>
+        `;
+      }).join("")
+      : '<li class="empty-state">This week has no inclusive dates saved.</li>';
+
+    summaryElement.innerHTML = `
+      <li>${escapeHtml(getSummaryStatus("Skills Learned", week.weeklySkillsLearned))}</li>
+      <li>${escapeHtml(getSummaryStatus("Problems Encountered", week.problemsEncountered))}</li>
+      <li>${escapeHtml(getSummaryStatus("Reflection", week.reflectionOrPointsOfLearning))}</li>
+    `;
+
+    if (openButton) {
+      openButton.disabled = false;
+    }
+  }
+
+  async function refreshDashboardWeekProgress() {
+    if (!window.OJTStorage) {
+      return;
+    }
+
+    try {
+      const [weeks, dailyLogs, dailyTasks] = await Promise.all([
+        window.OJTStorage.getWeeks(),
+        window.OJTStorage.getDailyLogs(),
+        window.OJTStorage.getDailyTasks()
+      ]);
+
+      dashboardState.weeks = weeks || [];
+      dashboardState.dailyLogs = dailyLogs || [];
+      dashboardState.dailyTasks = dailyTasks || [];
+      renderDashboardWeekProgress();
+    } catch (error) {
+      const daysElement = document.getElementById("dashboard-week-days");
+      if (daysElement) {
+        daysElement.innerHTML = '<li class="empty-state">Dashboard week progress could not be loaded.</li>';
+      }
+      console.error(error);
+    }
   }
 
   function updateRenderedProgressSummary() {
@@ -124,6 +307,7 @@
     }
 
     updateRenderedProgressSummary();
+    renderDashboardWeekProgress();
   }
 
   function updateWeeksSummary(weeks) {
@@ -134,6 +318,7 @@
       "summary-week-detail",
       count > 0 ? "Saved OJT weeks are ready for future daily logs." : "Create OJT weeks to organize future daily logs."
     );
+    refreshDashboardWeekProgress();
   }
 
 
@@ -148,6 +333,7 @@
       count > 0 ? "Saved daily logs are grouped by their OJT week." : "Create daily logs after choosing a saved week."
     );
     updateRenderedProgressSummary();
+    refreshDashboardWeekProgress();
   }
 
   document.addEventListener("input", (event) => {
@@ -170,10 +356,24 @@
     clearFormMessages(document);
   });
 
+  document.addEventListener("ojt:section-change", (event) => {
+    if (event.detail?.sectionId === "dashboard") {
+      refreshDashboardWeekProgress();
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    refreshDashboardWeekProgress();
+    document.getElementById("dashboard-open-weekly-preview")?.addEventListener("click", () => {
+      window.OJTApp?.showSection("weekly-preview");
+    });
+  });
+
   window.OJTUI = {
     showFormMessage,
     clearFormMessage,
     clearFormMessages,
+    refreshDashboardWeekProgress,
     updateDashboardSummary,
     updateWeeksSummary,
     updateDailyLogsSummary
