@@ -662,6 +662,20 @@ h1 {
   gap: 12px;
 }
 
+.weekly-summary-form {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 16px;
+}
+
+.weekly-summary-form .form-header h4 {
+  margin: 5px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
 .week-item,
 .day-slot,
 .day-accordion {

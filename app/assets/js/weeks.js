@@ -60,6 +60,15 @@
     });
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function formatRenderedTime(minutes) {
     return window.OJTCalculations.formatRenderedTime(minutes);
   }
@@ -77,6 +86,27 @@
   function getCurrentWeek() {
     const weekId = getValue("week-id");
     return state.weeks.find((week) => week.id === weekId) || null;
+  }
+
+  function getSummaryStatus(week) {
+    const requiredFields = [
+      week?.weeklySkillsLearned,
+      week?.problemsEncountered,
+      week?.reflectionOrPointsOfLearning
+    ];
+    const optionalFields = [week?.additionalNotes];
+    const filledRequiredCount = requiredFields.filter((value) => String(value || "").trim()).length;
+    const hasAnySummary = requiredFields.concat(optionalFields).some((value) => String(value || "").trim());
+
+    if (filledRequiredCount === requiredFields.length) {
+      return "Summary completed";
+    }
+
+    if (hasAnySummary) {
+      return "Summary partially filled";
+    }
+
+    return "Summary not started";
   }
 
   function getDayStatusText(dailyLog, taskCount) {
@@ -209,6 +239,46 @@
     return `<div class="day-slots">${slots.join("")}</div>`;
   }
 
+  function renderWeeklySummaryForm(week) {
+    return `
+      <form class="weekly-summary-form" data-week-summary-form data-week-id="${escapeHtml(week.id)}" novalidate>
+        <div class="form-header">
+          <div>
+            <span class="card-label">Weekly summary</span>
+            <h4>Journal summary</h4>
+          </div>
+          <p>${escapeHtml(getSummaryStatus(week))}</p>
+        </div>
+
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span>Skills Learned</span>
+            <textarea id="weekly-skills-learned-${escapeHtml(week.id)}" name="weeklySkillsLearned" rows="3">${escapeHtml(week.weeklySkillsLearned)}</textarea>
+          </label>
+          <label class="field field-wide">
+            <span>Problems Encountered</span>
+            <textarea id="problems-encountered-${escapeHtml(week.id)}" name="problemsEncountered" rows="3">${escapeHtml(week.problemsEncountered)}</textarea>
+          </label>
+          <label class="field field-wide">
+            <span>Reflection / Points of Learning</span>
+            <textarea id="reflection-or-points-${escapeHtml(week.id)}" name="reflectionOrPointsOfLearning" rows="4">${escapeHtml(week.reflectionOrPointsOfLearning)}</textarea>
+          </label>
+          <label class="field field-wide">
+            <span>Additional Notes</span>
+            <textarea id="weekly-additional-notes-${escapeHtml(week.id)}" name="additionalNotes" rows="3">${escapeHtml(week.additionalNotes)}</textarea>
+          </label>
+        </div>
+
+        <p class="phase-note">Weekly Summary is for learning, challenges, and reflection. Daily Logs stay focused on day records and task/work items.</p>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">Save weekly summary</button>
+          <p class="form-message" id="weekly-summary-message" hidden></p>
+        </div>
+      </form>
+    `;
+  }
+
   function renderWeeksList() {
     const list = getElement("weeks-list");
     const countLabel = getElement("weeks-count-label");
@@ -235,6 +305,7 @@
             <span class="card-label">Week ${week.weekNumber}</span>
             <h4>${week.inclusiveStartDate} to ${week.inclusiveEndDate}</h4>
             <p>${logCount === 1 ? "1 daily log saved" : `${logCount} daily logs saved`}. Weekly rendered time: ${formatRenderedTime(weeklyRenderedMinutes)}.</p>
+            <p>${getSummaryStatus(week)}.</p>
           </div>
           <div class="week-actions">
             <button class="secondary-button" type="button" data-week-action="view" data-week-id="${week.id}" aria-expanded="${isExpanded}">${detailButtonLabel}</button>
@@ -243,7 +314,7 @@
           </div>
         </div>
         <div class="week-accordion-body" ${isExpanded ? "" : "hidden"}>
-          ${isExpanded ? renderDaySlotsHtml(week) : ""}
+          ${isExpanded ? renderDaySlotsHtml(week) + renderWeeklySummaryForm(week) : ""}
         </div>
       `;
       list.appendChild(item);
@@ -342,6 +413,50 @@
     }
   }
 
+  function buildWeeklySummaryRecord(form) {
+    const week = state.weeks.find((savedWeek) => savedWeek.id === form.dataset.weekId);
+    const formData = new FormData(form);
+
+    if (!week) {
+      return null;
+    }
+
+    return {
+      ...week,
+      weeklySkillsLearned: String(formData.get("weeklySkillsLearned") || "").trim(),
+      problemsEncountered: String(formData.get("problemsEncountered") || "").trim(),
+      reflectionOrPointsOfLearning: String(formData.get("reflectionOrPointsOfLearning") || "").trim(),
+      additionalNotes: String(formData.get("additionalNotes") || "").trim(),
+      updatedAt: nowIso()
+    };
+  }
+
+  async function saveWeeklySummary(event) {
+    event.preventDefault();
+    const form = event.target;
+    const summaryRecord = buildWeeklySummaryRecord(form);
+    const messageElement = form.querySelector(".form-message");
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!summaryRecord) {
+      window.OJTUI.showFormMessage(messageElement, "This week could not be found. Please refresh and try again.", "error");
+      return;
+    }
+
+    try {
+      const savedWeek = await window.OJTStorage.saveWeek(summaryRecord);
+      state.weeks = state.weeks.filter((week) => week.id !== savedWeek.id).concat(savedWeek);
+      state.selectedWeekId = savedWeek.id;
+      renderWeeksList();
+      window.OJTUI.updateWeeksSummary(state.weeks);
+      window.OJTUI.showFormMessage(getElement("weekly-summary-message"), "Weekly summary saved.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "Weekly summary could not be saved. Please try again.", "error");
+      console.error(error);
+    }
+  }
+
   function handleWeekAction(event) {
     const button = event.target.closest("button[data-week-action]");
 
@@ -411,6 +526,11 @@
     getElement("cancel-week-edit-button")?.addEventListener("click", resetWeekForm);
     getElement("weeks-list")?.addEventListener("click", handleWeekAction);
     getElement("weeks-list")?.addEventListener("click", handleOpenDailyLog);
+    getElement("weeks-list")?.addEventListener("submit", (event) => {
+      if (event.target.matches("[data-week-summary-form]")) {
+        saveWeeklySummary(event);
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
