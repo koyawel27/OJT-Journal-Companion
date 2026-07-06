@@ -11,9 +11,19 @@
       return;
     }
 
+    clearTimeout(Number(element.dataset.messageTimer || 0));
     element.textContent = message;
     element.className = `form-message ${type}`;
     element.hidden = false;
+
+    if (type === "success") {
+      const timer = window.setTimeout(() => {
+        clearFormMessage(element);
+      }, 3500);
+      element.dataset.messageTimer = String(timer);
+    } else {
+      delete element.dataset.messageTimer;
+    }
   }
 
   function clearFormMessage(element) {
@@ -21,9 +31,16 @@
       return;
     }
 
+    clearTimeout(Number(element.dataset.messageTimer || 0));
+    delete element.dataset.messageTimer;
     element.textContent = "";
     element.className = "form-message";
     element.hidden = true;
+  }
+
+  function clearFormMessages(container) {
+    const root = container || document;
+    root.querySelectorAll(".form-message").forEach(clearFormMessage);
   }
 
   function setText(id, text) {
@@ -116,9 +133,31 @@
     );
     updateRenderedProgressSummary();
   }
+
+  document.addEventListener("input", (event) => {
+    const form = event.target.closest?.("form");
+
+    if (form) {
+      clearFormMessages(form);
+    }
+  });
+
+  document.addEventListener("change", (event) => {
+    const form = event.target.closest?.("form");
+
+    if (form) {
+      clearFormMessages(form);
+    }
+  });
+
+  document.addEventListener("ojt:section-change", () => {
+    clearFormMessages(document);
+  });
+
   window.OJTUI = {
     showFormMessage,
     clearFormMessage,
+    clearFormMessages,
     updateDashboardSummary,
     updateWeeksSummary,
     updateDailyLogsSummary

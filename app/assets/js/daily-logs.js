@@ -240,6 +240,7 @@
   }
 
   function selectWeek(weekId) {
+    window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
     state.selectedWeekId = weekId || "";
     state.expandedDate = null;
     state.activeDailyLogId = null;
@@ -585,6 +586,8 @@
   }
 
   function expandDay(dateText) {
+    window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
+
     if (state.expandedDate === dateText) {
       state.expandedDate = null;
       state.activeDailyLogId = null;
