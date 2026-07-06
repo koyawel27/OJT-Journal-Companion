@@ -1,13 +1,17 @@
 :root {
-  --page: #f6f8f5;
+  --page: #f9fbf9;
   --panel: #ffffff;
-  --ink: #1d2a24;
-  --muted: #637067;
-  --line: #dfe6dc;
-  --accent: #246b57;
-  --accent-soft: #dcebe5;
+  --ink: #1f2924;
+  --muted: #6b726f;
+  --line: #e8ebe9;
+  --accent: #216e55;
+  --accent-soft: #e2ede8;
   --marker: #f0b44d;
-  --shadow: 0 18px 45px rgba(41, 62, 50, 0.1);
+  --shadow-sm: 0 4px 12px rgba(33, 110, 85, 0.04);
+  --shadow-md: 0 8px 24px rgba(33, 110, 85, 0.06);
+  --shadow-lg: 0 16px 48px rgba(33, 110, 85, 0.08);
+  --radius-sm: 10px;
+  --radius-md: 14px;
 }
 
 * {
@@ -50,7 +54,7 @@ button {
   gap: 20px;
   padding: 28px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: linear-gradient(135deg, #ffffff 0%, #edf5ef 100%);
   box-shadow: var(--shadow);
 }
@@ -104,7 +108,7 @@ h1 {
   width: 42px;
   height: 42px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
@@ -131,7 +135,7 @@ h1 {
 .sidebar,
 .content {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   box-shadow: var(--shadow);
 }
@@ -143,6 +147,7 @@ h1 {
   display: grid;
   gap: 8px;
   padding: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-button {
@@ -152,7 +157,7 @@ h1 {
   width: 100%;
   min-height: 44px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--ink);
   cursor: pointer;
@@ -166,7 +171,7 @@ h1 {
   width: 28px;
   height: 28px;
   place-items: center;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: #f2f6f3;
   color: var(--accent);
 }
@@ -209,6 +214,7 @@ h1 {
 .content {
   min-height: 520px;
   padding: 32px;
+  box-shadow: var(--shadow-sm);
 }
 
 .app-section {
@@ -245,9 +251,10 @@ h1 {
 
 .placeholder-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 18px;
+  box-shadow: var(--shadow-sm);
 }
 
 .placeholder-card h3 {
@@ -269,9 +276,10 @@ h1 {
 
 .backup-panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 18px;
+  box-shadow: var(--shadow-sm);
 }
 
 .backup-panel h3 {
@@ -306,7 +314,8 @@ h1 {
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   h1 {
     margin-top: 2px;
@@ -343,12 +352,14 @@ h1 {
 
   .sidebar {
     display: none;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .content {
     min-height: 360px;
     padding: 18px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .app-section h2 {
     margin-bottom: 8px;
@@ -371,7 +382,8 @@ h1 {
   .placeholder-card,
   .backup-panel {
     padding: 14px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .drawer-overlay:not([hidden]) {
     position: fixed;
@@ -447,7 +459,8 @@ h1 {
 
   .app-header {
     padding: 12px 13px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .header-actions {
     gap: 8px;
@@ -464,7 +477,8 @@ h1 {
 
   .content {
     padding: 16px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .mobile-drawer:not([hidden]) {
     width: min(86vw, 300px);
@@ -485,7 +499,7 @@ h1 {
   justify-content: space-between;
   gap: 16px;
   border: 1px solid #efd9a8;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fff8e8;
   padding: 12px 16px;
   margin-bottom: 16px;
@@ -510,7 +524,7 @@ h1 {
   display: grid;
   gap: 18px;
   border: 1px solid #cfd9d1;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 18px;
   margin-bottom: 16px;
@@ -546,7 +560,7 @@ h1 {
   align-content: center;
   min-width: 0;
   border: 1px solid var(--accent-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #f2f6f3;
   padding: 14px;
 }
@@ -573,7 +587,7 @@ h1 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
 }
 
@@ -627,7 +641,7 @@ h1 {
 .dashboard-day-list li,
 .dashboard-summary-status li {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   padding: 10px;
 }
@@ -700,7 +714,8 @@ h1 {
   .dashboard-week-card {
     gap: 14px;
     padding: 14px;
-  }
+    box-shadow: var(--shadow-md);
+}
 
   .dashboard-week-header,
   .dashboard-week-grid {
@@ -736,9 +751,10 @@ h1 {
 }
 .summary-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .summary-card strong {
@@ -762,9 +778,10 @@ h1 {
 
 .profile-form {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-header {
@@ -814,10 +831,10 @@ h1 {
 .field select {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--ink);
-  padding: 10px 11px;
+  padding: 12px 14px;
   outline: none;
 }
 
@@ -841,14 +858,14 @@ h1 {
 }
 
 .primary-button {
-  min-height: 42px;
+  min-height: 46px;
   border: 1px solid var(--accent);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--accent);
   color: #ffffff;
   cursor: pointer;
   font-weight: 700;
-  padding: 9px 14px;
+  padding: 10px 18px;
 }
 
 .primary-button:hover {
@@ -887,7 +904,8 @@ h1 {
 
   .profile-form {
     padding: 15px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .form-header {
     display: block;
@@ -922,9 +940,10 @@ h1 {
 
 .week-panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .panel-header {
@@ -959,9 +978,10 @@ h1 {
 .weekly-summary-form {
   margin-top: 14px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .weekly-summary-form .form-header h4 {
@@ -983,7 +1003,7 @@ h1 {
 
 .preview-warnings {
   border: 1px solid #efd9a8;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fff8e8;
   padding: 12px 14px;
 }
@@ -1001,7 +1021,7 @@ h1 {
 
 .journal-preview-card {
   border: 1px solid #cfd9d1;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   padding: 20px;
   box-shadow: 0 12px 28px rgba(24, 47, 37, 0.08);
@@ -1011,7 +1031,7 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   border: 1px solid #cfd9d1;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -1070,7 +1090,7 @@ h1 {
 
 .preview-table {
   border: 1px solid #cfd9d1;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -1138,7 +1158,7 @@ h1 {
 .preview-total-row {
   margin-top: 18px;
   border: 1px solid var(--accent-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #f2f6f3;
   padding: 12px;
 }
@@ -1147,8 +1167,9 @@ h1 {
 .day-slot,
 .day-accordion {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
+  box-shadow: var(--shadow-sm);
 }
 
 .week-item-main,
@@ -1158,6 +1179,7 @@ h1 {
   justify-content: space-between;
   gap: 14px;
   padding: 14px;
+  box-shadow: var(--shadow-sm);
 }
 
 .week-accordion-body {
@@ -1204,14 +1226,14 @@ h1 {
 
 .secondary-button,
 .danger-button {
-  min-height: 38px;
+  min-height: 44px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
   font-weight: 700;
-  padding: 8px 12px;
+  padding: 10px 16px;
 }
 
 .secondary-button:hover {
@@ -1255,13 +1277,15 @@ h1 {
 
   .week-panel {
     padding: 15px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .panel-header,
   .week-item-main,
   .day-slot {
     display: block;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .panel-header p,
   .week-item-main .week-actions,
@@ -1316,7 +1340,7 @@ h1 {
   gap: 14px;
   width: 100%;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: transparent;
   color: var(--ink);
   cursor: pointer;
@@ -1435,9 +1459,10 @@ h1 {
 
 .photo-attachment-item {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .photo-attachment-main strong {
@@ -1478,7 +1503,7 @@ h1 {
 .calculation-result {
   margin-top: 14px;
   border: 1px solid var(--accent-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #f2f6f3;
   padding: 12px;
 }
@@ -1521,9 +1546,10 @@ h1 {
   gap: 12px;
   margin: 0 0 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #fbfcfa;
   padding: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .task-bullet-item:last-child {
@@ -1538,7 +1564,7 @@ h1 {
 }
 
 .task-bullet-content::before {
-  content: "•";
+  content: "â€¢";
   position: absolute;
   left: 0;
   color: var(--accent);
@@ -1629,7 +1655,8 @@ h1 {
 
   .task-bullet-item {
     display: block;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .task-bullet-actions {
     margin-top: 10px;
@@ -1643,7 +1670,8 @@ h1 {
   .week-item-main,
   .day-slot {
     display: block;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .week-item-main .week-actions,
   .day-slot .secondary-button {
@@ -1674,7 +1702,7 @@ body.daily-log-editor-open {
   width: 100%;
   min-height: 76px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
@@ -1721,14 +1749,14 @@ body.daily-log-editor-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 38px;
+  min-height: 44px;
   border: 1px solid var(--accent-soft);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: #f2f6f3;
   color: var(--accent);
   font-size: 0.88rem;
   font-weight: 700;
-  padding: 8px 12px;
+  padding: 10px 16px;
   white-space: nowrap;
 }
 
@@ -1781,7 +1809,7 @@ body.daily-log-editor-open {
   width: min(980px, 100%);
   max-height: calc(100vh - 48px);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--panel);
   box-shadow: 0 24px 70px rgba(24, 47, 37, 0.28);
   overflow: hidden;
@@ -1872,7 +1900,7 @@ body.daily-log-editor-open {
 }
 
 .photo-caption-details summary {
-  min-height: 38px;
+  min-height: 44px;
   color: var(--accent);
   cursor: pointer;
   font-size: 0.9rem;
@@ -1894,7 +1922,8 @@ body.daily-log-editor-open {
     gap: 10px;
     min-height: 112px;
     padding: 14px;
-  }
+    box-shadow: var(--shadow-sm);
+}
 
   .day-card-action {
     width: 100%;
