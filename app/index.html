@@ -19,9 +19,22 @@
         <h1>OJT Journal Companion</h1>
       </div>
       <div class="header-actions">
+        <button class="nav-button mobile-profile-button" type="button" data-section="profile" aria-label="Open Profile">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+            <path d="M5 20a7 7 0 0 1 14 0"></path>
+          </svg>
+        </button>
         <p class="header-note">Offline journal workspace</p>
       </div>
     </header>
+    <nav class="mobile-section-tabs" aria-label="Primary mobile navigation">
+      <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Home</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="weeks">Weeks</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="daily-logs">Logs</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="backup">Backup</button>
+    </nav>
 
     <div class="app-layout">
       <nav class="sidebar" aria-label="Main navigation">
@@ -89,6 +102,44 @@
             Review your saved profile details, total rendered time, and the current or latest
             week progress in one compact view.
           </p>
+          <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title" aria-live="polite">
+            <div class="dashboard-ojt-progress-header">
+              <div>
+                <span class="card-label">OJT Progress</span>
+                <h3 id="dashboard-ojt-progress-title">Overall completion</h3>
+              </div>
+              <strong class="dashboard-ojt-percent" id="dashboard-ojt-percent" aria-hidden="true">—</strong>
+            </div>
+            <div
+              class="dashboard-ojt-progress-bar-wrap"
+              id="dashboard-ojt-progress-bar-wrap"
+              role="progressbar"
+              aria-labelledby="dashboard-ojt-progress-title"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              hidden
+            >
+              <div class="dashboard-ojt-progress-bar" id="dashboard-ojt-progress-bar"></div>
+            </div>
+            <dl class="dashboard-ojt-stats" id="dashboard-ojt-stats" hidden>
+              <div>
+                <dt>Rendered</dt>
+                <dd id="dashboard-ojt-rendered">0h 0m</dd>
+              </div>
+              <div>
+                <dt>Required</dt>
+                <dd id="dashboard-ojt-required">0 hours</dd>
+              </div>
+              <div>
+                <dt>Remaining</dt>
+                <dd id="dashboard-ojt-remaining">0h 0m</dd>
+              </div>
+            </dl>
+            <p class="dashboard-ojt-empty" id="dashboard-ojt-empty">
+              Set your required OJT hours in Profile to track overall progress here.
+            </p>
+          </section>
           <div class="dashboard-summary" aria-live="polite">
             <article class="summary-card">
               <span class="card-label">Student</span>
@@ -99,11 +150,6 @@
               <span class="card-label">Company</span>
               <strong id="summary-company-name">Not set yet</strong>
               <p id="summary-company-detail">Save your company profile to show it here.</p>
-            </article>
-            <article class="summary-card">
-              <span class="card-label">Settings</span>
-              <strong id="summary-settings">Default setup</strong>
-              <p id="summary-required-hours">Required OJT hours will appear after saving.</p>
             </article>
             <article class="summary-card">
               <span class="card-label">Weeks</span>

@@ -245,6 +245,7 @@
       dashboardState.dailyLogs = dailyLogs || [];
       dashboardState.dailyTasks = dailyTasks || [];
       renderDashboardWeekProgress();
+      updateRenderedProgressSummary();
     } catch (error) {
       const daysElement = document.getElementById("dashboard-week-days");
       if (daysElement) {
@@ -254,26 +255,63 @@
     }
   }
 
-  function updateRenderedProgressSummary() {
+  function updateOjtProgressCard() {
     const totalRenderedMinutes = sumRenderedMinutes(dashboardState.dailyLogs);
     const requiredHours = Number(dashboardState.studentProfile?.requiredOjtHours || 0);
     const requiredMinutes = requiredHours * 60;
 
-    setText("summary-rendered-time", formatRenderedTime(totalRenderedMinutes));
+    const percentElement = document.getElementById("dashboard-ojt-percent");
+    const barWrap = document.getElementById("dashboard-ojt-progress-bar-wrap");
+    const bar = document.getElementById("dashboard-ojt-progress-bar");
+    const stats = document.getElementById("dashboard-ojt-stats");
+    const empty = document.getElementById("dashboard-ojt-empty");
 
-    if (requiredMinutes > 0) {
-      const remainingMinutes = Math.max(requiredMinutes - totalRenderedMinutes, 0);
-      const remainingText = formatRenderedTime(remainingMinutes);
-      setText("summary-rendered-detail", `${remainingText} remaining from ${requiredHours} required hours.`);
+    if (!percentElement || !barWrap || !bar || !stats || !empty) {
       return;
     }
 
+    if (!Number.isFinite(requiredHours) || requiredHours <= 0) {
+      percentElement.textContent = "—";
+      percentElement.setAttribute("aria-hidden", "true");
+      barWrap.hidden = true;
+      stats.hidden = true;
+      empty.hidden = false;
+      empty.textContent = totalRenderedMinutes > 0
+        ? "Set your required OJT hours in Profile to see completion progress."
+        : "Set your required OJT hours in Profile to track overall progress here.";
+      return;
+    }
+
+    const percent = requiredMinutes > 0
+      ? Math.min(100, Math.round((totalRenderedMinutes / requiredMinutes) * 100))
+      : 0;
+    const remainingMinutes = Math.max(requiredMinutes - totalRenderedMinutes, 0);
+    const requiredLabel = requiredHours === 1 ? "1 hour" : `${requiredHours} hours`;
+
+    percentElement.textContent = `${percent}%`;
+    percentElement.removeAttribute("aria-hidden");
+    bar.style.width = `${percent}%`;
+    barWrap.hidden = false;
+    barWrap.setAttribute("aria-valuenow", String(percent));
+    stats.hidden = false;
+    empty.hidden = true;
+
+    setText("dashboard-ojt-rendered", formatRenderedTime(totalRenderedMinutes));
+    setText("dashboard-ojt-required", requiredLabel);
+    setText("dashboard-ojt-remaining", formatRenderedTime(remainingMinutes));
+  }
+
+  function updateRenderedProgressSummary() {
+    const totalRenderedMinutes = sumRenderedMinutes(dashboardState.dailyLogs);
+
+    setText("summary-rendered-time", formatRenderedTime(totalRenderedMinutes));
     setText(
       "summary-rendered-detail",
       totalRenderedMinutes > 0
         ? "Total rendered time across all saved daily logs."
         : "Save complete daily time records to track OJT progress."
     );
+    updateOjtProgressCard();
   }
 
   function updateDashboardSummary(studentProfile, companyProfile, appSettings) {
@@ -292,16 +330,6 @@
       "summary-company-detail",
       companyProfile?.departmentOrAssignedArea || "Save your company profile to show it here."
     );
-
-    const weekStart = appSettings?.preferredWeekStartDay || "Monday";
-    const timeFormat = appSettings?.timeFormat || "24-hour";
-    setText("summary-settings", `${weekStart}, ${timeFormat}`);
-
-    if (studentProfile && Number(studentProfile.requiredOjtHours) > 0) {
-      setText("summary-required-hours", `${studentProfile.requiredOjtHours} required OJT hours saved.`);
-    } else {
-      setText("summary-required-hours", "Required OJT hours will appear after saving.");
-    }
 
     const reminderElement = document.getElementById("dashboard-backup-reminder");
     if (reminderElement) {
