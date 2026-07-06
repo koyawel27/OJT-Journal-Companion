@@ -15,7 +15,7 @@
         </svg>
       </button>
       <div class="header-title">
-        <p class="eyebrow">Personal OJT workspace</p>
+        <p class="eyebrow">Your OJT journal</p>
         <h1>OJT Journal Companion</h1>
       </div>
       <div class="header-actions">
@@ -25,7 +25,7 @@
             <path d="M5 20a7 7 0 0 1 14 0"></path>
           </svg>
         </button>
-        <p class="header-note">Offline journal workspace</p>
+        <p class="header-note">Saved only in this browser</p>
       </div>
     </header>
     <nav class="mobile-section-tabs" aria-label="Primary mobile navigation">
@@ -101,7 +101,7 @@
               <p class="section-kicker">Start here</p>
               <h2 id="dashboard-title">Dashboard</h2>
               <p class="dashboard-lead">
-                Your OJT progress overview — hours completed, current week status, and next steps.
+                See your OJT hours, this week's progress, and what to do next.
               </p>
             </div>
             <div class="dashboard-actions" aria-label="Quick actions">
@@ -113,7 +113,7 @@
 
           <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
             <p class="reminder-text">
-              <strong>Backup Reminder:</strong> You haven't exported a backup in over 7 days. Your data is stored only in this browser.
+              <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal lives only in this browser — export a copy to keep it safe.
             </p>
             <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
           </div>
@@ -153,7 +153,7 @@
               </div>
             </dl>
             <p class="dashboard-ojt-empty" id="dashboard-ojt-empty">
-              Set your required OJT hours in Profile to track overall progress here.
+              Add your required OJT hours in Profile to track overall progress here.
             </p>
           </section>
 
@@ -163,12 +163,12 @@
               <article class="summary-card summary-card--identity">
                 <span class="card-label">Student</span>
                 <strong id="summary-student-name">Not set yet</strong>
-                <p id="summary-student-detail">Save your student profile to show it here.</p>
+                <p id="summary-student-detail">Add your student details in Profile so they appear on your journal.</p>
               </article>
               <article class="summary-card summary-card--identity">
                 <span class="card-label">Company</span>
                 <strong id="summary-company-name">Not set yet</strong>
-                <p id="summary-company-detail">Save your company profile to show it here.</p>
+                <p id="summary-company-detail">Add your company details in Profile so they appear on your weekly journal preview.</p>
               </article>
             </div>
           </section>
@@ -178,7 +178,7 @@
               <div class="dashboard-week-intro">
                 <span class="card-label">Current / latest week</span>
                 <h3 id="dashboard-week-title">No OJT week yet</h3>
-                <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
+                <p id="dashboard-week-dates">Create your first OJT week to see progress here.</p>
               </div>
               <div class="dashboard-week-highlight">
                 <span class="dashboard-week-highlight-label">Weekly rendered</span>
@@ -208,7 +208,7 @@
                   <h4 id="dashboard-week-progress-title">Daily progress</h4>
                 </div>
                 <ul class="dashboard-day-list" id="dashboard-week-days">
-                  <li class="empty-state">No current week data to show yet.</li>
+                  <li class="empty-state">Create an OJT week, then log each day in Daily Logs.</li>
                 </ul>
               </section>
               <section class="dashboard-week-panel dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
@@ -226,25 +226,24 @@
           </section>
         </section>
 
-        <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
+                <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
           <p class="section-kicker">Student, company, and settings</p>
           <h2 id="profile-title">Profile</h2>
-          <p class="profile-intro">
-            Save the basic details that identify your OJT journal. This phase stores only your
-            student profile, company profile, and simple app settings on this browser.
+          <p>
+            Set up your student info, company placement, and app preferences. These details appear on your weekly journal preview and help track your OJT progress.
           </p>
 
-          <div class="profile-layout form-stack">
-            <form class="profile-form profile-section profile-section-student" id="student-profile-form" novalidate>
-              <header class="form-header profile-form-header">
+          <div class="form-stack">
+            <form class="profile-form" id="student-profile-form" novalidate>
+              <div class="form-header">
                 <div>
                   <span class="card-label">Student profile</span>
                   <h3>Student details</h3>
                 </div>
-                <p>Used for journal identity and prepared weekly output.</p>
-              </header>
+                <p>Your name and required hours — used on your journal and progress tracker.</p>
+              </div>
 
-              <div class="profile-form-body form-grid">
+              <div class="form-grid">
                 <label class="field">
                   <span>Student name</span>
                   <input type="text" id="student-name" autocomplete="name" required>
@@ -267,22 +266,22 @@
                 </label>
               </div>
 
-              <div class="form-actions profile-form-actions">
+              <div class="form-actions">
                 <button class="primary-button" type="submit">Save student profile</button>
                 <p class="form-message" id="student-profile-message" hidden></p>
               </div>
             </form>
 
-            <form class="profile-form profile-section profile-section-company" id="company-profile-form" novalidate>
-              <header class="form-header profile-form-header">
+            <form class="profile-form" id="company-profile-form" novalidate>
+              <div class="form-header">
                 <div>
                   <span class="card-label">Company profile</span>
                   <h3>OJT placement</h3>
                 </div>
-                <p>Stores the company context for this personal journal.</p>
-              </header>
+                <p>Your OJT company details — they show up on your weekly journal preview.</p>
+              </div>
 
-              <div class="profile-form-body form-grid">
+              <div class="form-grid">
                 <label class="field field-wide">
                   <span>Company name</span>
                   <input type="text" id="company-name" required>
@@ -305,22 +304,22 @@
                 </label>
               </div>
 
-              <div class="form-actions profile-form-actions">
+              <div class="form-actions">
                 <button class="primary-button" type="submit">Save company profile</button>
                 <p class="form-message" id="company-profile-message" hidden></p>
               </div>
             </form>
 
-            <form class="profile-form profile-section profile-section-settings" id="app-settings-form" novalidate>
-              <header class="form-header profile-form-header">
+            <form class="profile-form" id="app-settings-form" novalidate>
+              <div class="form-header">
                 <div>
-                  <span class="card-label">App settings</span>
+                  <span class="card-label">Settings</span>
                   <h3>Simple preferences</h3>
                 </div>
-                <p>Small defaults that guide journal organization on this device.</p>
-              </header>
+                <p>Small defaults for how weeks and times are shown in the app.</p>
+              </div>
 
-              <div class="profile-form-body form-grid">
+              <div class="form-grid">
                 <label class="field">
                   <span>Preferred week start day</span>
                   <select id="preferred-week-start-day">
@@ -342,7 +341,7 @@
                 </label>
               </div>
 
-              <div class="form-actions profile-form-actions">
+              <div class="form-actions">
                 <button class="primary-button" type="submit">Save settings</button>
                 <p class="form-message" id="app-settings-message" hidden></p>
               </div>
@@ -354,7 +353,7 @@
           <p class="section-kicker">Journal periods</p>
           <h2 id="weeks-title">Weeks</h2>
           <p>
-            Create weekly OJT journal periods with inclusive start and end dates. Daily logs can now be managed from the Daily Logs section.
+            Weeks organize your Daily Logs and Weekly Preview. Create one week at a time with its number and date range.
           </p>
 
           <div class="weeks-layout">
@@ -364,7 +363,7 @@
                   <span class="card-label">OJT week</span>
                   <h3 id="week-form-title">Create week</h3>
                 </div>
-                <p>Use one week number and a clear date range for each journal period.</p>
+                <p>Match your school journal week number and inclusive dates.</p>
               </div>
 
               <input type="hidden" id="week-id">
@@ -396,12 +395,12 @@
                   <span class="card-label">Saved weeks</span>
                   <h3 id="weeks-list-title">Weeks list</h3>
                 </div>
-                <p id="weeks-count-label">No weeks saved yet.</p>
+                <p id="weeks-count-label">No weeks yet — create your first OJT week above.</p>
               </div>
               <div class="weeks-list" id="weeks-list"></div>
             </section>
 
-            <p class="phase-note weeks-list-note">Expand a saved week to review day slots. Daily logs are managed from the Daily Logs section. Delete related daily logs before removing a week.</p>
+            <p class="phase-note weeks-list-note">Expand a saved week to review its days and weekly summary. Log daily work in Daily Logs. Delete daily logs first before removing a week.</p>
           </div>
         </section>
 
@@ -409,8 +408,7 @@
           <p class="section-kicker">Daily record keeping</p>
           <h2 id="daily-logs-title">Daily Logs</h2>
           <p>
-            Create daily OJT logs under saved weeks, then add structured task/work items for
-            clear accomplishment bullets later. Rendered time is calculated from each day's time fields.
+            Choose a week, open each day, save your rendered time and status, then add task items and photos as needed.
           </p>
 
           <div class="daily-logs-layout">
@@ -420,7 +418,7 @@
                   <span class="card-label">Week journal</span>
                   <h3 id="daily-log-week-title">Choose a saved week</h3>
                 </div>
-                <p id="daily-log-week-help">Select a week to open its journal-style day records.</p>
+                <p id="daily-log-week-help">Choose a week, then open each day to record your work and rendered hours.</p>
               </div>
 
               <label class="field">
@@ -437,8 +435,7 @@
           <p class="section-kicker">Prepared journal content</p>
           <h2 id="weekly-preview-title">Weekly Preview</h2>
           <p>
-            Select a saved week to review copy-ready weekly journal content for manual transfer
-            into the official school journal template.
+            Pick a saved week to preview your journal, then copy the text into your official school template.
           </p>
 
           <div class="weekly-preview-layout">
@@ -448,7 +445,7 @@
                   <span class="card-label">Weekly journal</span>
                   <h3 id="weekly-preview-controls-title">Choose a saved week</h3>
                 </div>
-                <p id="weekly-preview-help">Preview and copy prepared journal text.</p>
+                <p id="weekly-preview-help">Choose a week to preview, then copy the journal text.</p>
               </div>
 
               <label class="field">
@@ -463,7 +460,7 @@
             </section>
 
             <div class="weekly-preview-output" id="weekly-preview-output" aria-live="polite">
-              <p class="empty-state">Choose a saved week to generate a weekly journal preview.</p>
+              <p class="empty-state">Choose a saved week to preview your weekly journal.</p>
             </div>
           </div>
         </section>
@@ -471,62 +468,50 @@
         <section class="app-section" id="backup" aria-labelledby="backup-title" hidden>
           <p class="section-kicker">Manual protection</p>
           <h2 id="backup-title">Backup</h2>
-          <p class="backup-intro">
-            Your journal data is stored locally in this browser. Export a backup before clearing
-            browser data, changing devices, or doing maintenance. Photo-heavy backups may be large.
+          <p>
+            Your journal is stored only in this browser. Export a backup before clearing browser data or switching devices. Photo-heavy backups may take longer to download.
           </p>
 
-          <div class="backup-local-notice" role="note">
-            <p><strong>Stored only in this browser.</strong> Nothing is uploaded to a server. Export regularly to keep a safe copy of your journal.</p>
-          </div>
-
           <div class="backup-grid">
-            <section class="backup-panel backup-panel-export" aria-labelledby="export-backup-title">
-              <header class="backup-panel-header">
-                <span class="card-label">Export</span>
-                <h3 id="export-backup-title">Save a JSON backup</h3>
-              </header>
-              <p>Download all local app data, including photo documentation converted for JSON backup.</p>
-              <p class="backup-panel-note">Recommended safe action — keep a personal copy before maintenance or device changes.</p>
-              <button class="primary-button backup-export-button" type="button" id="export-backup-button">Export Backup</button>
+            <section class="backup-panel" aria-labelledby="export-backup-title">
+              <span class="card-label">Export</span>
+              <h3 id="export-backup-title">Save a JSON backup</h3>
+              <p>Download a JSON file with all your journal data, including photos.</p>
+              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
             </section>
 
-            <section class="backup-panel backup-panel-restore" aria-labelledby="restore-backup-title">
-              <header class="backup-panel-header">
-                <span class="card-label">Restore</span>
-                <h3 id="restore-backup-title">Restore from JSON</h3>
-              </header>
-              <p class="backup-caution-note"><strong>Caution:</strong> Restoring replaces the current local data in this browser. It does not merge records.</p>
-              <label class="field backup-restore-field">
+            <section class="backup-panel" aria-labelledby="restore-backup-title">
+              <span class="card-label">Restore</span>
+              <h3 id="restore-backup-title">Restore from JSON</h3>
+              <p>Replace everything in this browser with a backup file. Restore does not merge — it overwrites your current data.</p>
+              <label class="field">
                 <span>Backup file</span>
                 <input type="file" id="restore-backup-file" accept="application/json,.json">
               </label>
             </section>
           </div>
 
-          <section class="backup-panel backup-panel-reset backup-danger-zone" aria-labelledby="reset-local-data-title">
-            <header class="backup-panel-header">
-              <span class="card-label">Danger zone</span>
-              <h3 id="reset-local-data-title">Reset local app data</h3>
-            </header>
-            <p class="backup-danger-intro">Permanently erase all journal data stored by this app in this browser. Reset cannot be undone.</p>
-            <p class="backup-danger-note"><strong>Export a backup first</strong> if you may need your profile, weeks, daily logs, tasks, photos, or settings later.</p>
+          <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
+            <span class="card-label">Danger zone</span>
+            <h3 id="reset-local-data-title">Reset Local App Data</h3>
+            <p>
+              Your journal lives only in this browser. Reset permanently removes all local OJT data — profile, weeks, daily logs, tasks, photos, and settings. Export a backup first if you may need it later.
+            </p>
 
-            <div class="backup-reset-guardrails">
-              <label class="backup-reset-checkbox">
-                <input type="checkbox" id="reset-data-confirm-checkbox">
-                <span>I understand this will permanently delete all local app data from this browser.</span>
-              </label>
-              <label class="field backup-reset-text-field">
-                <span>Type RESET to confirm</span>
-                <input type="text" id="reset-data-confirm-text" autocomplete="off" spellcheck="false" placeholder="RESET" aria-describedby="reset-local-data-title">
-              </label>
-            </div>
+            <label class="reset-confirm-field" for="reset-confirm-checkbox">
+              <input type="checkbox" id="reset-confirm-checkbox">
+              <span>I understand this will permanently delete my local OJT journal data from this browser.</span>
+            </label>
 
-            <button class="danger-button backup-reset-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
+            <label class="field">
+              <span>Type RESET to confirm</span>
+              <input type="text" id="reset-confirm-text" autocomplete="off" spellcheck="false" inputmode="text" placeholder="RESET">
+            </label>
+
+            <button class="danger-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
           </section>
 
-          <p class="form-message backup-status-message" id="backup-message" hidden></p>
+          <p class="form-message" id="backup-message" hidden></p>
         </section>
       </main>
     </div>

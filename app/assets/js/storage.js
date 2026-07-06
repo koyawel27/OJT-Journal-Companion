@@ -250,7 +250,7 @@
       };
 
       transaction.onerror = () => {
-        reject(transaction.error || new Error("Local app data could not be reset."));
+        reject(transaction.error || new Error("Local data could not be reset."));
       };
     });
   }

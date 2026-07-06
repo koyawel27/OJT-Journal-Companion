@@ -310,6 +310,51 @@ h1 {
   color: var(--muted);
 }
 
+.backup-reset-panel {
+  margin-top: 18px;
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.backup-reset-panel h3 {
+  color: var(--danger-text);
+}
+
+.backup-reset-panel .card-label {
+  color: var(--danger);
+}
+
+.reset-confirm-field {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  margin: 0 0 14px;
+  cursor: pointer;
+}
+
+.reset-confirm-field input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--danger);
+}
+
+.reset-confirm-field span {
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.backup-reset-panel .field {
+  margin-bottom: 14px;
+}
+
+.backup-reset-panel .danger-button {
+  width: 100%;
+}
+
 .mobile-profile-button,
 .mobile-section-tabs {
   display: none;

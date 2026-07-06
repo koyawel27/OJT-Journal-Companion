@@ -140,11 +140,11 @@
     const warnings = [];
 
     if (!state.studentProfile?.studentName) {
-      warnings.push("Student profile is missing. Save your student profile before copying final journal content.");
+      warnings.push("Student profile is missing. Save it in Profile before copying your final journal.");
     }
 
     if (!state.companyProfile?.companyName) {
-      warnings.push("Company profile is missing. Save your company profile before copying final journal content.");
+      warnings.push("Company profile is missing. Save it in Profile so your journal shows the right placement.");
     }
 
     if (warnings.length === 0) {
@@ -324,7 +324,7 @@
     }
 
     if (!week) {
-      output.innerHTML = '<p class="empty-state">Choose a saved week to generate a weekly journal preview.</p>';
+      output.innerHTML = '<p class="empty-state">Choose a saved week to preview your weekly journal.</p>';
       copyButton.disabled = true;
       return;
     }
@@ -406,7 +406,7 @@
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week first, then return here for preview output." : "Preview and copy prepared journal text."
+      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy the journal text."
     );
   }
 
@@ -436,7 +436,7 @@
     window.OJTUI.clearFormMessage(messageElement);
 
     if (!state.copyText) {
-      window.OJTUI.showFormMessage(messageElement, "Choose a week before copying journal content.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Choose a week before copying.", "error");
       return;
     }
 
@@ -444,7 +444,7 @@
       await copyTextToClipboard(state.copyText);
       window.OJTUI.showFormMessage(messageElement, "Weekly journal copied to clipboard.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Copy failed. Please select and copy the preview manually.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Copy failed — select and copy the preview manually.", "error");
       console.error(error);
     }
   }
@@ -470,7 +470,7 @@
     } catch (error) {
       const output = getElement("weekly-preview-output");
       if (output) {
-        output.innerHTML = '<p class="empty-state">Weekly preview data could not be loaded. Please refresh and try again.</p>';
+        output.innerHTML = '<p class="empty-state">Could not load preview. Refresh and try again.</p>';
       }
       console.error(error);
     }

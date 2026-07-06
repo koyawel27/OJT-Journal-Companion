@@ -99,19 +99,19 @@
     const hasAnySummary = requiredFields.concat(optionalFields).some((value) => String(value || "").trim());
 
     if (filledRequiredCount === requiredFields.length) {
-      return "Summary completed";
+      return "Weekly summary complete";
     }
 
     if (hasAnySummary) {
-      return "Summary partially filled";
+      return "Weekly summary partially filled";
     }
 
-    return "Summary not started";
+    return "Weekly summary not started";
   }
 
   function getDayStatusText(dailyLog, taskCount) {
     if (!dailyLog) {
-      return "No daily log yet";
+      return "No daily log yet — open in Daily Logs";
     }
 
     let status = "Daily log saved";
@@ -159,7 +159,7 @@
 
   function validateWeek(weekRecord) {
     if (!getValue("week-number")) {
-      return "Please enter the week number.";
+      return "Enter the week number.";
     }
 
     if (Number.isNaN(weekRecord.weekNumber) || weekRecord.weekNumber <= 0) {
@@ -171,23 +171,23 @@
     });
 
     if (duplicateWeek) {
-      return "That week number is already saved. Please use a unique week number.";
+      return "That week number is already used. Pick a different one.";
     }
 
     if (!weekRecord.inclusiveStartDate) {
-      return "Please choose the inclusive start date.";
+      return "Choose the inclusive start date.";
     }
 
     if (!weekRecord.inclusiveEndDate) {
-      return "Please choose the inclusive end date.";
+      return "Choose the inclusive end date.";
     }
 
     if (weekRecord.inclusiveStartDate > weekRecord.inclusiveEndDate) {
-      return "Inclusive start date must not be later than inclusive end date.";
+      return "Start date must be on or before the end date.";
     }
 
     if (hasOverlappingRange(weekRecord)) {
-      return "This date range overlaps an existing week. Please choose a separate range.";
+      return "These dates overlap another saved week. Adjust the range.";
     }
 
     return "";
@@ -269,7 +269,7 @@
           </label>
         </div>
 
-        <p class="phase-note">Weekly Summary is for learning, challenges, and reflection. Daily Logs stay focused on day records and task/work items.</p>
+        <p class="phase-note">Fill in skills, challenges, and reflection for your weekly journal. Day-by-day work stays in Daily Logs.</p>
 
         <div class="form-actions">
           <button class="primary-button" type="submit">Save weekly summary</button>
@@ -285,10 +285,14 @@
     const sortedWeeks = sortWeeks(state.weeks);
 
     list.innerHTML = "";
-    countLabel.textContent = sortedWeeks.length === 1 ? "1 week saved." : `${sortedWeeks.length} weeks saved.`;
+    countLabel.textContent = sortedWeeks.length === 0
+      ? "No weeks yet — create your first OJT week above."
+      : sortedWeeks.length === 1
+      ? "1 week saved."
+      : `${sortedWeeks.length} weeks saved.`;
 
     if (sortedWeeks.length === 0) {
-      list.innerHTML = '<p class="empty-state">No weeks saved yet. Create your first OJT week above.</p>';
+      list.innerHTML = '<p class="empty-state">No weeks yet. Create your first OJT week above, then log days in Daily Logs.</p>';
       return;
     }
 
@@ -350,7 +354,7 @@
       if (relatedLogs.length > 0) {
         window.OJTUI.showFormMessage(
           getElement("week-form-message"),
-          "This week has daily logs. Delete those daily logs first before deleting the week.",
+          "This week still has daily logs. Delete them in Daily Logs before removing the week.",
           "error"
         );
         return;
@@ -361,7 +365,7 @@
       return;
     }
 
-    const confirmed = window.confirm(`Delete Week ${week.weekNumber}? This removes the week record.`);
+    const confirmed = window.confirm(`Delete Week ${week.weekNumber}? This only removes the week record — it cannot be undone.`);
 
     if (!confirmed) {
       return;

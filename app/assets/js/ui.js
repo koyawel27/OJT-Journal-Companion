@@ -168,12 +168,12 @@
 
     if (!week) {
       setText("dashboard-week-title", "No OJT week yet");
-      setText("dashboard-week-dates", "Create an OJT week to show progress here.");
+      setText("dashboard-week-dates", "Create your first OJT week to see progress here.");
       setText("dashboard-week-rendered", formatRenderedTime(0));
       setText("dashboard-week-logged-days", "0 of 0");
       setText("dashboard-week-worked-days", "0");
       setText("dashboard-week-open-days", "0");
-      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then add daily logs to see progress here.</li>';
+      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Daily Logs.</li>';
       summaryElement.innerHTML = `
         <li class="is-missing">Skills Learned: missing</li>
         <li class="is-missing">Problems Encountered: missing</li>
@@ -209,7 +209,7 @@
           return `
             <li class="dashboard-day-row is-empty${todayClass}">
               <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
-              <strong class="dashboard-day-result">No log yet</strong>
+              <strong class="dashboard-day-result">Not logged yet</strong>
             </li>
           `;
         }
@@ -230,7 +230,7 @@
           </li>
         `;
       }).join("")
-      : '<li class="empty-state">This week has no inclusive dates saved.</li>';
+      : '<li class="empty-state">This week has no dates saved. Edit the week in Weeks to fix the date range.</li>';
 
     summaryElement.innerHTML = [
       renderSummaryStatusItem("Skills Learned", week.weeklySkillsLearned),
@@ -261,7 +261,7 @@
     } catch (error) {
       const daysElement = document.getElementById("dashboard-week-days");
       if (daysElement) {
-        daysElement.innerHTML = '<li class="empty-state">Dashboard week progress could not be loaded.</li>';
+        daysElement.innerHTML = '<li class="empty-state">Could not load week progress. Refresh and try again.</li>';
       }
       console.error(error);
     }
@@ -289,8 +289,8 @@
       stats.hidden = true;
       empty.hidden = false;
       empty.textContent = totalRenderedMinutes > 0
-        ? "Set your required OJT hours in Profile to see completion progress."
-        : "Set your required OJT hours in Profile to track overall progress here.";
+        ? "Add your required OJT hours in Profile to see completion progress."
+        : "Add your required OJT hours in Profile to track overall progress here.";
       return;
     }
 
@@ -334,13 +334,13 @@
     setText("summary-student-name", studentProfile?.studentName || "Not set yet");
     setText(
       "summary-student-detail",
-      studentProfile?.courseOrProgram || "Save your student profile to show it here."
+      studentProfile?.courseOrProgram || "Add your student details in Profile so they appear on your journal."
     );
 
     setText("summary-company-name", companyProfile?.companyName || "Not set yet");
     setText(
       "summary-company-detail",
-      companyProfile?.departmentOrAssignedArea || "Save your company profile to show it here."
+      companyProfile?.departmentOrAssignedArea || "Add your company details in Profile so they appear on your weekly journal preview."
     );
 
     const reminderElement = document.getElementById("dashboard-backup-reminder");
@@ -370,7 +370,7 @@
     setText("summary-week-count", label);
     setText(
       "summary-week-detail",
-      count > 0 ? "Saved OJT weeks are ready for future daily logs." : "Create OJT weeks to organize future daily logs."
+      count > 0 ? "Saved weeks are ready for Daily Logs and Weekly Preview." : "Create your first OJT week before adding daily logs."
     );
     refreshDashboardWeekProgress();
   }
@@ -384,7 +384,7 @@
     setText("summary-daily-log-count", label);
     setText(
       "summary-daily-log-detail",
-      count > 0 ? "Saved daily logs are grouped by their OJT week." : "Create daily logs after choosing a saved week."
+      count > 0 ? "Daily logs are grouped by OJT week." : "Create a week first, then log each day in Daily Logs."
     );
     updateRenderedProgressSummary();
     refreshDashboardWeekProgress();

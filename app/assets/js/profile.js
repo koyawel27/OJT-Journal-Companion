@@ -72,11 +72,11 @@
 
   function validateStudentProfile(profile) {
     if (!profile.studentName) {
-      return "Please enter the student name before saving.";
+      return "Enter your student name before saving.";
     }
 
     if (Number.isNaN(profile.requiredOjtHours) || profile.requiredOjtHours < 0) {
-      return "Required OJT hours must be zero or a positive number.";
+      return "Required OJT hours must be zero or higher.";
     }
 
     return "";
@@ -84,7 +84,7 @@
 
   function validateCompanyProfile(profile) {
     if (!profile.companyName) {
-      return "Please enter the company name before saving.";
+      return "Enter your company name before saving.";
     }
 
     return "";
@@ -140,7 +140,7 @@
       populateSettingsForm(appSettings);
       window.OJTUI.updateDashboardSummary(studentProfile, companyProfile, appSettings);
     } catch (error) {
-      const message = "Saved profile data could not be loaded. Please refresh and try again.";
+      const message = "Could not load your profile. Refresh and try again.";
       window.OJTUI.showFormMessage(document.getElementById("student-profile-message"), message, "error");
       console.error(error);
     }
@@ -164,7 +164,7 @@
       window.OJTUI.updateDashboardSummary(state.studentProfile, state.companyProfile, state.appSettings);
       window.OJTUI.showFormMessage(messageElement, "Student profile saved.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Student profile could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not save student profile. Try again.", "error");
       console.error(error);
     }
   }
@@ -187,7 +187,7 @@
       window.OJTUI.updateDashboardSummary(state.studentProfile, state.companyProfile, state.appSettings);
       window.OJTUI.showFormMessage(messageElement, "Company profile saved.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Company profile could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not save company profile. Try again.", "error");
       console.error(error);
     }
   }
@@ -202,7 +202,7 @@
       window.OJTUI.updateDashboardSummary(state.studentProfile, state.companyProfile, state.appSettings);
       window.OJTUI.showFormMessage(messageElement, "Settings saved.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Settings could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not save settings. Try again.", "error");
       console.error(error);
     }
   }

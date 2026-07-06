@@ -246,9 +246,9 @@
     setValue("daily-log-week-select", state.selectedWeekId);
 
     if (sortedWeeks.length === 0) {
-      setText("daily-log-week-help", "Create an OJT week first, then return here for daily logs.");
+      setText("daily-log-week-help", "Create your first OJT week in Weeks, then come back to log each day.");
     } else {
-      setText("daily-log-week-help", "Select a week to open its journal-style day records.");
+      setText("daily-log-week-help", "Choose a week, then open each day to record your work and rendered hours.");
     }
   }
 
@@ -270,7 +270,7 @@
       ? "1 daily log saved"
       : `${logs.length} daily logs saved`;
 
-    countLabel.textContent = `${logsText} for this week. Weekly rendered time: ${formatRenderedTime(weeklyTotal)}.`;
+    countLabel.textContent = `${logsText} this week · ${formatRenderedTime(weeklyTotal)} rendered total.`;
   }
 
   function selectWeek(weekId) {
@@ -285,7 +285,7 @@
 
   function renderTaskBullets(tasks) {
     if (tasks.length === 0) {
-      return '<p class="empty-state">No task/work items yet. Save the day record first, then add items below.</p>';
+      return '<p class="empty-state">No tasks yet. Save the day record first, then add work items below.</p>';
     }
 
     return `
@@ -332,8 +332,8 @@
       ? formatRenderedTime(calculation.renderedMinutes)
       : "Not calculated";
     const helpText = !worked
-      ? "Rendered time is 0 for Absent and No OJT / Rest Day records."
-      : calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
+      ? "Absent and rest days count as 0 rendered hours."
+      : calculation.error || "Enter time in, time out, and break minutes to calculate rendered hours.";
     let taskComparison = "";
 
     if (worked && taskTotalMinutes > 0) {
@@ -375,7 +375,7 @@
 
   function renderPhotoList(photos) {
     if (photos.length === 0) {
-      return '<p class="empty-state">No photo documentation attached yet.</p>';
+      return '<p class="empty-state">No photos attached yet. Save the day record first, then add photos below.</p>';
     }
 
     return `
@@ -415,11 +415,12 @@
   function renderPhotoSection(dailyLog) {
     if (!dailyLog) {
       return `
-        <section class="editor-section editor-section-photos photo-documentation-panel" aria-labelledby="editor-photo-docs-title">
-          <header class="editor-section-header">
-            <h4 id="editor-photo-docs-title">Photo Documentation</h4>
-            <p class="editor-section-note">Save the day record before attaching photo documentation.</p>
-          </header>
+        <section class="photo-documentation-panel">
+          <div class="journal-col-header">
+            <span class="card-label">Photo documentation</span>
+            <h4>Attached photos</h4>
+            <p class="phase-note">Save the day record before attaching photos.</p>
+          </div>
         </section>
       `;
     }
@@ -427,11 +428,12 @@
     const photos = getPhotosForDailyLog(dailyLog.id);
 
     return `
-      <section class="editor-section editor-section-photos photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
-        <header class="editor-section-header">
-          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Photo Documentation</h4>
-          <p class="editor-section-note">Attach JPEG, PNG, or WebP photos up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
-        </header>
+      <section class="photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
+        <div class="journal-col-header">
+          <span class="card-label">Photo documentation</span>
+          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Attached photos</h4>
+          <p class="phase-note">Optional — attach JPEG, PNG, or WebP up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
+        </div>
 
         <div class="photo-attachment-list-wrap" id="photo-attachment-list">
           ${renderPhotoList(photos)}
@@ -465,6 +467,7 @@
   }
 
   function renderDayEditorBody(week, dateText, dailyLog) {
+    const dayLabel = getDayLabel(week, dateText);
     const dayStatus = getDailyLogStatus(dailyLog);
     const worked = isWorkedStatus(dayStatus);
     const timeFieldState = worked ? "" : "disabled";
@@ -477,16 +480,14 @@
 
     return `
       <div class="journal-row">
-        <section class="editor-section editor-section-day journal-col journal-col-time" aria-labelledby="editor-day-record-title">
-          <header class="editor-section-header">
-            <h4 id="editor-day-record-title">Day Record</h4>
-            <p class="editor-section-note">Set day status, time fields, and remarks for this date.</p>
-          </header>
-
+        <div class="journal-col journal-col-time">
           <form class="day-record-form" id="daily-log-form" novalidate>
             <input type="hidden" id="daily-log-id" value="${escapeHtml(dailyLog?.id || "")}">
             <input type="hidden" id="daily-log-form-week" value="${escapeHtml(week.id)}">
             <input type="hidden" id="daily-log-entry-date" value="${escapeHtml(dateText)}">
+
+            <span class="card-label">${escapeHtml(dayLabel)}</span>
+            <h4 class="journal-day-heading">${escapeHtml(formatDisplayDate(dateText))}</h4>
 
             <label class="field">
               <span>Day status</span>
@@ -520,16 +521,17 @@
               <p class="form-message" id="daily-log-form-message" hidden></p>
             </div>
           </form>
-        </section>
+        </div>
 
-        <section class="editor-section editor-section-tasks journal-col journal-col-tasks" aria-labelledby="editor-task-items-title">
-          <header class="editor-section-header">
-            <h4 id="editor-task-items-title">Work / Task Items</h4>
-            <p class="editor-section-note">${tasksEnabled ? "Add bullet-style work items for this day." : "Save the day record first, then add task/work items."}</p>
-          </header>
+        <div class="journal-col journal-col-tasks">
+          <div class="journal-col-header">
+            <span class="card-label">Task/work items</span>
+            <h4>Accomplishments</h4>
+            <p class="phase-note">${tasksEnabled ? "Add what you accomplished today — these become journal bullets." : "Save the day record first, then add task items here."}</p>
+          </div>
 
           <div class="task-list-display" id="daily-task-list">
-            ${tasksEnabled ? renderTaskBullets(tasks) : '<p class="empty-state">Task items appear here after the day record is saved.</p>'}
+            ${tasksEnabled ? renderTaskBullets(tasks) : '<p class="empty-state">Task items appear here after you save the day record.</p>'}
           </div>
 
           <form class="task-form" id="daily-task-form" novalidate>
@@ -557,7 +559,7 @@
               </label>
             </div>
 
-            <p class="phase-note">Task time is for documentation only and is not used as the official rendered hours source.</p>
+            <p class="phase-note">Task time is for your notes only — rendered hours come from time in, time out, and break.</p>
 
             <div class="form-actions">
               <button class="primary-button" type="submit" id="save-daily-task-button" ${tasksEnabled ? "" : "disabled"}>Save task item</button>
@@ -565,7 +567,7 @@
               <p class="form-message" id="daily-task-form-message" hidden></p>
             </div>
           </form>
-        </section>
+        </div>
       </div>
 
       ${renderPhotoSection(dailyLog)}
@@ -581,28 +583,23 @@
       : "";
     const taskText = tasks.length > 0 ? (tasks.length === 1 ? "1 task" : `${tasks.length} tasks`) : "";
     const photoText = photos.length > 0 ? (photos.length === 1 ? "1 photo" : `${photos.length} photos`) : "";
-    const metaMarkup = [
-      renderedText ? `<span class="day-card-stat is-hours">${escapeHtml(renderedText)}</span>` : "",
-      taskText ? `<span class="day-card-stat is-tasks">${escapeHtml(taskText)}</span>` : "",
-      photoText ? `<span class="day-card-stat is-photos">${escapeHtml(photoText)}</span>` : ""
-    ].filter(Boolean).join("");
+    const metaItems = [renderedText, taskText, photoText].filter(Boolean);
     const statusMarkup = dailyLog
       ? renderDayStatusBadge(dayStatus)
-      : '<span class="day-status-badge is-empty">No log yet</span>';
+      : '<span class="day-status-badge is-empty">Not logged yet</span>';
     const actionText = dailyLog ? "Open / Edit" : "Create Log";
-    const cardStateClass = dailyLog ? "has-log" : "is-empty";
 
     return `
-      <button class="daily-log-day-card ${cardStateClass}" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
+      <button class="daily-log-day-card" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
         <span class="day-card-main">
           <span class="day-card-label">Day ${escapeHtml(dayNumber)}</span>
-          <strong class="day-card-date">${escapeHtml(formatDisplayDate(dateText))}</strong>
+          <strong>${escapeHtml(formatDisplayDate(dateText))}</strong>
         </span>
         <span class="day-card-summary">
           ${statusMarkup}
-          <span class="day-card-meta">${metaMarkup || '<span class="day-card-hint">Ready for daily record</span>'}</span>
+          <span class="day-card-meta">${metaItems.length > 0 ? metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("") : "Tap to log this day"}</span>
         </span>
-        <span class="day-card-action" aria-hidden="true">${escapeHtml(actionText)}</span>
+        <span class="day-card-action">${escapeHtml(actionText)}</span>
       </button>
     `;
   }
@@ -616,18 +613,16 @@
     const titleId = `daily-log-editor-title-${dateText}`;
     const statusMarkup = dailyLog
       ? renderDayStatusBadge(dailyLog.dayStatus)
-      : '<span class="day-status-badge is-empty">No log yet</span>';
+      : '<span class="day-status-badge is-empty">Not logged yet</span>';
 
     return `
       <div class="daily-log-editor-overlay" data-editor-close="true">
         <section class="daily-log-editor-panel" role="dialog" aria-modal="true" aria-labelledby="${escapeHtml(titleId)}">
           <div class="daily-log-editor-header">
-            <div class="editor-header-main">
+            <div>
               <span class="card-label">Daily Log Editor</span>
-              <div class="editor-header-title-row">
-                <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} · ${escapeHtml(formatDisplayDate(dateText))}</h3>
-                ${statusMarkup}
-              </div>
+              <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} - ${escapeHtml(formatDisplayDate(dateText))}</h3>
+              ${statusMarkup}
             </div>
             <button class="secondary-button editor-close-button" type="button" id="daily-log-editor-close" data-editor-close="true">Close</button>
           </div>
@@ -663,7 +658,7 @@
       state.expandedDate = null;
       state.activeDailyLogId = null;
       syncDailyLogEditorState();
-      container.innerHTML = '<p class="empty-state">Choose a saved week to show journal day records.</p>';
+      container.innerHTML = '<p class="empty-state">Choose a week above to see its days.</p>';
       return;
     }
 
@@ -749,7 +744,7 @@
     const selectedWeek = state.weeks.find((week) => week.id === dailyLog.weekId);
 
     if (!dailyLog.weekId || !selectedWeek) {
-      return "Please choose an OJT week before saving the daily log.";
+      return "Choose an OJT week before saving.";
     }
 
     if (!dailyLog.entryDate) {
@@ -757,7 +752,7 @@
     }
 
     if (dailyLog.entryDate < selectedWeek.inclusiveStartDate || dailyLog.entryDate > selectedWeek.inclusiveEndDate) {
-      return "Entry date should be within the selected week's inclusive date range.";
+      return "Entry date must fall within the selected week's date range.";
     }
 
     if (!dayStatuses.includes(dailyLog.dayStatus)) {
@@ -777,7 +772,7 @@
     }
 
     if (!dailyLog.timeIn || !dailyLog.timeOut) {
-      return "Time in and time out are required for worked days.";
+      return "Time in and time out are required on worked days.";
     }
 
     if (!isValidTime(dailyLog.timeIn) || !isValidTime(dailyLog.timeOut)) {
@@ -813,7 +808,7 @@
 
     if (!isWorkedStatus(dayStatus)) {
       previewElement.textContent = formatRenderedTime(0);
-      helpElement.textContent = "Rendered time is 0 for Absent and No OJT / Rest Day records.";
+      helpElement.textContent = "Absent and rest days count as 0 rendered hours.";
       return;
     }
 
@@ -827,7 +822,7 @@
     previewElement.textContent = calculation.isComplete
       ? formatRenderedTime(calculation.renderedMinutes)
       : "Not calculated";
-    helpElement.textContent = calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
+    helpElement.textContent = calculation.error || "Enter time in, time out, and break minutes to calculate rendered hours.";
   }
 
   function updateDayStatusControls() {
@@ -874,11 +869,11 @@
 
   function validateTask(task) {
     if (!task.dailyLogId) {
-      return "Please save the day record before adding task items.";
+      return "Save the day record before adding tasks.";
     }
 
     if (!task.description) {
-      return "Please enter a task or work item description.";
+      return "Enter a task or work item description.";
     }
 
     if (!taskStatuses.includes(task.status)) {
@@ -932,17 +927,17 @@
       const saveMessage = savedLog.renderedMinutes !== null &&
         savedLog.renderedMinutes !== undefined &&
         Number.isFinite(Number(savedLog.renderedMinutes))
-        ? `Day record saved with ${formatRenderedTime(savedLog.renderedMinutes)} rendered time.`
-        : "Day record saved. Complete time in and time out to calculate rendered time.";
+        ? `Day saved — ${formatRenderedTime(savedLog.renderedMinutes)} rendered.`
+        : "Day saved. Add time in and time out to calculate rendered hours.";
       window.OJTUI.showFormMessage(getElement("daily-log-form-message"), saveMessage, "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Daily log could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not save daily log. Try again.", "error");
       console.error(error);
     }
   }
 
   async function deleteDailyLog(dailyLog) {
-    const confirmed = window.confirm(`Delete the daily log for ${dailyLog.entryDate}? Its task items and photo attachments will also be deleted.`);
+    const confirmed = window.confirm(`Delete the log for ${dailyLog.entryDate}? Tasks and photos for this day will also be removed.`);
 
     if (!confirmed) {
       return;
@@ -958,9 +953,9 @@
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Day record deleted.", "success");
+      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Day log deleted.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Daily log could not be deleted. Please try again.", "error");
+      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Could not delete daily log. Try again.", "error");
       console.error(error);
     }
   }
@@ -1003,7 +998,7 @@
   }
 
   async function deleteTask(task) {
-    const confirmed = window.confirm("Delete this task item? The day record will stay saved.");
+    const confirmed = window.confirm("Delete this task item? The day log will stay saved.");
 
     if (!confirmed) {
       return;
@@ -1035,7 +1030,7 @@
     window.OJTUI.clearFormMessage(messageElement);
 
     if (!selectedLog) {
-      window.OJTUI.showFormMessage(messageElement, "Save the day record before attaching photo documentation.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Save the day record before attaching photos.", "error");
       return;
     }
 
@@ -1053,9 +1048,9 @@
       form.reset();
       renderJournalWeek();
       updateWeekSummary();
-      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo documentation attached.", "success");
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attached.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Photo documentation could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not attach photo. Try again.", "error");
       console.error(error);
     }
   }
@@ -1097,7 +1092,7 @@
   }
 
   async function deletePhoto(photo) {
-    const confirmed = window.confirm(`Delete ${photo.fileName || "this photo"}? The daily log will stay saved.`);
+    const confirmed = window.confirm(`Delete ${photo.fileName || "this photo"}? The day log will stay saved.`);
 
     if (!confirmed) {
       return;
@@ -1204,7 +1199,7 @@
     } catch (error) {
       const container = getElement("journal-week-accordions");
       if (container) {
-        container.innerHTML = '<p class="empty-state">Saved daily logs could not be loaded. Please refresh and try again.</p>';
+        container.innerHTML = '<p class="empty-state">Could not load daily logs. Refresh and try again.</p>';
       }
       console.error(error);
     }
