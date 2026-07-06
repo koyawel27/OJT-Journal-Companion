@@ -88,15 +88,32 @@
     return `Day ${dayNumber}`;
   }
 
+  function formatRenderedTime(minutes) {
+    return window.OJTCalculations.formatRenderedTime(minutes);
+  }
+
+  function calculateRenderedTime(timeIn, timeOut, breakMinutes) {
+    return window.OJTCalculations.calculateRenderedTime(timeIn, timeOut, breakMinutes);
+  }
+
+  function getTaskTotalMinutes(tasks) {
+    return window.OJTCalculations.sumTaskMinutes(tasks);
+  }
+
   function getDayStatusText(dailyLog, taskCount) {
     if (!dailyLog) {
       return "No daily log yet";
     }
 
     let status = "Daily log saved";
+    const renderedMinutes = Number(dailyLog.renderedMinutes);
+
+    if (Number.isFinite(renderedMinutes) && renderedMinutes > 0) {
+      status += ` - ${formatRenderedTime(renderedMinutes)}`;
+    }
 
     if (taskCount > 0) {
-      status += taskCount === 1 ? " · 1 task item" : ` · ${taskCount} task items`;
+      status += taskCount === 1 ? " - 1 task item" : ` - ${taskCount} task items`;
     }
 
     return status;
@@ -176,9 +193,12 @@
       return;
     }
 
-    countLabel.textContent = logs.length === 1
-      ? "1 daily log saved for this week."
-      : `${logs.length} daily logs saved for this week.`;
+    const weeklyTotal = window.OJTCalculations.sumRenderedMinutes(logs);
+    const logsText = logs.length === 1
+      ? "1 daily log saved"
+      : `${logs.length} daily logs saved`;
+
+    countLabel.textContent = `${logsText} for this week. Weekly rendered time: ${formatRenderedTime(weeklyTotal)}.`;
   }
 
   function selectWeek(weekId) {
@@ -217,6 +237,45 @@
     `;
   }
 
+  function renderRenderedTimePanel(dailyLog, tasks) {
+    const calculation = calculateRenderedTime(
+      dailyLog?.timeIn || "",
+      dailyLog?.timeOut || "",
+      dailyLog?.breakMinutes || 0
+    );
+    const taskTotalMinutes = getTaskTotalMinutes(tasks);
+    const renderedText = calculation.isComplete
+      ? formatRenderedTime(calculation.renderedMinutes)
+      : "Not calculated";
+    const helpText = calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
+    let taskComparison = "";
+
+    if (taskTotalMinutes > 0) {
+      if (calculation.isComplete && taskTotalMinutes !== calculation.renderedMinutes) {
+        taskComparison = `
+          <p class="time-reference warning">
+            Task item time totals ${escapeHtml(formatRenderedTime(taskTotalMinutes))}. Task item time is for documentation only and may not match rendered hours.
+          </p>
+        `;
+      } else {
+        taskComparison = `
+          <p class="time-reference">
+            Task item time total: ${escapeHtml(formatRenderedTime(taskTotalMinutes))}. Task item time is documentation only.
+          </p>
+        `;
+      }
+    }
+
+    return `
+      <div class="calculation-result" aria-live="polite">
+        <span class="card-label">Rendered time</span>
+        <strong id="daily-rendered-time-preview">${escapeHtml(renderedText)}</strong>
+        <p id="daily-rendered-time-help">${escapeHtml(helpText)}</p>
+        ${taskComparison}
+      </div>
+    `;
+  }
+
   function renderDayEditorBody(week, dateText, dailyLog) {
     const dayLabel = getDayLabel(week, dateText);
     const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
@@ -249,10 +308,7 @@
               <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}">
             </label>
 
-            <div class="calculation-placeholder" aria-live="polite">
-              <strong>Rendered hours will be calculated in Phase 5.</strong>
-              <p>Phase 4 saves the day/date and time fields only.</p>
-            </div>
+            ${renderRenderedTimePanel(dailyLog, tasks)}
 
             <div class="form-actions">
               <button class="primary-button" type="submit" id="save-daily-log-button">${dailyLog ? "Save day record" : "Save day record"}</button>
@@ -391,6 +447,12 @@
     const existingLog = getActiveDailyLog() || getDailyLogForDate(getValue("daily-log-entry-date"));
     const timestamp = nowIso();
     const breakValue = getValue("daily-log-break-minutes");
+    const breakMinutes = breakValue === "" ? 0 : Number(breakValue);
+    const calculation = calculateRenderedTime(
+      getValue("daily-log-time-in"),
+      getValue("daily-log-time-out"),
+      breakMinutes
+    );
 
     return {
       id: getValue("daily-log-id") || existingLog?.id || createId("daily-log"),
@@ -398,16 +460,16 @@
       entryDate: getValue("daily-log-entry-date") || state.expandedDate,
       timeIn: getValue("daily-log-time-in"),
       timeOut: getValue("daily-log-time-out"),
-      breakMinutes: breakValue === "" ? 0 : Number(breakValue),
-      renderedMinutes: existingLog?.renderedMinutes || 0,
-      renderedHours: existingLog?.renderedHours || 0,
+      breakMinutes,
+      renderedMinutes: calculation.isComplete ? calculation.renderedMinutes : null,
+      renderedHours: calculation.isComplete ? calculation.renderedHours : null,
       createdAt: existingLog?.createdAt || timestamp,
       updatedAt: timestamp
     };
   }
 
   function isValidTime(value) {
-    return value === "" || /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+    return value === "" || window.OJTCalculations.isValidTime(value);
   }
 
   function validateDailyLog(dailyLog) {
@@ -433,6 +495,16 @@
       return "Break minutes must be zero or a positive number.";
     }
 
+    const calculation = calculateRenderedTime(dailyLog.timeIn, dailyLog.timeOut, dailyLog.breakMinutes);
+
+    if (calculation.error) {
+      return calculation.error;
+    }
+
+    if (calculation.isComplete && calculation.renderedMinutes < 0) {
+      return "Rendered minutes must not be negative.";
+    }
+
     const duplicateLog = state.dailyLogs.find((log) => {
       return log.id !== dailyLog.id && log.weekId === dailyLog.weekId && log.entryDate === dailyLog.entryDate;
     });
@@ -442,6 +514,27 @@
     }
 
     return "";
+  }
+
+  function updateRenderedPreview() {
+    const previewElement = getElement("daily-rendered-time-preview");
+    const helpElement = getElement("daily-rendered-time-help");
+
+    if (!previewElement || !helpElement) {
+      return;
+    }
+
+    const breakValue = getValue("daily-log-break-minutes");
+    const calculation = calculateRenderedTime(
+      getValue("daily-log-time-in"),
+      getValue("daily-log-time-out"),
+      breakValue === "" ? 0 : Number(breakValue)
+    );
+
+    previewElement.textContent = calculation.isComplete
+      ? formatRenderedTime(calculation.renderedMinutes)
+      : "Not calculated";
+    helpElement.textContent = calculation.error || "Complete time in, time out, and break minutes to calculate rendered time.";
   }
 
   function buildTaskRecord() {
@@ -523,7 +616,12 @@
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Day record saved. You can add task items on the right.", "success");
+      const saveMessage = savedLog.renderedMinutes !== null &&
+        savedLog.renderedMinutes !== undefined &&
+        Number.isFinite(Number(savedLog.renderedMinutes))
+        ? `Day record saved with ${formatRenderedTime(savedLog.renderedMinutes)} rendered time.`
+        : "Day record saved. Complete time in and time out to calculate rendered time.";
+      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), saveMessage, "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Daily log could not be saved. Please try again.", "error");
       console.error(error);
@@ -686,6 +784,11 @@
     });
 
     getElement("journal-week-accordions")?.addEventListener("click", handleJournalClick);
+    getElement("journal-week-accordions")?.addEventListener("input", (event) => {
+      if (["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].includes(event.target.id)) {
+        updateRenderedPreview();
+      }
+    });
     getElement("journal-week-accordions")?.addEventListener("submit", (event) => {
       if (event.target.id === "daily-log-form") {
         saveDailyLog(event);

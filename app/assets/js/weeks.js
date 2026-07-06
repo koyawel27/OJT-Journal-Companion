@@ -60,6 +60,16 @@
     });
   }
 
+  function formatRenderedTime(minutes) {
+    return window.OJTCalculations.formatRenderedTime(minutes);
+  }
+
+  function getWeekRenderedMinutes(weekId) {
+    return window.OJTCalculations.sumRenderedMinutes(
+      state.dailyLogs.filter((dailyLog) => dailyLog.weekId === weekId)
+    );
+  }
+
   function sortWeeks(weeks) {
     return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
   }
@@ -75,9 +85,14 @@
     }
 
     let status = "Daily log saved";
+    const renderedMinutes = Number(dailyLog.renderedMinutes);
+
+    if (Number.isFinite(renderedMinutes) && renderedMinutes > 0) {
+      status += ` - ${formatRenderedTime(renderedMinutes)}`;
+    }
 
     if (taskCount > 0) {
-      status += taskCount === 1 ? " · 1 task item" : ` · ${taskCount} task items`;
+      status += taskCount === 1 ? " - 1 task item" : ` - ${taskCount} task items`;
     }
 
     return status;
@@ -211,6 +226,7 @@
       const isExpanded = state.selectedWeekId === week.id;
       const detailButtonLabel = isExpanded ? "Collapse" : "View";
       const logCount = state.dailyLogs.filter((log) => log.weekId === week.id).length;
+      const weeklyRenderedMinutes = getWeekRenderedMinutes(week.id);
       const item = document.createElement("article");
       item.className = `week-item week-accordion${isExpanded ? " is-expanded" : ""}`;
       item.innerHTML = `
@@ -218,7 +234,7 @@
           <div>
             <span class="card-label">Week ${week.weekNumber}</span>
             <h4>${week.inclusiveStartDate} to ${week.inclusiveEndDate}</h4>
-            <p>${logCount === 1 ? "1 daily log saved." : `${logCount} daily logs saved.`}</p>
+            <p>${logCount === 1 ? "1 daily log saved" : `${logCount} daily logs saved`}. Weekly rendered time: ${formatRenderedTime(weeklyRenderedMinutes)}.</p>
           </div>
           <div class="week-actions">
             <button class="secondary-button" type="button" data-week-action="view" data-week-id="${week.id}" aria-expanded="${isExpanded}">${detailButtonLabel}</button>

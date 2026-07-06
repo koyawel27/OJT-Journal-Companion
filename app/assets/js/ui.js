@@ -1,4 +1,11 @@
 (function () {
+  const dashboardState = {
+    studentProfile: null,
+    companyProfile: null,
+    appSettings: null,
+    dailyLogs: []
+  };
+
   function showFormMessage(element, message, type) {
     if (!element) {
       return;
@@ -26,7 +33,41 @@
     }
   }
 
+  function formatRenderedTime(minutes) {
+    return window.OJTCalculations?.formatRenderedTime(minutes) || "0h 0m";
+  }
+
+  function sumRenderedMinutes(dailyLogs) {
+    return window.OJTCalculations?.sumRenderedMinutes(dailyLogs) || 0;
+  }
+
+  function updateRenderedProgressSummary() {
+    const totalRenderedMinutes = sumRenderedMinutes(dashboardState.dailyLogs);
+    const requiredHours = Number(dashboardState.studentProfile?.requiredOjtHours || 0);
+    const requiredMinutes = requiredHours * 60;
+
+    setText("summary-rendered-time", formatRenderedTime(totalRenderedMinutes));
+
+    if (requiredMinutes > 0) {
+      const remainingMinutes = Math.max(requiredMinutes - totalRenderedMinutes, 0);
+      const remainingText = formatRenderedTime(remainingMinutes);
+      setText("summary-rendered-detail", `${remainingText} remaining from ${requiredHours} required hours.`);
+      return;
+    }
+
+    setText(
+      "summary-rendered-detail",
+      totalRenderedMinutes > 0
+        ? "Total rendered time across all saved daily logs."
+        : "Save complete daily time records to track OJT progress."
+    );
+  }
+
   function updateDashboardSummary(studentProfile, companyProfile, appSettings) {
+    dashboardState.studentProfile = studentProfile;
+    dashboardState.companyProfile = companyProfile;
+    dashboardState.appSettings = appSettings;
+
     setText("summary-student-name", studentProfile?.studentName || "Not set yet");
     setText(
       "summary-student-detail",
@@ -48,6 +89,8 @@
     } else {
       setText("summary-required-hours", "Required OJT hours will appear after saving.");
     }
+
+    updateRenderedProgressSummary();
   }
 
   function updateWeeksSummary(weeks) {
@@ -62,13 +105,16 @@
 
 
   function updateDailyLogsSummary(dailyLogs) {
-    const count = dailyLogs.length;
+    const logs = dailyLogs || [];
+    dashboardState.dailyLogs = logs;
+    const count = logs.length;
     const label = count === 1 ? "1 log" : `${count} logs`;
     setText("summary-daily-log-count", label);
     setText(
       "summary-daily-log-detail",
       count > 0 ? "Saved daily logs are grouped by their OJT week." : "Create daily logs after choosing a saved week."
     );
+    updateRenderedProgressSummary();
   }
   window.OJTUI = {
     showFormMessage,

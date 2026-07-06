@@ -914,7 +914,7 @@ h1 {
   font-style: italic;
 }
 
-.calculation-placeholder {
+.calculation-result {
   margin-top: 14px;
   border: 1px solid var(--accent-soft);
   border-radius: 8px;
@@ -922,16 +922,29 @@ h1 {
   padding: 12px;
 }
 
-.calculation-placeholder strong {
+.calculation-result strong {
   display: block;
+  margin-top: 4px;
   color: var(--accent);
+  font-size: 1.15rem;
   line-height: 1.25;
 }
 
-.calculation-placeholder p {
+.calculation-result p {
   margin: 5px 0 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.calculation-result .time-reference {
+  border-top: 1px solid var(--accent-soft);
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.calculation-result .time-reference.warning {
+  color: #8a5b12;
+  font-weight: 700;
 }
 
 .task-bullet-list {

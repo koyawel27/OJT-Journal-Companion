@@ -118,9 +118,9 @@
           </div>
           <div class="placeholder-grid" aria-label="Future dashboard summaries">
             <article class="placeholder-card">
-              <span class="card-label">Planned</span>
-              <h3>Rendered hours</h3>
-              <p>A future summary will show total completed hours and remaining OJT hours.</p>
+              <span class="card-label">Rendered time</span>
+              <h3 id="summary-rendered-time">0h 0m</h3>
+              <p id="summary-rendered-detail">Save complete daily time records to track OJT progress.</p>
             </article>
             <article class="placeholder-card">
               <span class="card-label">Planned</span>
@@ -314,7 +314,7 @@
           <h2 id="daily-logs-title">Daily Logs</h2>
           <p>
             Create daily OJT logs under saved weeks, then add structured task/work items for
-            clear accomplishment bullets later. Rendered hour totals will be calculated in Phase 5.
+            clear accomplishment bullets later. Rendered time is calculated from each day's time fields.
           </p>
 
           <div class="daily-logs-layout">
@@ -443,6 +443,7 @@
 
   <script src="assets/js/db.js"></script>
   <script src="assets/js/storage.js"></script>
+  <script src="assets/js/calculations.js"></script>
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/profile.js"></script>
