@@ -9,17 +9,17 @@
 <body>
   <div class="app-shell">
     <header class="app-header">
+      <button class="menu-button" type="button" aria-label="Open navigation menu" aria-controls="mobile-nav-drawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
       <div class="header-title">
         <p class="eyebrow">Personal OJT workspace</p>
         <h1>OJT Journal Companion</h1>
       </div>
       <div class="header-actions">
         <p class="header-note">Offline journal workspace</p>
-        <button class="menu-button" type="button" aria-label="Open navigation menu" aria-controls="mobile-nav-drawer" aria-expanded="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 7h16M4 12h16M4 17h16"></path>
-          </svg>
-        </button>
       </div>
     </header>
 
@@ -122,36 +122,59 @@
             </article>
           </div>
           <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
-            <div class="dashboard-week-header">
-              <div>
-                <span class="card-label">Current / latest week</span>
-                <h3 id="dashboard-week-title">No OJT week yet</h3>
-                <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
+            <div class="dashboard-week-overview">
+              <div class="dashboard-week-header">
+                <div>
+                  <span class="card-label">Current / latest week</span>
+                  <h3 id="dashboard-week-title">No OJT week yet</h3>
+                  <p id="dashboard-week-dates">Create an OJT week to show progress here.</p>
+                </div>
+                <div class="dashboard-week-total">
+                  <span>Weekly rendered hours</span>
+                  <strong id="dashboard-week-rendered">0h 0m</strong>
+                </div>
               </div>
-              <div class="dashboard-week-total">
-                <span>Weekly rendered hours</span>
-                <strong id="dashboard-week-rendered">0h 0m</strong>
+
+              <div class="dashboard-week-stats" aria-label="Current week progress summary">
+                <div>
+                  <span>Days logged</span>
+                  <strong id="dashboard-week-logged-days">0 of 0</strong>
+                </div>
+                <div>
+                  <span>Worked days</span>
+                  <strong id="dashboard-week-worked-days">0</strong>
+                </div>
+                <div>
+                  <span>Open days</span>
+                  <strong id="dashboard-week-open-days">0</strong>
+                </div>
               </div>
             </div>
 
             <div class="dashboard-week-grid">
-              <div>
-                <h4>Daily progress</h4>
+              <section class="dashboard-week-progress" aria-labelledby="dashboard-week-progress-title">
+                <div class="dashboard-block-heading">
+                  <span class="card-label">Daily check-in</span>
+                  <h4 id="dashboard-week-progress-title">Daily progress</h4>
+                </div>
                 <ul class="dashboard-day-list" id="dashboard-week-days">
                   <li class="empty-state">No current week data to show yet.</li>
                 </ul>
-              </div>
-              <div>
-                <h4>Weekly summary</h4>
+              </section>
+              <section class="dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
+                <div class="dashboard-block-heading">
+                  <span class="card-label">Journal readiness</span>
+                  <h4 id="dashboard-week-summary-title">Weekly summary</h4>
+                </div>
                 <ul class="dashboard-summary-status" id="dashboard-week-summary-status">
                   <li>Skills Learned: missing</li>
                   <li>Problems Encountered: missing</li>
                   <li>Reflection: missing</li>
                 </ul>
-              </div>
-            </div>
-            <div class="dashboard-week-actions">
-              <button class="secondary-button" type="button" id="dashboard-open-weekly-preview">Open Weekly Preview</button>
+                <div class="dashboard-week-actions">
+                  <button class="secondary-button" type="button" id="dashboard-open-weekly-preview">Open Weekly Preview</button>
+                </div>
+              </section>
             </div>
           </section>
           <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>

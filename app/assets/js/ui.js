@@ -158,6 +158,9 @@
       setText("dashboard-week-title", "No OJT week yet");
       setText("dashboard-week-dates", "Create an OJT week to show progress here.");
       setText("dashboard-week-rendered", formatRenderedTime(0));
+      setText("dashboard-week-logged-days", "0 of 0");
+      setText("dashboard-week-worked-days", "0");
+      setText("dashboard-week-open-days", "0");
       daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then add daily logs to see progress here.</li>';
       summaryElement.innerHTML = `
         <li>Skills Learned: missing</li>
@@ -173,10 +176,16 @@
     const weekLogs = getLogsForWeek(week.id);
     const weekDates = getWeekDates(week);
     const weeklyRenderedMinutes = sumRenderedMinutes(weekLogs);
+    const loggedDayCount = weekDates.filter((dateText) => Boolean(getDailyLogForDate(week.id, dateText))).length;
+    const workedDayCount = weekLogs.filter((log) => normalizeDayStatus(log.dayStatus) === "Worked").length;
+    const openDayCount = Math.max(weekDates.length - loggedDayCount, 0);
 
     setText("dashboard-week-title", `Week ${week.weekNumber || "Not set"}`);
     setText("dashboard-week-dates", `${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
     setText("dashboard-week-rendered", formatRenderedTime(weeklyRenderedMinutes));
+    setText("dashboard-week-logged-days", `${loggedDayCount} of ${weekDates.length}`);
+    setText("dashboard-week-worked-days", String(workedDayCount));
+    setText("dashboard-week-open-days", String(openDayCount));
 
     daysElement.innerHTML = weekDates.length > 0
       ? weekDates.map((dateText, index) => {
@@ -184,22 +193,26 @@
 
         if (!log) {
           return `
-            <li>
-              <span>Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
-              <strong>No log yet</strong>
+            <li class="dashboard-day-row is-empty">
+              <span class="dashboard-day-main">Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+              <strong class="dashboard-day-result">No log yet</strong>
             </li>
           `;
         }
 
         const dayStatus = normalizeDayStatus(log.dayStatus);
         const taskCount = getTaskCount(log.id);
-        const taskText = taskCount > 0 ? ` - ${taskCount === 1 ? "1 task" : `${taskCount} tasks`}` : "";
-        const renderedText = dayStatus === "Worked" ? ` - ${formatRenderedTime(log.renderedMinutes)}` : "";
+        const taskText = taskCount > 0 ? (taskCount === 1 ? "1 task" : `${taskCount} tasks`) : "No tasks";
+        const renderedText = dayStatus === "Worked" ? formatRenderedTime(log.renderedMinutes) : formatRenderedTime(0);
 
         return `
-          <li>
-            <span>Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
-            <strong>${escapeHtml(dayStatus)}${escapeHtml(renderedText)}${escapeHtml(taskText)}</strong>
+          <li class="dashboard-day-row">
+            <span class="dashboard-day-main">Day ${index + 1} <small>${escapeHtml(dateText)}</small></span>
+            <strong class="dashboard-day-result">
+              <span class="dashboard-day-status">${escapeHtml(dayStatus)}</span>
+              <span>${escapeHtml(renderedText)}</span>
+              <small>${escapeHtml(taskText)}</small>
+            </strong>
           </li>
         `;
       }).join("")
