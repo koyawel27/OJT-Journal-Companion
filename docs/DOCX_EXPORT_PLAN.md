@@ -13,8 +13,42 @@ This is a plan only. **Nothing in this document is implemented yet.**
 | v1.0 app release | Complete, tagged, and released |
 | Weekly Preview + copy text | Complete (manual transfer workflow) |
 | Official DOCX export | **Not started — planning only** |
-| Official BPC `.docx` template in repo | **Not yet added** |
-| Client-side DOCX library decision | **Pending** |
+| Official BPC `.docx` template in repo | **Not added; sanitized template recommended by default** |
+| Client-side DOCX library decision | **Phase 0 reviewed; docxtemplater + PizZip remains recommended** |
+
+---
+
+## Phase 0 Dependency Review
+
+Phase 0 review checked the current plan against the v1.0 codebase and current upstream dependency metadata. The recommended direction remains realistic for this no-build, offline-first app: use browser-ready, vendored scripts loaded by `<script>` tags, keep generation client-side, and avoid npm/build tooling.
+
+| Library | Version considered | License | Source checked | Acceptable to vendor? | Restrictions or cautions |
+| --- | --- | --- | --- | --- | --- |
+| docxtemplater | 3.69.0 | MIT or GPL-3.0 dual license; package metadata lists MIT | Upstream GitHub `package.json`, upstream `LICENSE.md`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. Use the open-source core only. Paid modules such as image, HTML, table, chart, and styling modules are not required for the planned official weekly journal export and should not be introduced without a separate decision. |
+| PizZip | 3.2.0 | MIT or GPL-3.0 dual license | Upstream GitHub `package.json`, upstream `LICENSE.markdown`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. PizZip depends on `pako`; if a downloaded browser build includes bundled dependency code, preserve bundled notices and verify the distributed file's license header before committing. |
+
+Dependency shape notes:
+
+- Docxtemplater's browser documentation demonstrates loading `docxtemplater@3.69.0` and `pizzip@3.2.0` directly in the browser with plain script tags, so the proposed no-npm/no-bundler approach fits the current vanilla app architecture.
+- The docs also show `pizzip-utils` and `file-saver` in examples. For this app, prefer native `fetch()`/`arrayBuffer()` for the local template and a temporary `<a download>` with a generated Blob, so no extra library is planned unless implementation testing proves it necessary.
+- Docxtemplater package metadata currently lists `@xmldom/xmldom` as a dependency. Before vendoring a specific built file, inspect that distributed file and record any bundled transitive license notices if present.
+
+Codebase alignment notes:
+
+- `journal-preview.js` already derives Day 1 through Day N from `OJTWeek.inclusiveStartDate` and `inclusiveEndDate`, matching the dynamic day-row decision.
+- Weekly totals already use `OJTCalculations.sumRenderedMinutes()` over related `DailyLog` records, so no IndexedDB schema or stored weekly total is needed.
+- Current copy text includes task status through `getTaskBulletText()`. DOCX export should share date/log/task collection with preview, but use DOCX-specific accomplishment text that omits status.
+- `calculations.js` exposes the needed status normalization and rendered-time helpers; Phase 1 should reuse those rules without changing calculation behavior.
+
+## Template Asset Decision
+
+Do not commit the real official BPC-branded DOCX template to the public repository unless public sharing is confirmed by the school or institution.
+
+Recommended default:
+
+- Commit a sanitized template in the repo, using the same layout and placeholder names but without restricted BPC branding or private institutional content.
+- Keep the real official BPC template local only, under `app/assets/templates/bpc-ojt-weekly-journal.private.docx`.
+- `.gitignore` now excludes that private local template path to reduce accidental commits. If a different private filename is used later, add only that exact path.
 
 ---
 
