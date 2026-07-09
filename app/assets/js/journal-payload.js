@@ -97,7 +97,7 @@
     }
 
     if (options.includeBullet) {
-      text = `• ${text}`;
+      text = `\u2022 ${text}`;
     }
 
     return text;

@@ -1,12 +1,12 @@
 # OJT Journal Companion
 
-A lightweight, offline-first personal browser app for students and interns. Record daily OJT activities, track rendered hours, attach photo documentation, and prepare weekly journal content — then copy it into your official school journal template.
+A lightweight, offline-first personal browser app for students and interns. Record daily OJT activities, track rendered hours, attach photo documentation, and prepare weekly journal content — then copy it or export an official DOCX draft for manual review and submission.
 
 **v1.0 is complete.** Core features are implemented and have passed final manual regression testing.
 
 ## What this app is
 
-This is a **local, offline-first personal app** for **one student on one browser/device**. All data stays in your browser using **IndexedDB**. There is **no backend**, **no login**, **no cloud sync**, and **no PDF or DOCX export** in v1.0.
+This is a **local, offline-first personal app** for **one student on one browser/device**. All data stays in your browser using **IndexedDB**. There is **no backend**, **no login**, and **no cloud sync**. Official DOCX export is generated in the browser from local data and local template assets.
 
 Export JSON backups regularly. Browser storage can be cleared by you, the browser, or device maintenance — without a backup, your data may be lost.
 
@@ -28,6 +28,7 @@ Export JSON backups regularly. Browser storage can be cleared by you, the browse
 - **Task items** — Structured accomplishments under each daily log with personal status tracking
 - **Photo documentation** — Attach JPEG/PNG/WebP photos with caption and category; download or remove
 - **Weekly preview** — Official journal-like preview with **Copy Weekly Journal** plain-text output
+- **Official DOCX export** — Downloads a Word file from the selected week, using dynamic Day 1 through Day N rows and task bullets with optional duration/status
 - **Dashboard** — OJT progress, current-week status, and backup reminder
 - **Backup** — JSON export/import (photos included as Base64), plus guarded **Reset Local App Data**
 - **Mobile-friendly** — Responsive layout with compact mobile tab navigation on small screens
@@ -72,11 +73,15 @@ Opening `app/index.html` via `file://` may work in some browsers, but a local HT
 
 Keep backup files in a safe place outside the browser. They are your only recovery path when moving devices or after storage is cleared.
 
+JSON backup/restore is separate from Official DOCX Export. A DOCX file is for journal submission and editing in Word; it is not a restorable app backup.
+
 ## Scope boundaries
 
-**In scope (v1.0):** One local student user, profiles, weeks, daily logs, weekly preview, dashboard, JSON backup/restore/reset.
+**In scope:** One local student user, profiles, weeks, daily logs, weekly preview, dashboard, JSON backup/restore/reset, and client-side Official DOCX Export.
 
-**Out of scope (v1.0):** Login or accounts, backend server, cloud sync, GPS/QR attendance, supervisor or admin dashboards, PDF/DOCX export, multi-user or school-wide deployment, online journal submission.
+**Out of scope:** Login or accounts, backend server, cloud sync, GPS/QR attendance, supervisor or admin dashboards, PDF export, multi-user or school-wide deployment, online journal submission, and signature automation.
+
+The committed DOCX template is sanitized for public use. The optional real official template path, `app/assets/templates/bpc-ojt-weekly-journal.private.docx`, is local/ignored and should not be committed unless public sharing is explicitly confirmed.
 
 This repo is a **static web app folder**. It is not a PHP or XAMPP application, even though it may live under `C:\xampp-projects` as a local project location.
 
@@ -87,7 +92,7 @@ This repo is a **static web app folder**. It is not a PHP or XAMPP application, 
 - **Photo storage** depends on browser IndexedDB limits; large backups can be slow or heavy
 - **No inline photo gallery preview** — attach, list, caption, and download only
 - **No search** across logs or tasks
-- **No printable, PDF, or DOCX export** — copy weekly journal text to clipboard only
+- **No PDF export** — DOCX export is available, but downloaded files still need manual review, editing, signatures, and submission
 - **No PWA** — not installable as an app shell in v1.0
 - **Companion only** — does not replace official school forms, signatures, or supervisor validation
 
@@ -95,7 +100,8 @@ This repo is a **static web app folder**. It is not a PHP or XAMPP application, 
 
 Possible post–v1.0 enhancements (not committed):
 
-- PDF or DOCX export
+- PDF export
+- Further DOCX template polish if the official form changes
 - PWA installability
 - Better photo compression and ZIP backups for photo-heavy data
 - Basic search and printable weekly page
@@ -115,3 +121,5 @@ The app will stay personal-first. It is not intended to become a school-wide or 
 | [`docs/DATA_STRUCTURE.md`](docs/DATA_STRUCTURE.md) | Entities, fields, and validation rules |
 | [`docs/WORKFLOWS.md`](docs/WORKFLOWS.md) | Step-by-step user flows |
 | [`docs/POLISH_ROADMAP.md`](docs/POLISH_ROADMAP.md) | UI polish history and deferred items |
+| [`docs/DOCX_EXPORT_PLAN.md`](docs/DOCX_EXPORT_PLAN.md) | Official DOCX Export implementation plan and regression checklist |
+| [`docs/DOCX_TEMPLATE_PLACEHOLDERS.md`](docs/DOCX_TEMPLATE_PLACEHOLDERS.md) | DOCX template paths and placeholder mapping |

@@ -2,6 +2,8 @@
 
 This document lists the placeholders used by the DOCX export templates.
 
+Current implementation: `app/assets/js/docx-export.js` builds the template data, and `app/assets/js/journal-payload.js` builds the shared day/accomplishment payload.
+
 ## Template Files
 
 | Path | Purpose | Git status |

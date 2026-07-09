@@ -2,13 +2,13 @@
 
 Use this document to continue development in a fresh chat or onboard a developer later. For deeper detail, see the linked docs in `docs/`.
 
-**Handoff date context:** v1.0 core features are implemented, UI polish is accepted for now, project docs are synced, and final manual regression testing has passed.
+**Handoff date context:** v1.0 core features are released. Official DOCX Export is implemented on `feature/docx-export` as a post-v1.0 / v1.1 candidate and is in final regression/polish.
 
 ---
 
 ## 1. Project Summary
 
-**OJT Journal Companion** is a personal offline-first browser app for one student/intern. It helps record daily OJT work, calculate rendered hours, attach photo documentation, and prepare weekly journal content for **manual copy** into an official school template.
+**OJT Journal Companion** is a personal offline-first browser app for one student/intern. It helps record daily OJT work, calculate rendered hours, attach photo documentation, and prepare weekly journal content for **manual copy** or **Official DOCX Export** into an official school template workflow.
 
 It is a lightweight companion tool — not a school system, not a supervisor portal, and not a replacement for official forms or signatures.
 
@@ -24,7 +24,7 @@ It is a lightweight companion tool — not a school system, not a supervisor por
 | Styling | CSS (`app/assets/css/styles.css`) — single stylesheet, muted mid-tone theme |
 | Logic | Vanilla JavaScript (IIFE modules, no bundler) |
 | Storage | IndexedDB via `app/assets/js/db.js` and `app/assets/js/storage.js` |
-| Server | None required for v1.0 |
+| Server | No backend; local/static HTTP serving is recommended for DOCX template fetches |
 | Frameworks | None |
 | Build tools | None |
 
@@ -39,10 +39,14 @@ It is a lightweight companion tool — not a school system, not a supervisor por
 7. `profile.js`
 8. `weeks.js`
 9. `daily-logs.js`
-10. `journal-preview.js`
-11. `backup.js`
+10. `vendor/pizzip.min.js`
+11. `vendor/docxtemplater.min.js`
+12. `journal-payload.js`
+13. `docx-export.js`
+14. `journal-preview.js`
+15. `backup.js`
 
-**Global namespaces:** `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations`, `window.OJTPhotos`, `window.OJTUI`, `window.OJTApp`.
+**Global namespaces:** `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations`, `window.OJTPhotos`, `window.OJTUI`, `window.OJTApp`, `window.OJTJournalPayload`, `window.OJTDocxExport`.
 
 ---
 
@@ -53,6 +57,7 @@ It is a lightweight companion tool — not a school system, not a supervisor por
 - One local student user
 - Local browser use with IndexedDB storage; no backend required
 - Profile, weeks, daily logs, weekly preview, dashboard, backup/restore/reset
+- Official DOCX Export on `feature/docx-export` as a post-v1.0 / v1.1 candidate
 
 ### Out of scope (do not add without explicit decision)
 
@@ -61,10 +66,11 @@ It is a lightweight companion tool — not a school system, not a supervisor por
 - Cloud sync
 - GPS / QR attendance
 - Supervisor / admin / coordinator dashboards
-- PDF / DOCX export
+- PDF export
 - Frameworks or build tools
 - Multi-user or school-wide deployment
 - Online journal submission
+- Google Drive upload, email sending, cloud submission, and signature automation
 
 The repo lives under `C:\xampp-projects\ojt-journal-companion` as a **static web app folder**. It is not a PHP/XAMPP application.
 
@@ -81,7 +87,8 @@ The repo lives under `C:\xampp-projects\ojt-journal-companion` as a **static web
 | UI theme + microcopy polish | Accepted for now |
 | Final manual regression | Passed |
 | PWA / installable app | Deferred |
-| PDF / DOCX export | Deferred |
+| Official DOCX export | Implemented on `feature/docx-export`; final regression/polish |
+| PDF export | Deferred |
 
 **MVP definition:** Met per `docs/FEATURES.md` section 8.
 
@@ -115,6 +122,16 @@ The repo lives under `C:\xampp-projects\ojt-journal-companion` as a **static web
 - Official journal-like HTML preview per selected week
 - **Copy Weekly Journal** plain-text output to clipboard
 - Profile warnings when student/company name missing
+
+### Official DOCX Export
+
+- **Export Official DOCX** button in Weekly Preview
+- Client-side DOCX generation with vendored `PizZip` and `docxtemplater`
+- Shared payload builder in `journal-payload.js` keeps preview/copy/export data mapping aligned
+- Dynamic Day 1 through Day N rows from the selected week date range
+- Worked-day task lines include description, optional duration, and personal status
+- Uses the ignored private official template first when present, then falls back to the sanitized committed template
+- Leaves signatures blank and does not include photos, time-in/time-out columns, backend calls, or online submission
 
 ### Dashboard
 
@@ -155,7 +172,7 @@ The repo lives under `C:\xampp-projects\ojt-journal-companion` as a **static web
 - **Rendered hours** come from daily log `timeIn`, `timeOut`, `breakMinutes` when `dayStatus` is `Worked`. Store `renderedMinutes` as the source of truth.
 - **Absent / rest days** → `0` rendered minutes; time fields not required.
 - **Task `timeSpentMinutes`** is documentation only — never the official rendered-hours source.
-- **Task status** (`Pending`, `In Progress`, `Completed`) is personal tracking only — not approval or grading.
+- **Task status** (`Pending`, `In Progress`, `Completed`) is personal tracking only — not approval or grading. It is included in DOCX task accomplishment lines because the official journal submission requires it.
 - **Weekly total hours** are calculated from related `DailyLog` records, not typed into `OJTWeek`.
 - **Dates:** `YYYY-MM-DD`; times internal `HH:mm`; timestamps ISO 8601.
 - **Same-day logs only** — overnight shifts out of scope.
@@ -176,12 +193,12 @@ Recommended student flow:
 2. **Weeks** — create OJT week(s)
 3. **Daily Logs** — pick week → open each day → save status/time → add tasks → attach photos
 4. **Weeks** (expand week) — fill weekly summary fields
-5. **Weekly Preview** — pick week → review → copy journal text into official template
+5. **Weekly Preview** — pick week → review → copy journal text or export Official DOCX
 6. **Backup** — export JSON regularly; restore or reset only when intentional
 
 **Navigation:** Desktop uses sidebar; mobile uses compact tabs + profile header button.
 
-**Weekly Preview copy text** is generated by `buildPlainText()` in `journal-preview.js`. Do not change official journal labels inside generated preview/copy output without an explicit product decision.
+**Weekly Preview copy text** is generated by `buildPlainText()` in `journal-preview.js`. DOCX export data is generated through `journal-payload.js` and `docx-export.js`. Do not change official journal labels or DOCX placeholder mapping without an explicit product decision.
 
 **Do not** auto-submit journals or replace official school forms.
 
@@ -236,6 +253,8 @@ Located on Backup screen in danger-zone panel.
 **On success:** `clearAllData()` clears all IndexedDB stores → success message → page reload → empty app.
 
 **On cancel:** No data changed.
+
+JSON backup/restore/reset behavior is separate from Official DOCX Export. JSON files are for app data recovery or transfer; DOCX files are editable journal submission drafts and cannot restore app data.
 
 ---
 
@@ -315,6 +334,25 @@ Run after any meaningful change:
 * [ ] Restore from backup (confirm, reload, data returns)
 * [ ] Reset: checkbox + `RESET` + confirm → all data cleared after reload
 
+### Official DOCX Export
+
+* [ ] App loads without console errors
+* [ ] Weekly Preview still renders
+* [ ] Copy Weekly Journal still works
+* [ ] Export Official DOCX works
+* [ ] 5-day week exports Day 1 through Day 5 with warning
+* [ ] 6-day week exports Day 1 through Day 6 without day-count warning
+* [ ] 7-day week exports Day 1 through Day 7 with warning
+* [ ] Canceling a warning stops export
+* [ ] Worked day task bullets include duration and status
+* [ ] Missing daily log shows "No daily log recorded."
+* [ ] Absent/rest day output is correct
+* [ ] Weekly total matches `DailyLog.renderedMinutes` total
+* [ ] Photos are not included
+* [ ] Signature lines remain blank
+* [ ] Private official template is ignored and not committed
+* [ ] Sanitized fallback template still works if private template is unavailable
+
 ### Mobile (≤760px width)
 
 * [ ] Mobile tabs switch sections
@@ -333,7 +371,7 @@ Run after any meaningful change:
 * **Photo storage** depends on browser IndexedDB limits; large backups can be slow or large
 * **No inline photo gallery preview** — attach, list, caption, download only
 * **No search** across logs or tasks
-* **No printable/PDF/DOCX** export — copy to clipboard only for journal text
+* **No PDF export** — Official DOCX Export is available, but downloaded files still need manual review, signatures, and normal submission
 * **No PWA** — not installable as an app shell in v1.0
 * **Week selectors** may still show raw `YYYY-MM-DD` in some places (human-friendly dates partially deferred)
 * **Companion only** — does not validate with school, supervisor, or official submission systems
@@ -348,7 +386,6 @@ From `docs/FEATURES.md` and `docs/POLISH_ROADMAP.md`:
 ### Product (post–v1.0 candidates)
 
 * PDF export
-* DOCX export
 * PWA installability
 * Better photo compression
 * Basic search
@@ -365,7 +402,7 @@ From `docs/FEATURES.md` and `docs/POLISH_ROADMAP.md`:
 
 ### Explicitly do-not-build (without scope change)
 
-* Login, cloud sync, GPS/QR, admin/supervisor dashboards, grading, payroll, multi-user
+* Login, cloud sync, Google Drive upload, email sending, online submission, GPS/QR, admin/supervisor dashboards, grading, payroll, multi-user
 
 ---
 
@@ -373,10 +410,10 @@ From `docs/FEATURES.md` and `docs/POLISH_ROADMAP.md`:
 
 Pick one direction per change batch; keep the app working after each step.
 
-1. **Release hygiene** — Update root `README.md` (still says "Planning stage"); tag v1.0; optional changelog
+1. **Release hygiene** — Keep README/docs synced with the active branch; tag releases intentionally; optional changelog
 2. **Real-world soak test** — One full OJT week of daily use on target browser/device; verify backup/restore on second browser profile
 3. **Small UX wins** — Human-friendly dates in week selectors; dashboard recent-activity list (low risk, `ui.js` / selectors only)
-4. **Export upgrade** — PDF or DOCX if school template workflow needs it (new feature — plan first)
+4. **Export upgrade** — PDF or future DOCX template revisions if school requirements change (plan first)
 5. **PWA** — `manifest.json` + service worker for offline shell (separate batch; test cache vs IndexedDB carefully)
 6. **Code hygiene** — Batch 5 refactor only if maintenance pain appears; test all CRUD + backup/restore/reset after
 
@@ -397,6 +434,8 @@ Pick one direction per change batch; keep the app working after each step.
 | Profile forms                    | `app/assets/js/profile.js`         |
 | Weeks + weekly summary           | `app/assets/js/weeks.js`           |
 | Daily logs UI + CRUD             | `app/assets/js/daily-logs.js`      |
+| Shared weekly journal payload    | `app/assets/js/journal-payload.js` |
+| Official DOCX generation         | `app/assets/js/docx-export.js`     |
 | Weekly preview + copy text       | `app/assets/js/journal-preview.js` |
 | Export, restore, reset           | `app/assets/js/backup.js`          |
 
@@ -410,6 +449,8 @@ Pick one direction per change batch; keep the app working after each step.
 | `docs/WORKFLOWS.md`      | Step-by-step user flows                     |
 | `docs/BUILD_PLAN.md`     | How the app was built in phases             |
 | `docs/POLISH_ROADMAP.md` | UI polish batch history and deferred items  |
+| `docs/DOCX_EXPORT_PLAN.md` | Official DOCX Export plan, status, and checklist |
+| `docs/DOCX_TEMPLATE_PLACEHOLDERS.md` | DOCX template paths and placeholder mapping |
 
 ---
 
