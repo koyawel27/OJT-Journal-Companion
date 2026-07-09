@@ -1,5 +1,6 @@
 (function () {
-  const templatePath = "assets/templates/bpc-ojt-weekly-journal.docx";
+  const privateTemplatePath = "assets/templates/bpc-ojt-weekly-journal.private.docx";
+  const sanitizedTemplatePath = "assets/templates/bpc-ojt-weekly-journal.docx";
   const docxMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
   function assertDependencies() {
@@ -17,13 +18,29 @@
   }
 
   async function loadTemplateArrayBuffer() {
-    const response = await fetch(templatePath);
+    let privateResponse = null;
 
-    if (!response.ok) {
-      throw new Error(`DOCX template could not be loaded (${response.status}).`);
+    try {
+      privateResponse = await fetch(privateTemplatePath);
+    } catch (error) {
+      console.warn("Private DOCX template could not be requested. Falling back to sanitized template.", error);
     }
 
-    return response.arrayBuffer();
+    if (privateResponse?.ok) {
+      return privateResponse.arrayBuffer();
+    }
+
+    if (privateResponse?.status && privateResponse.status !== 404) {
+      console.warn(`Private DOCX template could not be loaded (${privateResponse.status}). Falling back to sanitized template.`);
+    }
+
+    const sanitizedResponse = await fetch(sanitizedTemplatePath);
+
+    if (!sanitizedResponse.ok) {
+      throw new Error(`DOCX template could not be loaded (${sanitizedResponse.status}).`);
+    }
+
+    return sanitizedResponse.arrayBuffer();
   }
 
   function getFallbackText(value) {

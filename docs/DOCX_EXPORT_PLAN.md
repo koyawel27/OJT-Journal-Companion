@@ -37,7 +37,7 @@ Codebase alignment notes:
 
 - `journal-preview.js` already derives Day 1 through Day N from `OJTWeek.inclusiveStartDate` and `inclusiveEndDate`, matching the dynamic day-row decision.
 - Weekly totals already use `OJTCalculations.sumRenderedMinutes()` over related `DailyLog` records, so no IndexedDB schema or stored weekly total is needed.
-- Current copy text includes task status through `getTaskBulletText()`. DOCX export should share date/log/task collection with preview, but use DOCX-specific accomplishment text that omits status.
+- Current copy text includes task status through `getTaskBulletText()`. DOCX export should share date/log/task collection with preview and include task status in DOCX-specific accomplishment lines because the official journal submission requires it.
 - `calculations.js` exposes the needed status normalization and rendered-time helpers; Phase 1 should reuse those rules without changing calculation behavior.
 
 ## Template Asset Decision
@@ -62,7 +62,7 @@ The export should:
 - Fill the official template from existing IndexedDB records.
 - Use the selected week's **inclusive date range** to decide how many Day rows appear in the output.
 - Leave signature lines blank.
-- Exclude photos, time-in/time-out columns, and task status from the official document body. Task status is intentionally omitted from the DOCX even though Weekly Preview copy text may include personal status labels (e.g. `Pending`, `In Progress`, `Completed`). The official journal form focuses on accomplishments, not personal task progress tracking.
+- Exclude photos and time-in/time-out columns from the official document body. Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of each submitted accomplishment line because the official journal submission requires it.
 - Not submit, email, upload, or auto-sign anything.
 
 This feature extends the current "copy to clipboard" workflow. It does not replace JSON backup or change how local data is stored.
@@ -103,7 +103,7 @@ No login, cloud sync, Google Drive upload, or online submission is involved.
 - PDF export (separate future feature).
 - Photo embedding in the official DOCX.
 - Time in / time out / break columns in the official DOCX (internal records only).
-- Task status labels (`Pending`, `In Progress`, `Completed`) in the official DOCX.
+- Treating task status labels (`Pending`, `In Progress`, `Completed`) as supervisor approval, official validation, grading, or signatures.
 - Auto-signatures, supervisor validation, or approval workflows.
 - Google Drive upload, email sending, or online submission.
 - Backend server, login, accounts, or cloud sync.
@@ -250,8 +250,8 @@ For each date in the week's inclusive range:
 
 - `DailyLog.timeIn`, `timeOut`, `breakMinutes` (internal time records).
 - `DailyLog.renderedMinutes` per day (only the **weekly total** appears on the form).
-- `DailyTask.timeSpentMinutes` (documentation only; must not affect rendered hours).
-- `DailyTask.status` (personal tracking only — excluded from DOCX; official form has no status column).
+- `DailyTask.timeSpentMinutes` is included only as optional documentation text in the accomplishment line; it must not affect rendered hours.
+- `DailyTask.status` is personal tracking inside the app, but it is included in DOCX output as part of the submitted accomplishment line because the official journal submission requires it.
 - `PhotoAttachment` records (explicitly excluded).
 - `OJTWeek.additionalNotes` (unless the official template has a matching field — currently it does not).
 
@@ -282,9 +282,9 @@ Align DOCX day-cell text with the existing `buildPlainText()` / `renderDailyAcco
 ### Worked day (`dayStatus === "Worked"`)
 
 - Output bullet-style lines from related `DailyTask` records, sorted by `sortOrder`.
-- Each bullet uses task `description` only.
-- Optionally append task duration in parentheses if `timeSpentMinutes` is set (matches current preview: `"Task name (1h 30m)"`).
-- Do **not** include task status in the official DOCX. This is a DOCX-specific rule: Weekly Preview copy text may append status after each task, but the official journal form should show accomplishment text only.
+- Each bullet uses task `description`.
+- Optionally append task duration in parentheses if `timeSpentMinutes` is set (for example: `"Task name (1h 30m)"`).
+- Include task status after the description/duration, separated by ` - ` (for example: `"• Task name (1h 30m) - Completed"`). Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of the submitted accomplishment line.
 - If multiple tasks exist, render as separate lines or Word bullet paragraphs inside the day cell.
 
 ### Worked day with no task items
@@ -469,7 +469,7 @@ Before coding, decide:
 - Extract week export payload from existing preview logic (dates, logs, tasks, summaries, weekly total).
 - Unit-test payload shape manually (console/log checklist).
 
-**Stop:** Payload for 5-, 6-, and 7-day weeks matches Weekly Preview rules, except task status is omitted from DOCX accomplishment text.
+**Stop:** Payload for 5-, 6-, and 7-day weeks matches Weekly Preview rules, and DOCX accomplishment text includes task description, optional duration, and task status.
 
 ### Phase 2 — Core DOCX generation
 
@@ -514,7 +514,7 @@ Run on a local HTTP server after implementation.
 
 ### Day content scenarios
 
-- [ ] Worked day with tasks → bullet-style accomplishments in day cell
+- [ ] Worked day with tasks → bullet-style accomplishments in day cell, formatted as `• description (optional duration) - status`
 - [ ] Worked day with no tasks → "No task items recorded for this day."
 - [ ] Absent day → "Absent" (+ remarks if set)
 - [ ] Rest day → "No OJT / Rest Day" (+ remarks if set)
@@ -533,7 +533,7 @@ Run on a local HTTP server after implementation.
 - [ ] No photos embedded in DOCX
 - [ ] Signature lines remain blank
 - [ ] No time in / time out columns in official output
-- [ ] No task status in official output
+- [ ] Task status appears in each worked-day task line in the official output
 - [ ] Export works offline (after initial page load)
 - [ ] No network calls except loading local template asset
 

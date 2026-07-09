@@ -88,8 +88,16 @@
     const status = String(task?.status || "").trim();
     let text = duration ? `${description} (${duration})` : description;
 
-    if (options.includeStatus && status) {
-      text += ` - ${status}`;
+    if (options.includeStatus) {
+      const statusText = status || options.fallbackStatus || "";
+
+      if (statusText) {
+        text += ` - ${statusText}`;
+      }
+    }
+
+    if (options.includeBullet) {
+      text = `• ${text}`;
     }
 
     return text;
@@ -100,7 +108,7 @@
   }
 
   function getTaskDocxText(task) {
-    return getTaskText(task, { includeStatus: false });
+    return getTaskText(task, { fallbackStatus: "Pending", includeBullet: true, includeStatus: true });
   }
 
   function getAccomplishmentLines(dailyLog, tasks, taskTextBuilder) {

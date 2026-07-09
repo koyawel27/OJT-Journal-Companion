@@ -6,6 +6,7 @@
     dailyLogs: [],
     dailyTasks: [],
     selectedWeekId: "",
+    currentPayload: null,
     copyText: ""
   };
 
@@ -45,6 +46,96 @@
       dailyLogs: state.dailyLogs,
       dailyTasks: state.dailyTasks
     });
+  }
+
+  function isBlank(value) {
+    return !String(value || "").trim();
+  }
+
+  function getDayCountWarning(payload) {
+    const dayCount = payload.days.length;
+
+    if (dayCount === 6) {
+      return "";
+    }
+
+    if (dayCount === 5) {
+      return "This week has 5 days. The official template is usually formatted for 6 days, and the export will include Day 1 through Day 5 only.";
+    }
+
+    if (dayCount === 7) {
+      return "This week has 7 days. The official template is usually formatted for 6 days, and the export will include Day 1 through Day 7.";
+    }
+
+    if (dayCount === 0) {
+      return "This week has no saved day range, which is unusual for the official template. The export will not include daily accomplishment rows.";
+    }
+
+    return `This week has ${dayCount} days, which is unusual for the official template. The export will include Day 1 through Day ${dayCount}.`;
+  }
+
+  function getEmptySummaryLabels(payload) {
+    const emptyLabels = [];
+
+    if (isBlank(payload.weeklySkillsLearned)) {
+      emptyLabels.push("Skills Learned");
+    }
+
+    if (isBlank(payload.problemsEncountered)) {
+      emptyLabels.push("Problems Encountered");
+    }
+
+    if (isBlank(payload.reflectionOrPointsOfLearning)) {
+      emptyLabels.push("Reflection (Points of Learning)");
+    }
+
+    return emptyLabels;
+  }
+
+  function buildExportWarnings(payload) {
+    const warnings = [];
+    const dayCountWarning = getDayCountWarning(payload);
+    const missingLogsCount = payload.days.filter((day) => !day.dailyLog).length;
+    const emptySummaryLabels = getEmptySummaryLabels(payload);
+
+    if (dayCountWarning) {
+      warnings.push(dayCountWarning);
+    }
+
+    if (isBlank(payload.studentName) || isBlank(payload.companyName)) {
+      const missingFields = [];
+
+      if (isBlank(payload.studentName)) {
+        missingFields.push("student name");
+      }
+
+      if (isBlank(payload.companyName)) {
+        missingFields.push("company name");
+      }
+
+      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Profile before final submission.`);
+    }
+
+    if (emptySummaryLabels.length > 0) {
+      warnings.push(`Some weekly summary fields are empty: ${emptySummaryLabels.join(", ")}. The DOCX will mark them as not filled in yet.`);
+    }
+
+    if (missingLogsCount > 0) {
+      const dateText = missingLogsCount === 1 ? "date has" : "dates have";
+      warnings.push(`${missingLogsCount} ${dateText} no daily log saved. Those days will show "No daily log recorded." in the DOCX.`);
+    }
+
+    return warnings;
+  }
+
+  function confirmExportWarnings(payload) {
+    const warnings = buildExportWarnings(payload);
+
+    if (warnings.length === 0) {
+      return true;
+    }
+
+    return window.confirm(`${warnings.join("\n\n")}\n\nContinue exporting DOCX?`);
   }
 
   function renderProfileWarnings() {
@@ -195,10 +286,12 @@
   function renderPreview() {
     const output = getElement("weekly-preview-output");
     const copyButton = getElement("copy-weekly-journal-button");
+    const exportButton = getElement("export-official-docx-button");
     const week = getSelectedWeek();
 
     window.OJTUI.clearFormMessage(getElement("weekly-preview-message"));
     state.copyText = "";
+    state.currentPayload = null;
 
     if (!output || !copyButton) {
       return;
@@ -207,12 +300,19 @@
     if (!week) {
       output.innerHTML = '<p class="empty-state">Choose a saved week to preview your weekly journal.</p>';
       copyButton.disabled = true;
+      if (exportButton) {
+        exportButton.disabled = true;
+      }
       return;
     }
 
     const payload = buildPayload(week);
+    state.currentPayload = payload;
     state.copyText = buildPlainText(payload);
     copyButton.disabled = false;
+    if (exportButton) {
+      exportButton.disabled = false;
+    }
 
     output.innerHTML = `
       ${renderProfileWarnings()}
@@ -288,7 +388,7 @@
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy the journal text."
+      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
     );
   }
 
@@ -331,6 +431,47 @@
     }
   }
 
+  async function exportOfficialDocx() {
+    const messageElement = getElement("weekly-preview-message");
+    const exportButton = getElement("export-official-docx-button");
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!state.currentPayload) {
+      window.OJTUI.showFormMessage(messageElement, "Choose a week before exporting.", "error");
+      return;
+    }
+
+    if (!confirmExportWarnings(state.currentPayload)) {
+      window.OJTUI.showFormMessage(messageElement, "DOCX export canceled.", "info");
+      return;
+    }
+
+    const originalButtonText = exportButton?.textContent || "Export Official DOCX";
+
+    try {
+      if (!window.OJTDocxExport?.exportPayload) {
+        throw new Error("DOCX export module is not loaded.");
+      }
+
+      if (exportButton) {
+        exportButton.disabled = true;
+        exportButton.textContent = "Exporting DOCX...";
+      }
+
+      await window.OJTDocxExport.exportPayload(state.currentPayload);
+      window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");
+      console.error(error);
+    } finally {
+      if (exportButton) {
+        exportButton.textContent = originalButtonText;
+        exportButton.disabled = !state.currentPayload;
+      }
+    }
+  }
+
   async function loadPreviewData() {
     try {
       const [studentProfile, companyProfile, weeks, dailyLogs, dailyTasks] = await Promise.all([
@@ -365,6 +506,7 @@
     });
 
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
+    getElement("export-official-docx-button")?.addEventListener("click", exportOfficialDocx);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
