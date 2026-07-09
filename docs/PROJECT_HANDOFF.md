@@ -128,7 +128,7 @@ The repo lives under `C:\xampp-projects\ojt-journal-companion` as a **static web
 - **Export Official DOCX** button in Weekly Preview
 - Client-side DOCX generation with vendored `PizZip` and `docxtemplater`
 - Shared payload builder in `journal-payload.js` keeps preview/copy/export data mapping aligned
-- Dynamic Day 1 through Day N rows from the selected week date range
+- Dynamic Day 1 through Day N rows from the selected week date range; DOCX row labels include the date, such as `Day 1 July 7, 2026`
 - Worked-day task lines include description, optional duration, and personal status
 - Uses the ignored private official template first when present, then falls back to the sanitized committed template
 - Leaves signatures blank and does not include photos, time-in/time-out columns, backend calls, or online submission
@@ -343,6 +343,7 @@ Run after any meaningful change:
 * [ ] 5-day week exports Day 1 through Day 5 with warning
 * [ ] 6-day week exports Day 1 through Day 6 without day-count warning
 * [ ] 7-day week exports Day 1 through Day 7 with warning
+* [ ] DOCX day labels include dates, formatted like `Day 1 July 7, 2026`
 * [ ] Canceling a warning stops export
 * [ ] Worked day task bullets include duration and status
 * [ ] Missing daily log shows "No daily log recorded."
