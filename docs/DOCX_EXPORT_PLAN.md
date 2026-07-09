@@ -15,6 +15,7 @@ The feature is implemented on `feature/docx-export` and is in Phase 4 final regr
 | Official DOCX export | **Implemented on `feature/docx-export`; Phase 4 final regression/polish in progress** |
 | Official BPC `.docx` template in repo | **Private official template remains local/ignored; sanitized fallback template is committed** |
 | Client-side DOCX library decision | **Complete; vendored docxtemplater + PizZip** |
+| DOCX photo documentation appendix | **Required by adviser; Phase 0 feasibility reviewed on `feature/docx-photo-appendix`; implementation pending dependency approval** |
 | Phase 0 dependency/template review | Complete |
 | Phase 1 shared journal payload helper | Complete |
 | Phase 2 core DOCX export engine | Complete |
@@ -29,7 +30,7 @@ Phase 0 review checked the current plan against the v1.0 codebase and current up
 
 | Library | Version considered | License | Source checked | Acceptable to vendor? | Restrictions or cautions |
 | --- | --- | --- | --- | --- | --- |
-| docxtemplater | 3.69.0 | MIT or GPL-3.0 dual license; package metadata lists MIT | Upstream GitHub `package.json`, upstream `LICENSE.md`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. Use the open-source core only. Paid modules such as image, HTML, table, chart, and styling modules are not required for the planned official weekly journal export and should not be introduced without a separate decision. |
+| docxtemplater | 3.69.0 | MIT or GPL-3.0 dual license; package metadata lists MIT | Upstream GitHub `package.json`, upstream `LICENSE.md`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. The open-source core is enough for text, loops, and line breaks, but the required photo appendix needs a separate image insertion dependency decision before implementation. |
 | PizZip | 3.2.0 | MIT or GPL-3.0 dual license | Upstream GitHub `package.json`, upstream `LICENSE.markdown`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. PizZip depends on `pako`; if a downloaded browser build includes bundled dependency code, preserve bundled notices and verify the distributed file's license header before committing. |
 
 Dependency shape notes:
@@ -67,7 +68,9 @@ The export should:
 - Fill the official template from existing IndexedDB records.
 - Use the selected week's **inclusive date range** to decide how many Day rows appear in the output.
 - Leave signature lines blank.
-- Exclude photos and time-in/time-out columns from the official document body. Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of each submitted accomplishment line because the official journal submission requires it.
+- Preserve the official journal pages and layout, then append a separate **Photo Documentation** section after the official journal content.
+- Group exported photos by Day N and actual date, with saved captions when available.
+- Exclude photos from Daily Accomplishments table cells and exclude time-in/time-out columns from the official document body. Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of each submitted accomplishment line because the official journal submission requires it.
 - Not submit, email, upload, or auto-sign anything.
 
 This feature extends the current "copy to clipboard" workflow. It does not replace JSON backup or change how local data is stored.
@@ -101,12 +104,13 @@ No login, cloud sync, Google Drive upload, or online submission is involved.
 - Total weekly Hours Rendered (calculated from `DailyLog` records).
 - Weekly summary sections: Skills Learned, Problems Encountered, Reflection (Points of Learning).
 - Blank signature lines preserved from the official template.
+- Separate Photo Documentation appendix after the official journal content, grouped by Day N and actual date, preserving image aspect ratio and captions when available.
 - Client-side generation only; works offline after the app and template asset are loaded.
 
 ### Out of scope (this feature)
 
 - PDF export (separate future feature).
-- Photo embedding in the official DOCX.
+- Placing photos inside Daily Accomplishments table cells.
 - Time in / time out / break columns in the official DOCX (internal records only).
 - Treating task status labels (`Pending`, `In Progress`, `Completed`) as supervisor approval, official validation, grading, or signatures.
 - Auto-signatures, supervisor validation, or approval workflows.
@@ -258,7 +262,6 @@ For each date in the week's inclusive range:
 - `DailyLog.renderedMinutes` per day (only the **weekly total** appears on the form).
 - `DailyTask.timeSpentMinutes` is included only as optional documentation text in the accomplishment line; it must not affect rendered hours.
 - `DailyTask.status` is personal tracking inside the app, but it is included in DOCX output as part of the submitted accomplishment line because the official journal submission requires it.
-- `PhotoAttachment` records (explicitly excluded).
 - `OJTWeek.additionalNotes` (unless the official template has a matching field — currently it does not).
 
 ### Footer / summary block
@@ -270,6 +273,22 @@ For each date in the week's inclusive range:
 | Problems Encountered | `OJTWeek.problemsEncountered` | Plain text; preserve line breaks. |
 | Reflection (Points of Learning) | `OJTWeek.reflectionOrPointsOfLearning` | Exact section title from official template. |
 | Signature lines | — | **Leave blank.** |
+
+### Photo Documentation Appendix
+
+Photo documentation is now a required DOCX feature, but implementation is pending until the image insertion dependency is approved.
+
+Accepted direction:
+
+- Keep the official BPC journal pages unchanged as the primary document body.
+- Add a separate **Photo Documentation** section after the official journal content.
+- Pull photos from the selected week's related `DailyLog` and `PhotoAttachment` records in IndexedDB.
+- Group photos by the same derived day order as the journal rows: `Day N Month D, YYYY`.
+- Include the saved `PhotoAttachment.caption` when present.
+- Preserve image aspect ratio and constrain photos to a predictable page width/height.
+- Multi-page output is acceptable.
+
+This should not change rendered-hours logic, task logic, backup/restore/reset behavior, or the IndexedDB schema unless a real blocker is found during implementation.
 
 ### Time calculation rules (must not change)
 
@@ -321,8 +340,12 @@ Align DOCX day-cell text with the existing `buildPlainText()` / `renderDailyAcco
 
 ### Photos
 
-- Never embed, attach, or reference photos in the official DOCX export.
-- Photo data stays in IndexedDB for personal documentation only.
+- Append photos only in the Photo Documentation section after the official journal content.
+- Do not place photos in Daily Accomplishments table cells.
+- Group photos by Day N and actual date.
+- Include captions when available.
+- Preserve image aspect ratio.
+- Do not infer accomplishments, rendered hours, attendance, approval, or validation from photos.
 
 ### Signatures
 
@@ -404,6 +427,16 @@ Render HTML similar to Weekly Preview and convert to DOCX.
 
 **Fallback if loops fail in Word:** maintain one master template and clone table rows programmatically (Option A + limited Option B hybrid) — only if testing shows the loop block breaks layout.
 
+### Photo Appendix Feasibility Review
+
+The existing vendored docxtemplater + PizZip setup can fill text, loops, and line breaks in an existing DOCX template, but it does not insert image binary parts by itself. A photo appendix needs one of these approved paths before implementation:
+
+1. Add an image-capable docxtemplater module and keep the current template-driven architecture.
+2. Manually edit DOCX Open XML package parts with PizZip, including image files, relationships, content types, and drawing XML.
+3. Leave photo placement manual if dependency approval or browser testing fails.
+
+Preferred direction is an image-capable docxtemplater module because it keeps the export architecture closest to the current implementation. Dependency approval must happen before coding image export.
+
 ---
 
 ## Files Affected
@@ -413,12 +446,13 @@ Render HTML similar to Weekly Preview and convert to DOCX.
 | `app/assets/templates/bpc-ojt-weekly-journal.docx` | Sanitized committed fallback template with placeholders |
 | `app/assets/templates/bpc-ojt-weekly-journal.private.docx` | Optional ignored local official template; must not be staged or committed |
 | `app/assets/js/journal-payload.js` | Shared week/date/log/task payload builder for preview, copy text, and DOCX export |
-| `app/assets/js/docx-export.js` | Template loading, docxtemplater merge, Blob generation, and download |
+| `app/assets/js/docx-export.js` | Template loading, docxtemplater merge, future photo appendix image handling, Blob generation, and download |
 | `app/assets/js/journal-preview.js` | Export button warnings, confirmation flow, and UI integration |
 | `app/index.html` | Export button and script tags for vendor libraries plus export modules |
 | `app/assets/css/styles.css` | Styling for export controls and preview layout |
 | `app/assets/js/vendor/pizzip.min.js` | Vendored DOCX zip dependency |
 | `app/assets/js/vendor/docxtemplater.min.js` | Vendored DOCX templating dependency |
+| `app/assets/js/vendor/*image-module*` | Potential future image insertion dependency, only after license and redistribution approval |
 | `docs/DOCX_TEMPLATE_PLACEHOLDERS.md` | Template paths and placeholder map |
 | `docs/DOCX_EXPORT_PLAN.md` | Implementation status and regression checklist |
 
@@ -437,8 +471,9 @@ Decision recorded for this feature branch:
 | npm / build tools? | Add bundler vs stay vanilla | **Stay vanilla** — no npm, no bundler |
 | Template preparation | Who adds Word placeholders? | Developer prepares one `.docx` from official BPC file and documents placeholders in this plan or a short `docs/DOCX_TEMPLATE_PLACEHOLDERS.md` |
 | License check | docxtemplater, PizZip, and any other chosen library | Review and record in this document before vendoring |
+| Photo appendix dependency | Paid official image module vs open-source community image module vs manual OOXML | **Pending approval**; do not implement image export until this is decided |
 
-**Third-party license gate:** Completed before vendoring. Keep license notices with vendored DOCX libraries.
+**Third-party license gate:** Completed for current text-only DOCX export dependencies. A new license gate is required before adding any image insertion dependency.
 
 **Explicit constraint:** DOCX dependencies must remain vendored browser scripts. Do not introduce a build pipeline just for DOCX export.
 
@@ -456,6 +491,8 @@ Decision recorded for this feature branch:
 | `fetch()` for template requires HTTP server | `file://` may fail | Document same server requirement as IndexedDB testing |
 | Vendored library size | Slightly heavier app load | Load vendor scripts only on Weekly Preview or lazy-load before export |
 | Student assumes export replaces official submission | Process confusion | Clear microcopy: export is a draft; signatures and submission are manual |
+| Photo-heavy DOCX files become large or slow | Browser memory pressure, slow download, difficult upload/submission | Keep current per-photo size limit, warn on large photo totals, and only downscale/compress after separate approval |
+| Image module licensing is not approved | Cannot safely redistribute dependency | Keep photo placement manual, or use a reviewed alternative |
 
 ---
 
@@ -502,6 +539,16 @@ Decision recorded for this feature branch:
 
 **Stop:** Meets [Stop Condition](#stop-condition).
 
+### Photo Appendix Phase 0 — Feasibility and implementation planning — Complete
+
+- Confirmed photo records already exist in IndexedDB as `PhotoAttachment` records linked to `DailyLog`.
+- Confirmed current DOCX payload does not load photo records yet.
+- Confirmed existing docxtemplater + PizZip core is not enough for image insertion without an image module or manual OOXML work.
+- Accepted appendix direction: preserve official journal pages, append Photo Documentation after official content, group by Day N and actual date, include captions, preserve image aspect ratio.
+- Implementation remains pending until the dependency/license path is approved.
+
+**Stop:** No code implementation in this phase.
+
 ---
 
 ## Manual Testing Checklist
@@ -544,7 +591,11 @@ Run on a local HTTP server after implementation.
 
 ### Exclusions and safety
 
-- [ ] No photos embedded in DOCX
+- [ ] Photo Documentation appendix appears after official journal content when photos exist
+- [ ] Photos are grouped by Day N and actual date
+- [ ] Saved captions appear when available
+- [ ] Photos are not placed inside Daily Accomplishments table cells
+- [ ] Image aspect ratio is preserved
 - [ ] Signature lines remain blank
 - [ ] No time in / time out columns in official output
 - [ ] Task status appears in each worked-day task line in the official output
@@ -570,7 +621,7 @@ Official DOCX Export is ready for v1.1 when:
 2. Day rows follow the week's inclusive date range (5, 6, or 7 days) without forced padding or truncation.
 3. Non-6-day weeks show the documented warning before export.
 4. Data mapping follows all [time calculation rules](#time-calculation-rules-must-not-change) and [export content rules](#export-content-rules).
-5. Photos, signatures, backend calls, and online submission are absent.
+5. Photo documentation is appended after the official journal content; signatures, backend calls, and online submission are absent.
 6. Manual testing checklist passes on the target browser (Chrome/Edge minimum; note LibreOffice differences if tested).
 
 ---
@@ -588,7 +639,7 @@ Do not implement these as part of Official DOCX Export:
 - Supervisor approval or validation workflows
 - Auto-signatures or digital signature fields
 - PDF export
-- Photo embedding or photo appendix pages
+- Placing photos inside Daily Accomplishments table cells
 - GPS / QR attendance
 - Admin, coordinator, or supervisor dashboards
 - Multi-user or school-wide deployment features
