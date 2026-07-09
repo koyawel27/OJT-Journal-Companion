@@ -6,6 +6,7 @@
     dailyLogs: [],
     dailyTasks: [],
     selectedWeekId: "",
+    currentPayload: null,
     copyText: ""
   };
 
@@ -29,111 +30,112 @@
       .replaceAll("'", "&#039;");
   }
 
-  function parseDate(dateText) {
-    const [year, month, day] = dateText.split("-").map(Number);
-    return new Date(year, month - 1, day);
-  }
-
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
   function sortWeeks(weeks) {
     return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
-  }
-
-  function sortDailyLogs(logs) {
-    return [...logs].sort((first, second) => first.entryDate.localeCompare(second.entryDate));
-  }
-
-  function sortTasks(tasks) {
-    return [...tasks].sort((first, second) => {
-      return (first.sortOrder || 0) - (second.sortOrder || 0) ||
-        String(first.createdAt || "").localeCompare(String(second.createdAt || ""));
-    });
-  }
-
-  function formatRenderedTime(minutes) {
-    return window.OJTCalculations.formatRenderedTime(minutes);
   }
 
   function getSelectedWeek() {
     return state.weeks.find((week) => week.id === state.selectedWeekId) || null;
   }
 
-  function getLogsForWeek(weekId) {
-    return sortDailyLogs(state.dailyLogs.filter((log) => log.weekId === weekId));
+  function buildPayload(week) {
+    return window.OJTJournalPayload.buildWeeklyJournalPayload({
+      week,
+      studentProfile: state.studentProfile,
+      companyProfile: state.companyProfile,
+      dailyLogs: state.dailyLogs,
+      dailyTasks: state.dailyTasks
+    });
   }
 
-  function getDailyLogForDate(weekId, dateText) {
-    return state.dailyLogs.find((log) => log.weekId === weekId && log.entryDate === dateText) || null;
+  function isBlank(value) {
+    return !String(value || "").trim();
   }
 
-  function getTasksForLog(dailyLogId) {
-    return sortTasks(state.dailyTasks.filter((task) => task.dailyLogId === dailyLogId));
-  }
+  function getDayCountWarning(payload) {
+    const dayCount = payload.days.length;
 
-  function normalizeDayStatus(value) {
-    return window.OJTCalculations.normalizeDayStatus(value);
-  }
-
-  function getWeekDates(week) {
-    if (!week?.inclusiveStartDate || !week?.inclusiveEndDate) {
-      return [];
-    }
-
-    const dates = [];
-    const currentDate = parseDate(week.inclusiveStartDate);
-    const endDate = parseDate(week.inclusiveEndDate);
-
-    while (currentDate <= endDate) {
-      dates.push(formatDate(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    return dates;
-  }
-
-  function formatTaskDuration(minutesValue) {
-    const minutes = Number(minutesValue);
-
-    if (!Number.isFinite(minutes) || minutes <= 0) {
+    if (dayCount === 6) {
       return "";
     }
 
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (hours > 0 && remainingMinutes > 0) {
-      return `${hours}h ${remainingMinutes}m`;
+    if (dayCount === 5) {
+      return "This week has 5 days. The official template is usually formatted for 6 days, and the export will include Day 1 through Day 5 only.";
     }
 
-    if (hours > 0) {
-      return `${hours}h`;
+    if (dayCount === 7) {
+      return "This week has 7 days. The official template is usually formatted for 6 days, and the export will include Day 1 through Day 7.";
     }
 
-    return `${remainingMinutes}m`;
+    if (dayCount === 0) {
+      return "This week has no saved day range, which is unusual for the official template. The export will not include daily accomplishment rows.";
+    }
+
+    return `This week has ${dayCount} days, which is unusual for the official template. The export will include Day 1 through Day ${dayCount}.`;
   }
 
-  function getTaskBulletText(task) {
-    const description = String(task?.description || "").trim();
+  function getEmptySummaryLabels(payload) {
+    const emptyLabels = [];
 
-    if (!description) {
-      return "";
+    if (isBlank(payload.weeklySkillsLearned)) {
+      emptyLabels.push("Skills Learned");
     }
 
-    const duration = formatTaskDuration(task.timeSpentMinutes);
-    const status = String(task?.status || "").trim();
-    let text = duration ? `${description} (${duration})` : description;
-
-    if (status) {
-      text += ` - ${status}`;
+    if (isBlank(payload.problemsEncountered)) {
+      emptyLabels.push("Problems Encountered");
     }
 
-    return text;
+    if (isBlank(payload.reflectionOrPointsOfLearning)) {
+      emptyLabels.push("Reflection (Points of Learning)");
+    }
+
+    return emptyLabels;
+  }
+
+  function buildExportWarnings(payload) {
+    const warnings = [];
+    const dayCountWarning = getDayCountWarning(payload);
+    const missingLogsCount = payload.days.filter((day) => !day.dailyLog).length;
+    const emptySummaryLabels = getEmptySummaryLabels(payload);
+
+    if (dayCountWarning) {
+      warnings.push(dayCountWarning);
+    }
+
+    if (isBlank(payload.studentName) || isBlank(payload.companyName)) {
+      const missingFields = [];
+
+      if (isBlank(payload.studentName)) {
+        missingFields.push("student name");
+      }
+
+      if (isBlank(payload.companyName)) {
+        missingFields.push("company name");
+      }
+
+      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Profile before final submission.`);
+    }
+
+    if (emptySummaryLabels.length > 0) {
+      warnings.push(`Some weekly summary fields are empty: ${emptySummaryLabels.join(", ")}. The DOCX will mark them as not filled in yet.`);
+    }
+
+    if (missingLogsCount > 0) {
+      const dateText = missingLogsCount === 1 ? "date has" : "dates have";
+      warnings.push(`${missingLogsCount} ${dateText} no daily log saved. Those days will show "No daily log recorded." in the DOCX.`);
+    }
+
+    return warnings;
+  }
+
+  function confirmExportWarnings(payload) {
+    const warnings = buildExportWarnings(payload);
+
+    if (warnings.length === 0) {
+      return true;
+    }
+
+    return window.confirm(`${warnings.join("\n\n")}\n\nContinue exporting DOCX?`);
   }
 
   function renderProfileWarnings() {
@@ -159,7 +161,7 @@
   }
 
   function renderTaskBullets(tasks) {
-    const taskBullets = tasks.map(getTaskBulletText).filter(Boolean);
+    const taskBullets = tasks.map(window.OJTJournalPayload.getTaskCopyText).filter(Boolean);
 
     if (taskBullets.length === 0) {
       return '<p class="empty-state">No task items recorded for this day.</p>';
@@ -174,12 +176,14 @@
     `;
   }
 
-  function renderDailyAccomplishment(dailyLog, tasks) {
+  function renderDailyAccomplishment(day) {
+    const dailyLog = day.dailyLog;
+
     if (!dailyLog) {
       return '<p class="empty-state">No daily log recorded.</p>';
     }
 
-    const dayStatus = normalizeDayStatus(dailyLog.dayStatus);
+    const dayStatus = day.dayStatus;
     const remarks = String(dailyLog.dayRemarks || "").trim();
 
     if (dayStatus === "Absent" || dayStatus === "No OJT / Rest Day") {
@@ -189,13 +193,11 @@
       `;
     }
 
-    return renderTaskBullets(tasks);
+    return renderTaskBullets(day.tasks);
   }
 
-  function renderDailyRows(week) {
-    const dates = getWeekDates(week);
-
-    if (dates.length === 0) {
+  function renderDailyRows(payload) {
+    if (payload.days.length === 0) {
       return `
         <div class="preview-table-row">
           <div class="preview-day-cell">No dates</div>
@@ -204,38 +206,30 @@
       `;
     }
 
-    return dates.map((dateText, index) => {
-      const dailyLog = getDailyLogForDate(week.id, dateText);
-      const tasks = dailyLog ? getTasksForLog(dailyLog.id) : [];
-      const dayStatus = dailyLog ? normalizeDayStatus(dailyLog.dayStatus) : "";
-
+    return payload.days.map((day) => {
       return `
         <div class="preview-table-row">
           <div class="preview-day-cell">
-            <strong>Day ${index + 1}</strong>
-            <span>${escapeHtml(dateText)}</span>
-            ${dayStatus ? `<span>${escapeHtml(dayStatus)}</span>` : ""}
+            <strong>${escapeHtml(day.dayLabel)}</strong>
+            <span>${escapeHtml(day.date)}</span>
+            ${day.dayStatus ? `<span>${escapeHtml(day.dayStatus)}</span>` : ""}
           </div>
-          <div class="preview-work-cell">${renderDailyAccomplishment(dailyLog, tasks)}</div>
+          <div class="preview-work-cell">${renderDailyAccomplishment(day)}</div>
         </div>
       `;
     }).join("");
   }
 
-  function renderDailyLogEmptyNote(week) {
-    if (getLogsForWeek(week.id).length > 0) {
+  function renderDailyLogEmptyNote(payload) {
+    if (payload.dailyLogCount > 0) {
       return "";
     }
 
     return '<p class="empty-state preview-empty-note">No daily logs are saved for this week yet.</p>';
   }
 
-  function getWeekTotalText(week) {
-    return formatRenderedTime(window.OJTCalculations.sumRenderedMinutes(getLogsForWeek(week.id)));
-  }
-
   function renderSummarySection(title, content) {
-    const summaryText = getSummaryText(content);
+    const summaryText = window.OJTJournalPayload.getSummaryText(content);
     const isEmpty = !String(content || "").trim();
 
     return `
@@ -246,67 +240,45 @@
     `;
   }
 
-  function getSummaryText(value) {
-    return String(value || "").trim() || "Not filled in yet.";
-  }
-
-  function buildPlainText(week) {
+  function buildPlainText(payload) {
     const lines = [];
-    const dates = getWeekDates(week);
 
-    lines.push(`Student Name: ${state.studentProfile?.studentName || "Not set"}`);
-    lines.push(`Company: ${state.companyProfile?.companyName || "Not set"}`);
-    lines.push(`Week Number: ${week.weekNumber || "Not set"}`);
-    lines.push(`Inclusive Dates: ${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
+    lines.push(`Student Name: ${payload.studentName || "Not set"}`);
+    lines.push(`Company: ${payload.companyName || "Not set"}`);
+    lines.push(`Week Number: ${payload.weekNumber || "Not set"}`);
+    lines.push(`Inclusive Dates: ${payload.inclusiveStartDate || "Not set"} to ${payload.inclusiveEndDate || "Not set"}`);
     lines.push("");
     lines.push("DAILY ACCOMPLISHMENTS");
 
-    if (dates.length === 0) {
+    if (payload.days.length === 0) {
       lines.push("No inclusive date range saved for this week.");
     }
 
-    dates.forEach((dateText, index) => {
-      const dailyLog = getDailyLogForDate(week.id, dateText);
-      const tasks = dailyLog ? getTasksForLog(dailyLog.id) : [];
-
+    payload.days.forEach((day) => {
       lines.push("");
-      lines.push(`Day ${index + 1} - ${dateText}`);
+      lines.push(`${day.dayLabel} - ${day.date}`);
 
-      if (!dailyLog) {
+      if (!day.dailyLog) {
         lines.push("- No daily log recorded.");
         return;
       }
 
-      const dayStatus = normalizeDayStatus(dailyLog.dayStatus);
-      const remarks = String(dailyLog.dayRemarks || "").trim();
-
-      if (dayStatus === "Absent" || dayStatus === "No OJT / Rest Day") {
-        lines.push(`- ${dayStatus}${remarks ? ` - ${remarks}` : ""}`);
-        return;
-      }
-
-      const taskBullets = tasks.map(getTaskBulletText).filter(Boolean);
-
-      if (taskBullets.length === 0) {
-        lines.push("- No task items recorded for this day.");
-      } else {
-        taskBullets.forEach((taskText) => {
-          lines.push(`- ${taskText}`);
-        });
-      }
+      day.copyText.split("\n").forEach((line) => {
+        lines.push(`- ${line}`);
+      });
     });
 
     lines.push("");
-    lines.push(`Total weekly Hours Rendered: ${getWeekTotalText(week)}`);
+    lines.push(`Total weekly Hours Rendered: ${payload.totalRenderedDisplay}`);
     lines.push("");
     lines.push("Skills Learned:");
-    lines.push(getSummaryText(week.weeklySkillsLearned));
+    lines.push(payload.summaryDisplay.weeklySkillsLearned);
     lines.push("");
     lines.push("Problems Encountered:");
-    lines.push(getSummaryText(week.problemsEncountered));
+    lines.push(payload.summaryDisplay.problemsEncountered);
     lines.push("");
     lines.push("Reflection (Points of Learning):");
-    lines.push(getSummaryText(week.reflectionOrPointsOfLearning));
+    lines.push(payload.summaryDisplay.reflectionOrPointsOfLearning);
 
     return lines.join("\n");
   }
@@ -314,10 +286,12 @@
   function renderPreview() {
     const output = getElement("weekly-preview-output");
     const copyButton = getElement("copy-weekly-journal-button");
+    const exportButton = getElement("export-official-docx-button");
     const week = getSelectedWeek();
 
     window.OJTUI.clearFormMessage(getElement("weekly-preview-message"));
     state.copyText = "";
+    state.currentPayload = null;
 
     if (!output || !copyButton) {
       return;
@@ -326,11 +300,19 @@
     if (!week) {
       output.innerHTML = '<p class="empty-state">Choose a saved week to preview your weekly journal.</p>';
       copyButton.disabled = true;
+      if (exportButton) {
+        exportButton.disabled = true;
+      }
       return;
     }
 
-    state.copyText = buildPlainText(week);
+    const payload = buildPayload(week);
+    state.currentPayload = payload;
+    state.copyText = buildPlainText(payload);
     copyButton.disabled = false;
+    if (exportButton) {
+      exportButton.disabled = false;
+    }
 
     output.innerHTML = `
       ${renderProfileWarnings()}
@@ -338,37 +320,37 @@
         <div class="preview-info-grid">
           <div>
             <span>Student Name</span>
-            <strong>${escapeHtml(state.studentProfile?.studentName || "Not set")}</strong>
+            <strong>${escapeHtml(payload.studentName || "Not set")}</strong>
           </div>
           <div>
             <span>Company</span>
-            <strong>${escapeHtml(state.companyProfile?.companyName || "Not set")}</strong>
+            <strong>${escapeHtml(payload.companyName || "Not set")}</strong>
           </div>
           <div>
             <span>Week Number</span>
-            <strong>${escapeHtml(week.weekNumber || "Not set")}</strong>
+            <strong>${escapeHtml(payload.weekNumber || "Not set")}</strong>
           </div>
           <div>
             <span>Inclusive Dates</span>
-            <strong>${escapeHtml(week.inclusiveStartDate || "Not set")} to ${escapeHtml(week.inclusiveEndDate || "Not set")}</strong>
+            <strong>${escapeHtml(payload.inclusiveStartDate || "Not set")} to ${escapeHtml(payload.inclusiveEndDate || "Not set")}</strong>
           </div>
         </div>
 
         <section class="preview-section-block preview-accomplishments-section">
           <h4>Daily Accomplishments</h4>
-          ${renderDailyLogEmptyNote(week)}
+          ${renderDailyLogEmptyNote(payload)}
           <div class="preview-table">
             <div class="preview-table-header">
               <div>Day</div>
               <div>Daily Accomplishments</div>
             </div>
-            ${renderDailyRows(week)}
+            ${renderDailyRows(payload)}
           </div>
         </section>
 
         <section class="preview-total-row">
           <span>Total weekly Hours Rendered</span>
-          <strong>${escapeHtml(getWeekTotalText(week))}</strong>
+          <strong>${escapeHtml(payload.totalRenderedDisplay)}</strong>
         </section>
 
         ${renderSummarySection("Skills Learned", week.weeklySkillsLearned)}
@@ -406,7 +388,7 @@
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy the journal text."
+      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
     );
   }
 
@@ -449,6 +431,47 @@
     }
   }
 
+  async function exportOfficialDocx() {
+    const messageElement = getElement("weekly-preview-message");
+    const exportButton = getElement("export-official-docx-button");
+
+    window.OJTUI.clearFormMessage(messageElement);
+
+    if (!state.currentPayload) {
+      window.OJTUI.showFormMessage(messageElement, "Choose a week before exporting.", "error");
+      return;
+    }
+
+    if (!confirmExportWarnings(state.currentPayload)) {
+      window.OJTUI.showFormMessage(messageElement, "DOCX export canceled.", "info");
+      return;
+    }
+
+    const originalButtonText = exportButton?.textContent || "Export Official DOCX";
+
+    try {
+      if (!window.OJTDocxExport?.exportPayload) {
+        throw new Error("DOCX export module is not loaded.");
+      }
+
+      if (exportButton) {
+        exportButton.disabled = true;
+        exportButton.textContent = "Exporting DOCX...";
+      }
+
+      await window.OJTDocxExport.exportPayload(state.currentPayload);
+      window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");
+      console.error(error);
+    } finally {
+      if (exportButton) {
+        exportButton.textContent = originalButtonText;
+        exportButton.disabled = !state.currentPayload;
+      }
+    }
+  }
+
   async function loadPreviewData() {
     try {
       const [studentProfile, companyProfile, weeks, dailyLogs, dailyTasks] = await Promise.all([
@@ -483,6 +506,7 @@
     });
 
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
+    getElement("export-official-docx-button")?.addEventListener("click", exportOfficialDocx);
   }
 
   document.addEventListener("DOMContentLoaded", () => {

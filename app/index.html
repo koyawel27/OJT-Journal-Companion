@@ -453,10 +453,12 @@
                 <select id="weekly-preview-week-select"></select>
               </label>
 
-              <div class="form-actions">
+              <div class="form-actions weekly-preview-actions">
                 <button class="primary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
+                <button class="secondary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" disabled>Export Official DOCX</button>
                 <p class="form-message" id="weekly-preview-message" hidden></p>
               </div>
+              <p class="phase-note weekly-preview-export-note" id="weekly-preview-export-note">Downloads a Word file for manual review, signing, and submission.</p>
             </section>
 
             <div class="weekly-preview-output" id="weekly-preview-output" aria-live="polite">
@@ -599,6 +601,10 @@
   <script src="assets/js/profile.js"></script>
   <script src="assets/js/weeks.js"></script>
   <script src="assets/js/daily-logs.js"></script>
+  <script src="assets/js/vendor/pizzip.min.js"></script>
+  <script src="assets/js/vendor/docxtemplater.min.js"></script>
+  <script src="assets/js/journal-payload.js"></script>
+  <script src="assets/js/docx-export.js"></script>
   <script src="assets/js/journal-preview.js"></script>
   <script src="assets/js/backup.js"></script>
 </body>

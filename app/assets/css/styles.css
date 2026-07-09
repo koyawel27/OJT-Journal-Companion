@@ -1351,6 +1351,10 @@ h1 {
   color: var(--danger);
 }
 
+.form-message.info {
+  color: var(--label);
+}
+
 @media (max-width: 760px) {
   .form-stack {
     gap: 14px;
@@ -1454,6 +1458,10 @@ h1 {
 .weekly-preview-output {
   display: grid;
   gap: 12px;
+}
+
+.weekly-preview-export-note {
+  margin-top: 10px;
 }
 
 .preview-warnings {

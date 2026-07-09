@@ -1,8 +1,8 @@
 # Official DOCX Export Plan
 
-Planning document for a possible post–v1.0 / v1.1 feature: **Official BPC OJT Weekly Journal DOCX Export**.
+Implementation plan and status document for the post-v1.0 / v1.1 candidate feature: **Official BPC OJT Weekly Journal DOCX Export**.
 
-This is a plan only. **Nothing in this document is implemented yet.**
+The feature is implemented on `feature/docx-export` and is in Phase 4 final regression, polish, and documentation review.
 
 ---
 
@@ -12,9 +12,48 @@ This is a plan only. **Nothing in this document is implemented yet.**
 | --- | --- |
 | v1.0 app release | Complete, tagged, and released |
 | Weekly Preview + copy text | Complete (manual transfer workflow) |
-| Official DOCX export | **Not started — planning only** |
-| Official BPC `.docx` template in repo | **Not yet added** |
-| Client-side DOCX library decision | **Pending** |
+| Official DOCX export | **Implemented on `feature/docx-export`; Phase 4 final regression/polish in progress** |
+| Official BPC `.docx` template in repo | **Private official template remains local/ignored; sanitized fallback template is committed** |
+| Client-side DOCX library decision | **Complete; vendored docxtemplater + PizZip** |
+| Phase 0 dependency/template review | Complete |
+| Phase 1 shared journal payload helper | Complete |
+| Phase 2 core DOCX export engine | Complete |
+| Phase 3 UI integration and warnings | Complete |
+| Phase 4 final regression, polish, docs | In progress |
+
+---
+
+## Phase 0 Dependency Review
+
+Phase 0 review checked the current plan against the v1.0 codebase and current upstream dependency metadata. The recommended direction remains realistic for this no-build, offline-first app: use browser-ready, vendored scripts loaded by `<script>` tags, keep generation client-side, and avoid npm/build tooling.
+
+| Library | Version considered | License | Source checked | Acceptable to vendor? | Restrictions or cautions |
+| --- | --- | --- | --- | --- | --- |
+| docxtemplater | 3.69.0 | MIT or GPL-3.0 dual license; package metadata lists MIT | Upstream GitHub `package.json`, upstream `LICENSE.md`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. Use the open-source core only. Paid modules such as image, HTML, table, chart, and styling modules are not required for the planned official weekly journal export and should not be introduced without a separate decision. |
+| PizZip | 3.2.0 | MIT or GPL-3.0 dual license | Upstream GitHub `package.json`, upstream `LICENSE.markdown`, Docxtemplater browser docs at `https://docxtemplater.com/docs/get-started-browser/` | Yes, under the MIT option | Include/retain license notice when vendoring. PizZip depends on `pako`; if a downloaded browser build includes bundled dependency code, preserve bundled notices and verify the distributed file's license header before committing. |
+
+Dependency shape notes:
+
+- Docxtemplater's browser documentation demonstrates loading `docxtemplater@3.69.0` and `pizzip@3.2.0` directly in the browser with plain script tags, so the proposed no-npm/no-bundler approach fits the current vanilla app architecture.
+- The docs also show `pizzip-utils` and `file-saver` in examples. For this app, prefer native `fetch()`/`arrayBuffer()` for the local template and a temporary `<a download>` with a generated Blob, so no extra library is planned unless implementation testing proves it necessary.
+- Docxtemplater package metadata currently lists `@xmldom/xmldom` as a dependency. Before vendoring a specific built file, inspect that distributed file and record any bundled transitive license notices if present.
+
+Codebase alignment notes:
+
+- `journal-preview.js` already derives Day 1 through Day N from `OJTWeek.inclusiveStartDate` and `inclusiveEndDate`, matching the dynamic day-row decision.
+- Weekly totals already use `OJTCalculations.sumRenderedMinutes()` over related `DailyLog` records, so no IndexedDB schema or stored weekly total is needed.
+- Current copy text includes task status through `getTaskBulletText()`. DOCX export should share date/log/task collection with preview and include task status in DOCX-specific accomplishment lines because the official journal submission requires it.
+- `calculations.js` exposes the needed status normalization and rendered-time helpers; Phase 1 should reuse those rules without changing calculation behavior.
+
+## Template Asset Decision
+
+Do not commit the real official BPC-branded DOCX template to the public repository unless public sharing is confirmed by the school or institution.
+
+Recommended default:
+
+- Commit a sanitized template in the repo, using the same layout and placeholder names but without restricted BPC branding or private institutional content.
+- Keep the real official BPC template local only, under `app/assets/templates/bpc-ojt-weekly-journal.private.docx`.
+- `.gitignore` now excludes that private local template path to reduce accidental commits. If a different private filename is used later, add only that exact path.
 
 ---
 
@@ -28,7 +67,7 @@ The export should:
 - Fill the official template from existing IndexedDB records.
 - Use the selected week's **inclusive date range** to decide how many Day rows appear in the output.
 - Leave signature lines blank.
-- Exclude photos, time-in/time-out columns, and task status from the official document body. Task status is intentionally omitted from the DOCX even though Weekly Preview copy text may include personal status labels (e.g. `Pending`, `In Progress`, `Completed`). The official journal form focuses on accomplishments, not personal task progress tracking.
+- Exclude photos and time-in/time-out columns from the official document body. Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of each submitted accomplishment line because the official journal submission requires it.
 - Not submit, email, upload, or auto-sign anything.
 
 This feature extends the current "copy to clipboard" workflow. It does not replace JSON backup or change how local data is stored.
@@ -40,7 +79,7 @@ This feature extends the current "copy to clipboard" workflow. It does not repla
 1. Student completes profile, company info, OJT week, daily logs, tasks, and weekly summary fields (same as v1.0).
 2. Student opens **Weekly Preview** and selects the target week.
 3. Student reviews the on-screen preview (existing v1.0 behavior).
-4. Student clicks a new **Export Official DOCX** button (planned).
+4. Student clicks **Export Official DOCX**.
 5. If the week is not exactly 6 days, the app shows a **non-blocking warning** explaining the day-count mismatch (see [Warning Behavior](#warning-behavior-for-non-6-day-weeks)).
 6. If profile or summary data is missing, the app shows warnings but may still allow export (same spirit as current profile warnings).
 7. App builds a DOCX from the official BPC template + mapped app data.
@@ -69,7 +108,7 @@ No login, cloud sync, Google Drive upload, or online submission is involved.
 - PDF export (separate future feature).
 - Photo embedding in the official DOCX.
 - Time in / time out / break columns in the official DOCX (internal records only).
-- Task status labels (`Pending`, `In Progress`, `Completed`) in the official DOCX.
+- Treating task status labels (`Pending`, `In Progress`, `Completed`) as supervisor approval, official validation, grading, or signatures.
 - Auto-signatures, supervisor validation, or approval workflows.
 - Google Drive upload, email sending, or online submission.
 - Backend server, login, accounts, or cloud sync.
@@ -127,7 +166,7 @@ Based on the official template reference documented in `docs/POLISH_ROADMAP.md` 
 - No photo section exists in the official form.
 - Signature blocks must stay empty for the student and supervisor to fill in by hand.
 
-**Prerequisite:** Obtain the official BPC `.docx` file from the school and add it to the repo as a static template asset (see [Files Likely Affected Later](#files-likely-affected-later)).
+**Implementation note:** The sanitized public `.docx` template is committed as a static asset. The real official BPC template can be used locally at `app/assets/templates/bpc-ojt-weekly-journal.private.docx`, but that private path is ignored and must not be committed unless public sharing is confirmed.
 
 **Public repository caution:** Before committing the official BPC `.docx` template to a public GitHub repository, confirm that public sharing is allowed by the school or institution. If public sharing is **not** allowed, commit a **sanitized sample template** (same layout and placeholders, no school branding or restricted content) and keep the actual school template as a **local ignored file** (e.g. listed in `.gitignore` for developer machines only).
 
@@ -216,8 +255,8 @@ For each date in the week's inclusive range:
 
 - `DailyLog.timeIn`, `timeOut`, `breakMinutes` (internal time records).
 - `DailyLog.renderedMinutes` per day (only the **weekly total** appears on the form).
-- `DailyTask.timeSpentMinutes` (documentation only; must not affect rendered hours).
-- `DailyTask.status` (personal tracking only — excluded from DOCX; official form has no status column).
+- `DailyTask.timeSpentMinutes` is included only as optional documentation text in the accomplishment line; it must not affect rendered hours.
+- `DailyTask.status` is personal tracking inside the app, but it is included in DOCX output as part of the submitted accomplishment line because the official journal submission requires it.
 - `PhotoAttachment` records (explicitly excluded).
 - `OJTWeek.additionalNotes` (unless the official template has a matching field — currently it does not).
 
@@ -248,9 +287,9 @@ Align DOCX day-cell text with the existing `buildPlainText()` / `renderDailyAcco
 ### Worked day (`dayStatus === "Worked"`)
 
 - Output bullet-style lines from related `DailyTask` records, sorted by `sortOrder`.
-- Each bullet uses task `description` only.
-- Optionally append task duration in parentheses if `timeSpentMinutes` is set (matches current preview: `"Task name (1h 30m)"`).
-- Do **not** include task status in the official DOCX. This is a DOCX-specific rule: Weekly Preview copy text may append status after each task, but the official journal form should show accomplishment text only.
+- Each bullet uses task `description`.
+- Optionally append task duration in parentheses if `timeSpentMinutes` is set (for example: `"Task name (1h 30m)"`).
+- Include task status after the description/duration, separated by ` - ` (for example: `"• Task name (1h 30m) - Completed"`). Task status remains personal progress tracking inside the app, but it is included in DOCX output as part of the submitted accomplishment line.
 - If multiple tasks exist, render as separate lines or Word bullet paragraphs inside the day cell.
 
 ### Worked day with no task items
@@ -366,27 +405,29 @@ Render HTML similar to Weekly Preview and convert to DOCX.
 
 ---
 
-## Files Likely Affected Later
+## Files Affected
 
 | File | Change |
 | --- | --- |
-| `app/assets/templates/bpc-ojt-weekly-journal.docx` | **New** — official or sanitized sample template with placeholders (not in repo yet; see public repository caution) |
-| `app/assets/js/docx-export.js` | **New** — export orchestration, warnings, download |
-| `app/assets/js/journal-preview.js` | Refactor to share week payload / accomplishment text builders with DOCX export |
-| `app/assets/js/calculations.js` | Possibly reuse only; no calculation rule changes expected |
-| `app/index.html` | Export button, script tags for vendor libs + `docx-export.js` |
-| `app/assets/css/styles.css` | Minor styling for export button and warning messages |
-| `app/assets/js/vendor/pizzip.min.js` | **New** — vendored dependency (if Option A chosen) |
-| `app/assets/js/vendor/docxtemplater.min.js` | **New** — vendored dependency (if Option A chosen) |
-| `docs/DOCX_EXPORT_PLAN.md` | Update status when implementation starts |
+| `app/assets/templates/bpc-ojt-weekly-journal.docx` | Sanitized committed fallback template with placeholders |
+| `app/assets/templates/bpc-ojt-weekly-journal.private.docx` | Optional ignored local official template; must not be staged or committed |
+| `app/assets/js/journal-payload.js` | Shared week/date/log/task payload builder for preview, copy text, and DOCX export |
+| `app/assets/js/docx-export.js` | Template loading, docxtemplater merge, Blob generation, and download |
+| `app/assets/js/journal-preview.js` | Export button warnings, confirmation flow, and UI integration |
+| `app/index.html` | Export button and script tags for vendor libraries plus export modules |
+| `app/assets/css/styles.css` | Styling for export controls and preview layout |
+| `app/assets/js/vendor/pizzip.min.js` | Vendored DOCX zip dependency |
+| `app/assets/js/vendor/docxtemplater.min.js` | Vendored DOCX templating dependency |
+| `docs/DOCX_TEMPLATE_PLACEHOLDERS.md` | Template paths and placeholder map |
+| `docs/DOCX_EXPORT_PLAN.md` | Implementation status and regression checklist |
 
 Do not modify `backup.js`, `storage.js` schema, or IndexedDB version for this feature unless a separate decision adds export metadata (not required for v1.1).
 
 ---
 
-## Dependency Decision Needed
+## Dependency Decision
 
-Before coding, decide:
+Decision recorded for this feature branch:
 
 | Question | Options | Recommendation |
 | --- | --- | --- |
@@ -396,9 +437,9 @@ Before coding, decide:
 | Template preparation | Who adds Word placeholders? | Developer prepares one `.docx` from official BPC file and documents placeholders in this plan or a short `docs/DOCX_TEMPLATE_PLACEHOLDERS.md` |
 | License check | docxtemplater, PizZip, and any other chosen library | Review and record in this document before vendoring |
 
-**Third-party license gate (stop rule):** Do **not** vendor or commit third-party DOCX libraries until their licenses have been reviewed and recorded in this document (library name, version, license type, and any use restrictions). Phase 0 cannot proceed to vendoring until this gate is satisfied.
+**Third-party license gate:** Completed before vendoring. Keep license notices with vendored DOCX libraries.
 
-**Explicit constraint:** Adding dependencies is acceptable for v1.1 **only as vendored browser scripts**. Do not introduce a build pipeline just for DOCX export.
+**Explicit constraint:** DOCX dependencies must remain vendored browser scripts. Do not introduce a build pipeline just for DOCX export.
 
 ---
 
@@ -419,7 +460,7 @@ Before coding, decide:
 
 ## Build Phases
 
-### Phase 0 — Template and dependency prep
+### Phase 0 — Template and dependency prep — Complete
 
 - Obtain official BPC weekly journal `.docx`.
 - Confirm public-sharing rules; use sanitized sample template in repo if needed (see [Public repository caution](#official-bpc-weekly-journal-template-structure)).
@@ -430,21 +471,21 @@ Before coding, decide:
 
 **Stop:** Template opens in Word and manual test fill looks correct; library licenses reviewed and recorded.
 
-### Phase 1 — Shared journal payload builder
+### Phase 1 — Shared journal payload builder — Complete
 
 - Extract week export payload from existing preview logic (dates, logs, tasks, summaries, weekly total).
 - Unit-test payload shape manually (console/log checklist).
 
-**Stop:** Payload for 5-, 6-, and 7-day weeks matches Weekly Preview rules, except task status is omitted from DOCX accomplishment text.
+**Stop:** Payload for 5-, 6-, and 7-day weeks matches Weekly Preview rules, and DOCX accomplishment text includes task description, optional duration, and task status.
 
-### Phase 2 — Core DOCX generation
+### Phase 2 — Core DOCX generation — Complete
 
 - Implement `docx-export.js`: load template, merge payload, produce Blob, trigger download.
 - Handle missing profile/summary data gracefully.
 
 **Stop:** Downloaded DOCX opens in Word with correct header, day rows, total, and summaries.
 
-### Phase 3 — UI integration and warnings
+### Phase 3 — UI integration and warnings — Complete
 
 - Add **Export Official DOCX** button to Weekly Preview.
 - Implement non-6-day week confirm dialog.
@@ -452,7 +493,7 @@ Before coding, decide:
 
 **Stop:** Full workflow works from week selection to downloaded file.
 
-### Phase 4 — Manual regression and polish
+### Phase 4 — Manual regression and polish — In progress
 
 - Run manual testing checklist (below).
 - Adjust template or text formatting based on real Word output.
@@ -468,19 +509,24 @@ Run on a local HTTP server after implementation.
 
 ### Setup
 
+- [ ] App loads without console errors
 - [ ] Student profile saved with name
 - [ ] Company profile saved with name
 - [ ] At least one OJT week with valid inclusive dates
+- [ ] Weekly Preview still renders
+- [ ] Copy Weekly Journal still works
+- [ ] Export Official DOCX works
 
 ### Day-count scenarios
 
 - [ ] Export **5-day** week → DOCX has Day 1–Day 5 only; warning shown
 - [ ] Export **6-day** week → DOCX has Day 1–Day 6; no day-count warning
 - [ ] Export **7-day** week → DOCX has Day 1–Day 7; warning shown
+- [ ] Canceling a warning stops export
 
 ### Day content scenarios
 
-- [ ] Worked day with tasks → bullet-style accomplishments in day cell
+- [ ] Worked day with tasks → bullet-style accomplishments in day cell, formatted as `• description (optional duration) - status`
 - [ ] Worked day with no tasks → "No task items recorded for this day."
 - [ ] Absent day → "Absent" (+ remarks if set)
 - [ ] Rest day → "No OJT / Rest Day" (+ remarks if set)
@@ -499,9 +545,11 @@ Run on a local HTTP server after implementation.
 - [ ] No photos embedded in DOCX
 - [ ] Signature lines remain blank
 - [ ] No time in / time out columns in official output
-- [ ] No task status in official output
+- [ ] Task status appears in each worked-day task line in the official output
 - [ ] Export works offline (after initial page load)
 - [ ] No network calls except loading local template asset
+- [ ] Private official template is ignored and not committed
+- [ ] Sanitized fallback template still works if private template is unavailable
 
 ### Edge cases
 
@@ -555,7 +603,7 @@ Do not implement these as part of Official DOCX Export:
 
 | Document | Use for |
 | --- | --- |
-| `docs/FEATURES.md` | v1.0 feature status and DOCX listed as future |
+| `docs/FEATURES.md` | v1.0 feature status and post-v1.0 DOCX export candidate status |
 | `docs/DATA_STRUCTURE.md` | Field names, relationships, calculation rules |
 | `docs/WORKFLOWS.md` | Weekly preview and manual transfer workflow |
 | `docs/POLISH_ROADMAP.md` | Official template structure reference |
@@ -564,4 +612,4 @@ Do not implement these as part of Official DOCX Export:
 
 ---
 
-*Planning document only. Confirm against the actual official BPC `.docx` template before implementation begins.*
+*Implementation/status document. Re-run the manual checklist before merging `feature/docx-export` into `master`.*

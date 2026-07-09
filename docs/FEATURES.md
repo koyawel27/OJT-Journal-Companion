@@ -2,11 +2,13 @@
 
 ## 1. Feature Overview
 
-OJT Journal Companion is a personal offline-first journal companion for one student using local offline data. Its features help the student record daily OJT work, track rendered hours, organize basic photo documentation, and prepare weekly journal content for manual transfer into an official school template.
+OJT Journal Companion is a personal offline-first journal companion for one student using local offline data. Its features help the student record daily OJT work, track rendered hours, organize basic photo documentation, and prepare weekly journal content for copying or DOCX export into an official school template workflow.
 
 The app stays lightweight. It is not a full internship management system, and v1.0 does not include accounts, approval flows, dashboards for other roles, online submission, or automatic syncing across devices.
 
 **v1.0 status:** Core features listed below are implemented and have passed final manual regression testing.
+
+**Post-v1.0 / v1.1 candidate status:** Official DOCX Export is implemented on `feature/docx-export` for final regression and merge review.
 
 ## 2. v1.0 Must-Have Features
 
@@ -31,6 +33,7 @@ These features are required for the first usable version.
 - Reflection or points of learning
 - Weekly journal preview
 - Copy-ready weekly journal content
+- Official DOCX export from a selected week
 - IndexedDB local storage
 - JSON backup/export
 - JSON import/restore
@@ -60,13 +63,13 @@ These features improve the experience but v1.0 works without them.
 - Draft status indicators
 - Export as plain text or Markdown (copy Weekly Journal plain text is implemented)
 - Bullet-style task output in weekly journal previews — **implemented**
+- Official DOCX Export — **implemented post-v1.0 / v1.1 candidate** (client-side Word file download from the selected week)
 
 ## 5. Future Features
 
 These features may be considered after v1.0 is stable and the basic offline-first workflow works well.
 
 - PDF export
-- DOCX export
 - PWA installability
 - Better photo compression
 - Optional AI summary assistance
@@ -109,6 +112,7 @@ These features are outside the v1.0 direction and should not be built yet.
 | Weekly journal content | Must-have | Complete | Skills learned, problems encountered, reflection. |
 | Weekly preview | Must-have | Complete | Official journal-like preview layout. |
 | Copy-ready output | Must-have | Complete | Copy Weekly Journal to clipboard. |
+| Official DOCX export | Post-v1.0 | Implemented on `feature/docx-export` | Client-side Word export with dynamic Day 1 through Day N rows, sanitized template fallback, optional private template support, and task bullets with duration/status. |
 | IndexedDB storage | Must-have | Complete | Local offline-first storage. |
 | JSON backup/export | Must-have | Complete | Includes photos as Base64 in JSON. |
 | JSON import/restore | Must-have | Complete | Replace-style restore with confirmation. |
@@ -156,7 +160,13 @@ Photo documentation should be included carefully. Imported photos, photo records
 
 Advanced photo features such as preview, compression, gallery viewing, or image editing are not required for v1.0. Photo preview may remain a nice-to-have feature, while compression and richer image handling should be treated as future work.
 
-Weekly journal output should focus on helping the student prepare content for manual transfer into the official school journal template. The app should not submit journals online or replace official school forms.
+Weekly journal output should focus on helping the student prepare content for manual transfer into the official school journal template. Official DOCX Export is a post-v1.0 / v1.1 candidate that downloads a Word file for the selected week; it does not submit journals online or replace official school forms, signatures, or supervisor review.
+
+DOCX export uses dynamic Day 1 through Day N rows from the selected week date range. Worked-day task lines include the task description, optional task-level duration, and personal task status. The optional duration remains documentation detail only and must not affect rendered hours.
+
+The export engine tries the local ignored private template at `app/assets/templates/bpc-ojt-weekly-journal.private.docx` first, then falls back to the sanitized committed template at `app/assets/templates/bpc-ojt-weekly-journal.docx`. The private official template should not be committed unless public sharing is explicitly confirmed.
+
+JSON backup/export and JSON import/restore remain separate from DOCX export. JSON files preserve app data for recovery or device transfer; DOCX files are editable journal submission drafts.
 
 
 Structured daily task/work items support multiple accomplishment bullets under one daily log. Each task item may include a description, optional task-level time spent, personal status (`Pending`, `In Progress`, or `Completed`), optional notes, and display ordering. Task items appear as bullet-style output in the weekly journal preview.
