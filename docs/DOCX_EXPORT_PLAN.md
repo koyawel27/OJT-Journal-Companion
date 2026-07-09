@@ -95,7 +95,7 @@ No login, cloud sync, Google Drive upload, or online submission is involved.
 ### In scope (proposed v1.1)
 
 - One selected `OJTWeek` → one downloadable DOCX.
-- Dynamic Day 1…Day N rows from `inclusiveStartDate` to `inclusiveEndDate`.
+- Dynamic Day 1…Day N rows from `inclusiveStartDate` to `inclusiveEndDate`, with DOCX row labels showing both day number and calendar date.
 - Header fields: Student Name, Company, Week Number, Inclusive Dates.
 - Daily Accomplishments table with accomplishment text per day.
 - Total weekly Hours Rendered (calculated from `DailyLog` records).
@@ -159,7 +159,7 @@ Based on the official template reference documented in `docs/POLISH_ROADMAP.md` 
 **Template observations:**
 
 - The sample template shows **6 day rows**, which matches a typical 6-day OJT week.
-- The left column shows **Day 1**, **Day 2**, etc. — not calendar dates, times, or day status.
+- The left column shows **Day 1 July 7, 2026**, **Day 2 July 8, 2026**, etc. — not time fields or day status.
 - The right column holds accomplishment text (usually bullet-style lines).
 - **Total weekly Hours Rendered** uses the exact label from the official template (lowercase "weekly").
 - Summary section titles must match exactly: **Skills Learned**, **Problems Encountered**, **Reflection (Points of Learning)**.
@@ -182,14 +182,15 @@ Implementation rule (same logic as `getWeekDates()` in `journal-preview.js`):
 2. Walk each calendar day from start to end (inclusive).
 3. Assign **Day 1**, **Day 2**, … **Day N** in order.
 4. Map each date to its matching `DailyLog` (if any) and related `DailyTask` records.
+5. Format the DOCX row label as **Day N Month D, YYYY** using the selected week's actual date for that row.
 
 **Examples:**
 
 | Week range | Days in range | DOCX day rows |
 | --- | --- | --- |
-| Mon–Fri (5 days) | 5 | Day 1 … Day 5 |
-| Mon–Sat (6 days) | 6 | Day 1 … Day 6 |
-| Mon–Sun (7 days) | 7 | Day 1 … Day 7 |
+| Mon–Fri (5 days) | 5 | Day 1 + date … Day 5 + date |
+| Mon–Sat (6 days) | 6 | Day 1 + date … Day 6 + date |
+| Mon–Sun (7 days) | 7 | Day 1 + date … Day 7 + date |
 
 The export must **not** pad a 5-day week with an empty Day 6, and must **not** truncate a 7-day week to 6 rows.
 
@@ -248,7 +249,7 @@ For each date in the week's inclusive range:
 
 | DOCX cell | App source | Notes |
 | --- | --- | --- |
-| Left: `Day N` | Computed index (1-based) | Not stored; derived from date order. |
+| Left: `Day N Month D, YYYY` | Computed index (1-based) + selected week date | Not stored; derived from date order and formatted for DOCX only, e.g. `Day 1 July 7, 2026`. |
 | Right: accomplishment text | `DailyLog` + related `DailyTask[]` | See [Export Content Rules](#export-content-rules). |
 
 **Not mapped to the official DOCX:**
@@ -391,14 +392,14 @@ Render HTML similar to Weekly Preview and convert to DOCX.
 1. Add `docx-export.js` module exposing `window.OJTDocxExport`.
 2. Extract shared "week journal payload" builder from `journal-preview.js` (or call shared helpers) so copy text and DOCX use the same mapping rules.
 3. Load template from `app/assets/templates/bpc-ojt-weekly-journal.docx` via `fetch()` (requires HTTP server, same as the rest of the app).
-4. Build payload: header fields + array of `{ dayLabel, accomplishmentText }` + weekly total + summary fields.
+4. Build payload: header fields + array of `{ dayLabel, accomplishmentText }` + weekly total + summary fields. DOCX template data formats `dayLabel` as `Day N Month D, YYYY`.
 5. Run docxtemplater → produce Blob → trigger download via temporary `<a download>`.
 6. Wire **Export Official DOCX** button in Weekly Preview section.
 
 **Dynamic rows strategy:**
 
 - Prepare the official template with a single table row pattern inside a `{#days}` … `{/days}` loop (docxtemplater syntax).
-- Each iteration fills `{dayLabel}` (e.g. "Day 1") and `{accomplishmentText}` (multiline string or sub-bullets).
+- Each iteration fills `{dayLabel}` (e.g. "Day 1 July 7, 2026") and `{accomplishmentText}` (multiline string or sub-bullets).
 - Avoid maintaining separate 5-day, 6-day, and 7-day template files unless loop rows prove unreliable in Word.
 
 **Fallback if loops fail in Word:** maintain one master template and clone table rows programmatically (Option A + limited Option B hybrid) — only if testing shows the loop block breaks layout.
@@ -522,6 +523,7 @@ Run on a local HTTP server after implementation.
 - [ ] Export **5-day** week → DOCX has Day 1–Day 5 only; warning shown
 - [ ] Export **6-day** week → DOCX has Day 1–Day 6; no day-count warning
 - [ ] Export **7-day** week → DOCX has Day 1–Day 7; warning shown
+- [ ] DOCX day labels include dates, formatted like `Day 1 July 7, 2026`
 - [ ] Canceling a warning stops export
 
 ### Day content scenarios

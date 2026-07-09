@@ -37,8 +37,10 @@ The template uses a docxtemplater loop around one table row:
 
 | Placeholder | Source |
 | --- | --- |
-| `{dayLabel}` | Derived label, such as `Day 1` |
+| `{dayLabel}` | DOCX display label built from the derived day label and selected week date, such as `Day 1 July 7, 2026` |
 | `{docxAccomplishmentText}` | Accomplishment text from the shared journal payload, with worked-day task lines formatted as description, optional duration, and status |
+
+`dayLabel` is date-inclusive only in the DOCX template data. Weekly Preview and Copy Weekly Journal keep their existing date display/output.
 
 `docxAccomplishmentText` includes worked-day task lines as `• description (optional duration) - status`, such as `• Bible Reading & Devotion (30m) - Completed`. Task duration may appear because it is documentation text, but it must not affect rendered hours.
 

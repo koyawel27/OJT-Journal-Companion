@@ -47,6 +47,32 @@
     return String(value || "").trim() || "Not filled in yet.";
   }
 
+  function formatDocxDayDate(dateText) {
+    const [year, month, day] = String(dateText || "").split("-").map(Number);
+
+    if (!year || !month || !day) {
+      return "";
+    }
+
+    const date = new Date(year, month - 1, day);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function buildDocxDayLabel(day) {
+    const dateDisplay = formatDocxDayDate(day.date);
+
+    return [day.dayLabel, dateDisplay].filter(Boolean).join(" ");
+  }
+
   function buildTemplateData(payload) {
     return {
       studentName: payload.studentName || "Not set",
@@ -58,7 +84,7 @@
       problemsEncountered: getFallbackText(payload.problemsEncountered),
       reflectionOrPointsOfLearning: getFallbackText(payload.reflectionOrPointsOfLearning),
       days: (payload.days || []).map((day) => ({
-        dayLabel: day.dayLabel,
+        dayLabel: buildDocxDayLabel(day),
         docxAccomplishmentText: day.docxAccomplishmentText || "No daily log recorded."
       }))
     };
