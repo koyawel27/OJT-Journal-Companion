@@ -7,8 +7,8 @@ const directImageTypes = {
   "image/jpeg": ".jpg",
   "image/png": ".png"
 };
-const landscapeImageBoundsCm = { width: 13.2, height: 7.4 };
-const portraitImageBoundsCm = { width: 9.4, height: 10.2 };
+const landscapeImageBoundsCm = { width: 7.2, height: 5.4 };
+const portraitImageBoundsCm = { width: 6.8, height: 8.5 };
 
 function createExportError(message, cause) {
   const error = new Error(message);
@@ -88,6 +88,11 @@ function formatDocxDayDate(dateText) {
 
 function buildDocxDayLabel(day) {
   return [day.dayLabel, formatDocxDayDate(day.date)].filter(Boolean).join(" ");
+}
+
+function buildPhotoDayLabel(day) {
+  const separator = String.fromCharCode(0x2014);
+  return [day.dayLabel, formatDocxDayDate(day.date)].filter(Boolean).join(` ${separator} `);
 }
 
 function sortPhotosForDailyLog(photos, dailyLogId) {
@@ -193,6 +198,37 @@ function fitImage(widthPx, heightPx) {
   };
 }
 
+const emptyGridPhoto = {
+  image: {
+    data: "iVBORw0KGgoAAAANSUhEUgAAAHgAAABQCAYAAADSm7GJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANiSURBVHhe7Z3BattAEIb9Hn2oQJ+gjxIozaVvUHrIsdBLL8GQYyCQW3MLPqaQU4shh6QEl6q77s56NBpJKyxF9s8/8AVrdzTyzicpCjHJYnn7o3r/9ZqAsohf3rz7SEChYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgaHgsGhYHAmE/x2ua5qcXvh5k3DRXWVDnv12du27Oa9uF+e+7mNNfUc5/Smuk/zu1hX56dO7ki4vw8++fDFTY7jNtfj091zevMmHlZu/visqlU65OrG27bs5tvi1913J/e5ur7069jjfHtIEy2xq9/PED+Ln8GFJU54BeK4l295SW96s0ljMhDi6Xc9dyrkkC/hhbdtaZt//JMm/oZrzeRuQ43rOV1nHfogkXti8mOU9maIn0kF60U+hUbYMcmLC/MW6o0JufESPY2225bWeZkI8WhyJbw16TFZu5W7Jawr+h9y4s8uWBa0DdN4jW1UjrCPOulzSIMbciXCuK29r+CuK3ij1mnl5zpJYAzJ2ZfZBetF6bBnqTQji8kDIZwxe2VLw/It0JEwVHBb6P10LXktV6ee2+bLQAgcwQnvSmtrVMlY4zZmT6SJBLedmNtaaseYV5uL+WpeC+7rTRcHIzijRTgSdANLxmrfAnSMILikyTY3v58grVFHrV2v6XgFywpD1G5JMr6vYFVfGjLmLbqkyY1cJVFC1+l8yFLzJceOzCtYLVYvKJ/lewr2ZHbVlqbZbUvfvMbLtVdkrY7sEMJK1j9ClRw7Mq/ggHf7kdCLkHUPEayb1YgZBevxGHauqycSpQ9hswuO6DNTQkuLSEMGCQ7btdpJqs2R7dcU3Hs1hvfmtKXRlz4OQjCZDgoGh4LBoWBwKBgcCgaHgsGhYHAoGBwKBoeCwaFgcCgYHAoGh4LBoWBwKBgcCgbnoATzj512E/vj9a2LuF+pn8kFt9Ui/xmzp14tCp6ZMXvq1aLgmRmzp14tCp6ZMXvq1aLgmRmzp16tyQXzKbqbo3+KJuNDweBQMDgUDA4Fg0PB4FAwOBQMDgWDQ8HgUDA4FAwOBYNDweBQMDgUDA4FgzOZ4JOzsn/KQaYlevD8xDnrcpBgcthQMDgUDA4Fg0PB4BQL5meZjxPvM9auYIIDBYNDweBQMDRV9Q8usF/+Gq1aoQAAAABJRU5ErkJggg==",
+    extension: ".png",
+    width: 0.01,
+    height: 0.01
+  },
+  captionDisplay: "",
+  isPlaceholder: true
+};
+
+function createEmptyGridPhoto() {
+  return {
+    ...emptyGridPhoto,
+    image: { ...emptyGridPhoto.image }
+  };
+}
+
+function buildPhotoRows(photos) {
+  const rows = [];
+
+  for (let index = 0; index < photos.length; index += 2) {
+    rows.push({
+      leftPhoto: photos[index],
+      rightPhoto: photos[index + 1] || createEmptyGridPhoto()
+    });
+  }
+
+  return rows;
+}
+
 async function buildPhotoDays(payload) {
   const relatedPhotos = payload.photoAttachments || [];
   const photoDays = [];
@@ -225,8 +261,9 @@ async function buildPhotoDays(payload) {
     }
 
     photoDays.push({
-      dayLabel: buildDocxDayLabel(day),
-      photos: preparedPhotos
+      dayLabel: buildPhotoDayLabel(day),
+      photos: preparedPhotos,
+      photoRows: buildPhotoRows(preparedPhotos)
     });
   }
 
@@ -360,6 +397,7 @@ window.OJTDocxExportV2 = {
   buildFilename,
   buildPayloadForWeek,
   buildPhotoDays,
+  buildPhotoRows,
   buildTemplateData,
   exportPayload,
   exportSelectedPreviewWeek,

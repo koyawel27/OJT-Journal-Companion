@@ -459,7 +459,7 @@
         exportButton.textContent = "Exporting DOCX...";
       }
 
-      await window.OJTDocxExportV2.exportPayload(state.currentPayload);
+      await window.OJTDocxExportV2.exportWeekById(state.selectedWeekId);
       window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");
