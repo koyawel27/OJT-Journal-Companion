@@ -6,7 +6,7 @@ OJT Journal Companion is a personal offline-first journal companion for one stud
 
 **v1.0 status:** released baseline.
 
-**v1.1 release-candidate status:** Official DOCX Export with an automatic photo appendix is implemented on feature/docx-photo-appendix. It is awaiting final merged-branch regression, review, merge, and version/tag finalization.
+**v1.1 status:** Released after merge and final regression. Official DOCX Export with an automatic photo appendix is included. The v1.1 Git tag remains the final repository release action.
 
 The app is not an internship management system. It has no accounts, approval workflow, online submission, or automatic cross-device sync.
 
@@ -22,7 +22,7 @@ The app is not an internship management system. It has no accounts, approval wor
 - Dashboard OJT progress and backup reminder
 - JSON backup/export, replace-style restore, and guarded reset
 
-## Official DOCX Export - v1.1 release candidate
+## Official DOCX Export - v1.1 released
 
 The Weekly Preview export button creates one editable Word document for the selected week.
 

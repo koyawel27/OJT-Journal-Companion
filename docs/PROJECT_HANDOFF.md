@@ -2,7 +2,7 @@
 
 Use this document to continue development or onboard a developer.
 
-**Release context:** v1.0 is the released baseline. Official DOCX Export with an automatic photo appendix is implemented on feature/docx-photo-appendix as the **v1.1 release candidate**. It is not released or tagged yet.
+**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released as v1.1. Final regression passed. The v1.1 Git tag is the remaining repository release action.
 
 ## Project summary
 
@@ -46,9 +46,9 @@ Key globals include window.OJTDB, window.OJTStorage, window.OJTCalculations, win
 | --- | --- |
 | v1.0 core workflow | Released baseline |
 | Dashboard, mobile tabs, backup/restore/reset | Complete |
-| Official DOCX Export | Implemented v1.1 release candidate |
-| Automatic photo appendix | Implemented v1.1 release candidate |
-| v1.1 tag/release | Not done |
+| Official DOCX Export | v1.1 released and merged into master |
+| Automatic photo appendix | v1.1 released and merged into master |
+| v1.1 tag/release | Tag creation and push remain |
 | PDF export, PWA, cloud workflows | Deferred |
 
 ## Data rules that must not change
@@ -156,10 +156,8 @@ The compact two-column appendix layout was manually accepted. Configurable image
 
 ## Release steps
 
-1. Run final manual regression from the merged branch.
-2. Review the PR and merge.
-3. Finalize the v1.1 version and tag.
-4. Keep release notes synchronized with the active v2 export path.
+1. Create and push the v1.1 Git tag.
+2. Keep release notes synchronized with the active v2 export path.
 
 ## Deferred work
 

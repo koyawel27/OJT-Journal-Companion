@@ -2,7 +2,7 @@
 
 A lightweight, offline-first personal browser app for students and interns. Record daily OJT activities, track rendered hours, attach photo documentation, and prepare a weekly journal for copying or official DOCX submission.
 
-**v1.0 is the released baseline.** Official DOCX Export with an automatic photo appendix is implemented on the current feature branch as the **v1.1 release candidate**. It is not tagged or released yet.
+**v1.0 is the original baseline release.** **v1.1 is released** with Official DOCX Export and an automatic Photo Documentation appendix. The v1.1 Git tag is the remaining repository release action.
 
 ## What this app is
 
