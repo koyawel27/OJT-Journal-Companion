@@ -2,7 +2,7 @@
 
 ## Status
 
-Official DOCX Export with an automatic Photo Documentation appendix is implemented on feature/docx-photo-appendix as the **v1.1 release candidate**. v1.0 remains the previously released baseline. v1.1 is not tagged or released yet.
+Official DOCX Export with an automatic Photo Documentation appendix is merged into master and released as v1.1. Final regression and release validation are complete. The v1.1 Git tag is not created yet.
 
 | Item | Status |
 | --- | --- |
@@ -19,8 +19,10 @@ Official DOCX Export with an automatic Photo Documentation appendix is implement
 | Compact two-column layout | Complete |
 | Regression and hardening | Complete |
 | v1 runtime cleanup | Complete |
-| Documentation synchronization | Current phase |
-| v1.1 release/tag | Pending |
+| Documentation synchronization | Complete |
+| Final regression | Complete on merged master |
+| PR review and merge | Complete |
+| v1.1 release status | Implementation merged; tag creation and push remain |
 
 ## Final production design
 
@@ -71,11 +73,8 @@ The completed regression covered selected-week correctness, no-photo output, JPE
 
 The current compact layout was manually accepted. Exported DOCX files remain editable, and manual photo sizing is allowed when needed.
 
-## Remaining release steps
+## Remaining release action
 
-1. Finish documentation synchronization.
-2. Run final manual regression from the merged branch.
-3. Review and merge the PR.
-4. Finalize the v1.1 version and tag.
+v1.1 implementation is merged and release validation is complete. The remaining repository action is creating and pushing the v1.1 tag.
 
-Do not mark v1.1 as released before merge and tag.
+Do not claim that the v1.1 tag exists until it is actually created and pushed.
