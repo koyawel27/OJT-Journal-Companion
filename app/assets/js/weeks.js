@@ -2,9 +2,9 @@
   const state = {
     weeks: [],
     dailyLogs: [],
-    dailyTasks: [],
     selectedWeekId: null,
-    expandedWeekId: null
+    historyOpen: false,
+    weekFormOpen: false
   };
 
   function getElement(id) {
@@ -38,19 +38,19 @@
       return window.crypto.randomUUID();
     }
 
-    return `week-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return "week-" + Date.now() + "-" + Math.random().toString(16).slice(2);
   }
 
   function parseDate(dateText) {
-    const [year, month, day] = dateText.split("-").map(Number);
-    return new Date(year, month - 1, day);
+    const parts = String(dateText || "").split("-").map(Number);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
   function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return year + "-" + month + "-" + day;
   }
 
   function formatDisplayDate(dateText) {
@@ -74,63 +74,73 @@
     return window.OJTCalculations.formatRenderedTime(minutes);
   }
 
-  function getWeekRenderedMinutes(weekId) {
-    return window.OJTCalculations.sumRenderedMinutes(
-      state.dailyLogs.filter((dailyLog) => dailyLog.weekId === weekId)
-    );
-  }
-
   function sortWeeks(weeks) {
     return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
-  function getCurrentWeek() {
+  function getSelectedWeek() {
+    return state.weeks.find((week) => week.id === state.selectedWeekId) || null;
+  }
+
+  function getCurrentFormWeek() {
     const weekId = getValue("week-id");
     return state.weeks.find((week) => week.id === weekId) || null;
   }
 
-  function getSummaryStatus(week) {
+  function getWeekDates(week) {
+    if (!week?.inclusiveStartDate || !week?.inclusiveEndDate) {
+      return [];
+    }
+
+    const dates = [];
+    const currentDate = parseDate(week.inclusiveStartDate);
+    const endDate = parseDate(week.inclusiveEndDate);
+
+    while (currentDate <= endDate) {
+      dates.push(formatDate(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  }
+
+  function getLogsForWeek(week) {
+    if (!week) {
+      return [];
+    }
+
+    return state.dailyLogs.filter((dailyLog) => {
+      return dailyLog.weekId === week.id &&
+        dailyLog.entryDate >= week.inclusiveStartDate &&
+        dailyLog.entryDate <= week.inclusiveEndDate;
+    });
+  }
+
+  function getWeekRenderedMinutes(week) {
+    return window.OJTCalculations.sumRenderedMinutes(getLogsForWeek(week));
+  }
+
+  function getSummaryState(week) {
     const requiredFields = [
       week?.weeklySkillsLearned,
       week?.problemsEncountered,
       week?.reflectionOrPointsOfLearning
     ];
-    const optionalFields = [week?.additionalNotes];
-    const filledRequiredCount = requiredFields.filter((value) => String(value || "").trim()).length;
-    const hasAnySummary = requiredFields.concat(optionalFields).some((value) => String(value || "").trim());
+    const filledCount = requiredFields.filter((value) => String(value || "").trim()).length;
 
-    if (filledRequiredCount === requiredFields.length) {
-      return "Weekly summary complete";
+    if (filledCount === 0) {
+      return "Not started";
     }
 
-    if (hasAnySummary) {
-      return "Weekly summary partially filled";
+    if (filledCount === requiredFields.length) {
+      return "Complete";
     }
 
-    return "Weekly summary not started";
-  }
-
-  function getDayStatusText(dailyLog, taskCount) {
-    if (!dailyLog) {
-      return "No daily log yet — open in Daily Logs";
-    }
-
-    let status = "Daily log saved";
-    const renderedMinutes = Number(dailyLog.renderedMinutes);
-
-    if (Number.isFinite(renderedMinutes) && renderedMinutes > 0) {
-      status += ` - ${formatRenderedTime(renderedMinutes)}`;
-    }
-
-    if (taskCount > 0) {
-      status += taskCount === 1 ? " - 1 task item" : ` - ${taskCount} task items`;
-    }
-
-    return status;
+    return "In progress";
   }
 
   function buildWeekRecord() {
-    const currentWeek = getCurrentWeek();
+    const currentWeek = getCurrentFormWeek();
     const timestamp = nowIso();
 
     return {
@@ -194,182 +204,284 @@
     return "";
   }
 
-  function resetWeekForm() {
+  function setWeekFormOpen(open) {
+    state.weekFormOpen = Boolean(open);
+    const panel = getElement("week-form-panel");
+    if (panel) {
+      panel.hidden = !state.weekFormOpen;
+    }
+  }
+
+  function resetWeekForm(options) {
+    const settings = options || {};
     setValue("week-id", "");
     setValue("week-number", "");
     setValue("inclusive-start-date", "");
     setValue("inclusive-end-date", "");
     setText("week-form-title", "Create week");
     setText("save-week-button", "Save week");
-    getElement("cancel-week-edit-button").hidden = true;
     window.OJTUI.clearFormMessage(getElement("week-form-message"));
+
+    if (settings.hide !== false) {
+      setWeekFormOpen(false);
+    }
   }
 
-  function renderDaySlotsHtml(week) {
-    const startDate = parseDate(week.inclusiveStartDate);
-    const endDate = parseDate(week.inclusiveEndDate);
-    let currentDate = startDate;
-    let dayNumber = 1;
-    const slots = [];
+  function focusWeekNumber() {
+    window.requestAnimationFrame(() => {
+      getElement("week-number")?.focus();
+    });
+  }
 
-    while (currentDate <= endDate) {
-      const dateText = formatDate(currentDate);
-      const dailyLog = state.dailyLogs.find((log) => log.weekId === week.id && log.entryDate === dateText);
-      const taskCount = dailyLog
-        ? state.dailyTasks.filter((task) => task.dailyLogId === dailyLog.id).length
-        : 0;
-      const statusText = getDayStatusText(dailyLog, taskCount);
+  function openNewWeekForm() {
+    resetWeekForm({ hide: false });
+    setWeekFormOpen(true);
+    focusWeekNumber();
+  }
 
-      slots.push(`
-        <article class="day-slot">
-          <div>
-            <strong>Day ${dayNumber}</strong>
-            <span class="day-slot-date">${formatDisplayDate(dateText)}</span>
-            <p>${statusText}</p>
-          </div>
-          <button class="secondary-button" type="button" data-open-daily-log-week-id="${week.id}" data-open-daily-log-date="${dateText}">
-            ${dailyLog ? "Open Log" : "Create Log"}
-          </button>
-        </article>
-      `);
-
-      currentDate.setDate(currentDate.getDate() + 1);
-      dayNumber += 1;
+  function startEditWeek(week) {
+    if (!week) {
+      return;
     }
 
-    return `<div class="day-slots">${slots.join("")}</div>`;
+    window.OJTSelectedWeek?.selectWeek(week.id, {
+      weeks: state.weeks,
+      source: "journal:edit-week"
+    });
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || week.id;
+    setValue("week-id", week.id);
+    setValue("week-number", week.weekNumber);
+    setValue("inclusive-start-date", week.inclusiveStartDate);
+    setValue("inclusive-end-date", week.inclusiveEndDate);
+    setText("week-form-title", "Edit Week " + week.weekNumber);
+    setText("save-week-button", "Save changes");
+    window.OJTUI.clearFormMessage(getElement("week-form-message"));
+    setWeekFormOpen(true);
+    focusWeekNumber();
   }
 
-  function renderWeeklySummaryForm(week) {
-    return `
-      <form class="weekly-summary-form" data-week-summary-form data-week-id="${escapeHtml(week.id)}" novalidate>
-        <div class="form-header">
-          <div>
-            <span class="card-label">Weekly summary</span>
-            <h4>Journal summary</h4>
-          </div>
-          <p>${escapeHtml(getSummaryStatus(week))}</p>
-        </div>
+  function renderWeekSelect() {
+    const select = getElement("journal-week-select");
+    const sortedWeeks = sortWeeks(state.weeks);
 
-        <div class="form-grid">
-          <label class="field field-wide">
-            <span>Skills Learned</span>
-            <textarea id="weekly-skills-learned-${escapeHtml(week.id)}" name="weeklySkillsLearned" rows="3">${escapeHtml(week.weeklySkillsLearned)}</textarea>
-          </label>
-          <label class="field field-wide">
-            <span>Problems Encountered</span>
-            <textarea id="problems-encountered-${escapeHtml(week.id)}" name="problemsEncountered" rows="3">${escapeHtml(week.problemsEncountered)}</textarea>
-          </label>
-          <label class="field field-wide">
-            <span>Reflection / Points of Learning</span>
-            <textarea id="reflection-or-points-${escapeHtml(week.id)}" name="reflectionOrPointsOfLearning" rows="4">${escapeHtml(week.reflectionOrPointsOfLearning)}</textarea>
-          </label>
-          <label class="field field-wide">
-            <span>Additional Notes</span>
-            <textarea id="weekly-additional-notes-${escapeHtml(week.id)}" name="additionalNotes" rows="3">${escapeHtml(week.additionalNotes)}</textarea>
-          </label>
-        </div>
+    if (!select) {
+      return;
+    }
 
-        <p class="phase-note">Fill in skills, challenges, and reflection for your weekly journal. Day-by-day work stays in Daily Logs.</p>
+    select.innerHTML = "";
+    sortedWeeks.forEach((week) => {
+      const option = document.createElement("option");
+      option.value = week.id;
+      option.textContent = "Week " + week.weekNumber + " (" + week.inclusiveStartDate + " to " + week.inclusiveEndDate + ")";
+      select.appendChild(option);
+    });
+    select.disabled = sortedWeeks.length === 0;
+    select.value = state.selectedWeekId || "";
+  }
 
-        <div class="form-actions">
-          <button class="primary-button" type="submit">Save weekly summary</button>
-          <p class="form-message" id="weekly-summary-message" hidden></p>
-        </div>
-      </form>
-    `;
+  function renderToolbar() {
+    const sortedWeeks = sortWeeks(state.weeks);
+    const selectedWeek = getSelectedWeek();
+    const navigation = getElement("journal-week-navigation");
+    const previousButton = getElement("journal-previous-week");
+    const nextButton = getElement("journal-next-week");
+    const historyButton = getElement("journal-all-weeks");
+
+    if (sortedWeeks.length === 0) {
+      state.historyOpen = false;
+    }
+
+    renderWeekSelect();
+
+    if (navigation) {
+      navigation.hidden = sortedWeeks.length === 0;
+    }
+
+    if (previousButton) {
+      previousButton.disabled = !selectedWeek ||
+        !window.OJTSelectedWeek?.getPreviousWeek(sortedWeeks, selectedWeek.id);
+    }
+
+    if (nextButton) {
+      nextButton.disabled = !selectedWeek ||
+        !window.OJTSelectedWeek?.getNextWeek(sortedWeeks, selectedWeek.id);
+    }
+
+    if (historyButton) {
+      historyButton.disabled = sortedWeeks.length === 0;
+      historyButton.setAttribute("aria-expanded", String(state.historyOpen));
+    }
+  }
+
+  function renderOverview() {
+    const week = getSelectedWeek();
+    const emptyState = getElement("journal-empty-state");
+    const workspace = getElement("journal-selected-workspace");
+
+    if (emptyState) {
+      emptyState.hidden = Boolean(week);
+    }
+
+    if (workspace) {
+      workspace.hidden = !week;
+    }
+
+    if (!week) {
+      return;
+    }
+
+    const dates = getWeekDates(week);
+    const logs = getLogsForWeek(week);
+    setText("journal-overview-title", "Week " + week.weekNumber);
+    setText("journal-overview-dates", formatDisplayDate(week.inclusiveStartDate) + " to " + formatDisplayDate(week.inclusiveEndDate));
+    setText("journal-overview-rendered", formatRenderedTime(getWeekRenderedMinutes(week)));
+    setText("journal-overview-logged-days", logs.length + " of " + dates.length);
+    setText("journal-overview-summary-state", getSummaryState(week));
+  }
+
+  function renderWeeklySummaryForm() {
+    const container = getElement("journal-weekly-summary");
+    const week = getSelectedWeek();
+
+    if (!container) {
+      return;
+    }
+
+    if (!week) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = [
+      '<form class="weekly-summary-form" data-week-summary-form data-week-id="' + escapeHtml(week.id) + '" novalidate>',
+      '  <div class="form-grid">',
+      '    <label class="field field-wide"><span>Skills Learned</span><textarea name="weeklySkillsLearned" rows="3">' + escapeHtml(week.weeklySkillsLearned) + '</textarea></label>',
+      '    <label class="field field-wide"><span>Problems Encountered</span><textarea name="problemsEncountered" rows="3">' + escapeHtml(week.problemsEncountered) + '</textarea></label>',
+      '    <label class="field field-wide"><span>Reflection / Points of Learning</span><textarea name="reflectionOrPointsOfLearning" rows="4">' + escapeHtml(week.reflectionOrPointsOfLearning) + '</textarea></label>',
+      '    <label class="field field-wide"><span>Additional Notes</span><textarea name="additionalNotes" rows="3">' + escapeHtml(week.additionalNotes) + '</textarea></label>',
+      '  </div>',
+      '  <div class="form-actions">',
+      '    <button class="primary-button" type="submit">Save weekly summary</button>',
+      '    <p class="form-message" id="weekly-summary-message" hidden></p>',
+      '  </div>',
+      '</form>'
+    ].join("");
   }
 
   function renderWeeksList() {
     const list = getElement("weeks-list");
     const countLabel = getElement("weeks-count-label");
-    const sortedWeeks = sortWeeks(state.weeks);
+    const panel = getElement("all-weeks-panel");
+    const sortedWeeks = sortWeeks(state.weeks).reverse();
 
-    list.innerHTML = "";
-    countLabel.textContent = sortedWeeks.length === 0
-      ? "No weeks yet — create your first OJT week above."
-      : sortedWeeks.length === 1
-      ? "1 week saved."
-      : `${sortedWeeks.length} weeks saved.`;
+    if (panel) {
+      panel.hidden = !state.historyOpen;
+    }
 
-    if (sortedWeeks.length === 0) {
-      list.innerHTML = '<p class="empty-state">No weeks yet. Create your first OJT week above, then log days in Daily Logs.</p>';
+    if (!list || !countLabel) {
       return;
     }
 
+    countLabel.textContent = sortedWeeks.length === 1
+      ? "1 week saved."
+      : sortedWeeks.length + " weeks saved.";
+    list.innerHTML = "";
+
     sortedWeeks.forEach((week) => {
-      const isExpanded = state.expandedWeekId === week.id;
-      const detailButtonLabel = isExpanded ? "Collapse" : "View";
-      const logCount = state.dailyLogs.filter((log) => log.weekId === week.id).length;
-      const weeklyRenderedMinutes = getWeekRenderedMinutes(week.id);
+      const logs = getLogsForWeek(week);
+      const selected = week.id === state.selectedWeekId;
       const item = document.createElement("article");
-      item.className = `week-item week-accordion${isExpanded ? " is-expanded" : ""}`;
-      item.innerHTML = `
-        <div class="week-item-main">
-          <div>
-            <span class="card-label">Week ${week.weekNumber}</span>
-            <h4>${week.inclusiveStartDate} to ${week.inclusiveEndDate}</h4>
-            <p>${logCount === 1 ? "1 daily log saved" : `${logCount} daily logs saved`}. Weekly rendered time: ${formatRenderedTime(weeklyRenderedMinutes)}.</p>
-            <p>${getSummaryStatus(week)}.</p>
-          </div>
-          <div class="week-actions">
-            <button class="secondary-button" type="button" data-week-action="view" data-week-id="${week.id}" aria-expanded="${isExpanded}">${detailButtonLabel}</button>
-            <button class="secondary-button" type="button" data-week-action="edit" data-week-id="${week.id}">Edit</button>
-            <button class="danger-button" type="button" data-week-action="delete" data-week-id="${week.id}">Delete</button>
-          </div>
-        </div>
-        <div class="week-accordion-body" ${isExpanded ? "" : "hidden"}>
-          ${isExpanded ? renderDaySlotsHtml(week) + renderWeeklySummaryForm(week) : ""}
-        </div>
-      `;
+      item.className = "week-item journal-history-item" + (selected ? " is-selected" : "");
+      item.innerHTML = [
+        '<div class="week-item-main">',
+        '  <div>',
+        '    <span class="card-label">Week ' + escapeHtml(week.weekNumber) + (selected ? " - Selected" : "") + '</span>',
+        '    <h4>' + escapeHtml(formatDisplayDate(week.inclusiveStartDate)) + ' to ' + escapeHtml(formatDisplayDate(week.inclusiveEndDate)) + '</h4>',
+        '    <p>' + escapeHtml(formatRenderedTime(getWeekRenderedMinutes(week))) + ' rendered - ' + logs.length + (logs.length === 1 ? " daily log" : " daily logs") + ' - Summary: ' + escapeHtml(getSummaryState(week)) + '</p>',
+        '  </div>',
+        '  <div class="week-actions">',
+        '    <button class="secondary-button" type="button" data-week-action="select" data-week-id="' + escapeHtml(week.id) + '"' + (selected ? " disabled" : "") + '>' + (selected ? "Selected" : "Select") + '</button>',
+        '    <button class="secondary-button" type="button" data-week-action="edit" data-week-id="' + escapeHtml(week.id) + '">Edit</button>',
+        '    <button class="danger-button" type="button" data-week-action="delete" data-week-id="' + escapeHtml(week.id) + '">Delete</button>',
+        '  </div>',
+        '</div>'
+      ].join("");
       list.appendChild(item);
     });
   }
 
-  function showWeekDetail(week) {
-    window.OJTSelectedWeek?.selectWeek(week.id, { weeks: state.weeks, source: "weeks:view" });
-    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || week.id;
-    state.expandedWeekId = week.id;
+  function renderJournalContext() {
+    renderToolbar();
+    renderOverview();
     renderWeeksList();
+    setWeekFormOpen(state.weekFormOpen);
   }
 
-  function hideWeekDetail() {
-    state.expandedWeekId = null;
-    renderWeeksList();
+  function renderJournal() {
+    renderJournalContext();
+    renderWeeklySummaryForm();
   }
 
-  function startEditWeek(week) {
-    setValue("week-id", week.id);
-    setValue("week-number", week.weekNumber);
-    setValue("inclusive-start-date", week.inclusiveStartDate);
-    setValue("inclusive-end-date", week.inclusiveEndDate);
-    setText("week-form-title", `Edit Week ${week.weekNumber}`);
-    setText("save-week-button", "Save changes");
-    getElement("cancel-week-edit-button").hidden = false;
-    window.OJTUI.clearFormMessage(getElement("week-form-message"));
+  function selectWeek(weekId, source) {
+    const previousWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
+    const selected = window.OJTSelectedWeek?.selectWeek(weekId, {
+      weeks: state.weeks,
+      source: source || "journal"
+    });
+
+    if (!selected) {
+      return;
+    }
+
+    const selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || weekId;
+    if (selectedWeekId === previousWeekId) {
+      state.selectedWeekId = selectedWeekId;
+      renderJournalContext();
+    }
+  }
+
+  function selectAdjacentWeek(direction) {
+    const week = getSelectedWeek();
+    if (!week) {
+      return;
+    }
+
+    const adjacentWeek = direction === "previous"
+      ? window.OJTSelectedWeek?.getPreviousWeek(state.weeks, week.id)
+      : window.OJTSelectedWeek?.getNextWeek(state.weeks, week.id);
+
+    if (adjacentWeek) {
+      selectWeek(adjacentWeek.id, "journal:" + direction);
+    }
+  }
+
+  function toggleHistory() {
+    state.historyOpen = !state.historyOpen;
+    renderJournalContext();
   }
 
   async function deleteWeek(week) {
+    const messageElement = getElement("journal-message");
+
     try {
       const dailyLogs = await window.OJTStorage.getDailyLogs();
       const relatedLogs = dailyLogs.filter((dailyLog) => dailyLog.weekId === week.id);
 
       if (relatedLogs.length > 0) {
         window.OJTUI.showFormMessage(
-          getElement("week-form-message"),
-          "This week still has daily logs. Delete them in Daily Logs before removing the week.",
+          messageElement,
+          "This week still has daily logs. Delete them in Journal before removing the week.",
           "error"
         );
         return;
       }
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("week-form-message"), "Related daily logs could not be checked. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Related daily logs could not be checked. Please try again.", "error");
       console.error(error);
       return;
     }
 
-    const confirmed = window.confirm("Delete Week " + week.weekNumber + "? This only removes the week record — it cannot be undone.");
-
+    const confirmed = window.confirm("Delete Week " + week.weekNumber + "? This only removes the week record - it cannot be undone.");
     if (!confirmed) {
       return;
     }
@@ -380,24 +492,35 @@
       const nextWeek = window.OJTSelectedWeek?.getNextWeek(state.weeks, week.id);
       await window.OJTStorage.deleteWeek(week.id);
       state.weeks = state.weeks.filter((savedWeek) => savedWeek.id !== week.id);
-      if (state.expandedWeekId === week.id) {
-        state.expandedWeekId = null;
-      }
+
       if (wasSelected) {
         const fallbackWeek = state.weeks.find((savedWeek) => savedWeek.id === previousWeek?.id) ||
           state.weeks.find((savedWeek) => savedWeek.id === nextWeek?.id) || null;
+
         if (fallbackWeek) {
-          window.OJTSelectedWeek?.selectWeek(fallbackWeek.id, { weeks: state.weeks, source: "weeks:delete" });
+          window.OJTSelectedWeek?.selectWeek(fallbackWeek.id, {
+            weeks: state.weeks,
+            source: "weeks:delete"
+          });
         } else {
-          window.OJTSelectedWeek?.clearSelection({ weeks: state.weeks, source: "weeks:delete" });
+          window.OJTSelectedWeek?.clearSelection({
+            weeks: state.weeks,
+            source: "weeks:delete"
+          });
         }
-      } else {
-        renderWeeksList();
       }
+
+      state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
+
+      if (!wasSelected) {
+        renderJournalContext();
+      }
+
       window.OJTUI.updateWeeksSummary(state.weeks);
-      window.OJTUI.showFormMessage(getElement("week-form-message"), "Week deleted.", "success");
+      document.dispatchEvent(new CustomEvent("ojt:weeks-data-change"));
+      window.OJTUI.showFormMessage(messageElement, "Week deleted.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("week-form-message"), "Week could not be deleted. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Week could not be deleted. Please try again.", "error");
       console.error(error);
     }
   }
@@ -418,17 +541,21 @@
 
     try {
       const savedWeek = await window.OJTStorage.saveWeek(weekRecord);
+      const previousWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
       state.weeks = state.weeks.filter((week) => week.id !== savedWeek.id).concat(savedWeek);
-      if (isNewWeek || window.OJTSelectedWeek?.getSelectedWeekId() === savedWeek.id) {
-        window.OJTSelectedWeek?.selectWeek(savedWeek.id, { weeks: state.weeks, source: isNewWeek ? "weeks:new-week" : "weeks:edit" });
-      } else {
-        window.OJTSelectedWeek?.initialize(state.weeks);
-      }
-      state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
-      window.OJTUI.updateWeeksSummary(state.weeks);
-      renderWeeksList();
+      window.OJTSelectedWeek?.selectWeek(savedWeek.id, {
+        weeks: state.weeks,
+        source: isNewWeek ? "weeks:new-week" : "weeks:edit"
+      });
+      state.selectedWeekId = savedWeek.id;
       resetWeekForm();
-      window.OJTUI.showFormMessage(messageElement, "Week saved.", "success");
+
+      if (previousWeekId === savedWeek.id) {
+        renderJournal();
+      }
+      window.OJTUI.updateWeeksSummary(state.weeks);
+      document.dispatchEvent(new CustomEvent("ojt:weeks-data-change"));
+      window.OJTUI.showFormMessage(getElement("journal-message"), isNewWeek ? "Week created and selected." : "Week changes saved.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Week could not be saved. Please try again.", "error");
       console.error(error);
@@ -458,7 +585,6 @@
     const form = event.target;
     const summaryRecord = buildWeeklySummaryRecord(form);
     const messageElement = form.querySelector(".form-message");
-
     window.OJTUI.clearFormMessage(messageElement);
 
     if (!summaryRecord) {
@@ -469,11 +595,14 @@
     try {
       const savedWeek = await window.OJTStorage.saveWeek(summaryRecord);
       state.weeks = state.weeks.filter((week) => week.id !== savedWeek.id).concat(savedWeek);
-      window.OJTSelectedWeek?.selectWeek(savedWeek.id, { weeks: state.weeks, source: "weeks:summary" });
-      state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || savedWeek.id;
-      state.expandedWeekId = savedWeek.id;
-      renderWeeksList();
+      window.OJTSelectedWeek?.selectWeek(savedWeek.id, {
+        weeks: state.weeks,
+        source: "weeks:summary"
+      });
+      state.selectedWeekId = savedWeek.id;
+      renderJournal();
       window.OJTUI.updateWeeksSummary(state.weeks);
+      document.dispatchEvent(new CustomEvent("ojt:weeks-data-change"));
       window.OJTUI.showFormMessage(getElement("weekly-summary-message"), "Weekly summary saved.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Weekly summary could not be saved. Please try again.", "error");
@@ -483,23 +612,17 @@
 
   function handleWeekAction(event) {
     const button = event.target.closest("button[data-week-action]");
-
     if (!button) {
       return;
     }
 
     const week = state.weeks.find((savedWeek) => savedWeek.id === button.dataset.weekId);
-
     if (!week) {
       return;
     }
 
-    if (button.dataset.weekAction === "view") {
-      if (state.selectedWeekId === week.id) {
-        hideWeekDetail();
-      } else {
-        showWeekDetail(week);
-      }
+    if (button.dataset.weekAction === "select") {
+      selectWeek(week.id, "journal:history");
     }
 
     if (button.dataset.weekAction === "edit") {
@@ -511,47 +634,103 @@
     }
   }
 
-  function handleOpenDailyLog(event) {
-    const button = event.target.closest("button[data-open-daily-log-week-id]");
+  function getLocalDateText() {
+    return formatDate(new Date());
+  }
 
-    if (!button) {
+  function logToday() {
+    const today = getLocalDateText();
+    const containingWeek = sortWeeks(state.weeks).find((week) => {
+      return week.inclusiveStartDate <= today && week.inclusiveEndDate >= today;
+    });
+
+    const journalSection = getElement("journal");
+    if (!journalSection?.classList.contains("is-visible")) {
+      window.OJTApp?.showSection("journal");
+    }
+
+    if (!containingWeek) {
+      window.OJTUI.showFormMessage(
+        getElement("journal-message"),
+        "No saved week includes today. Select or create a week to continue.",
+        "info"
+      );
       return;
     }
 
-    const detail = {
-      weekId: button.dataset.openDailyLogWeekId,
-      entryDate: button.dataset.openDailyLogDate
-    };
+    const previousWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
+    window.OJTSelectedWeek?.selectWeek(containingWeek.id, {
+      weeks: state.weeks,
+      source: "journal:log-today"
+    });
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || containingWeek.id;
 
-    window.OJTApp?.showSection("daily-logs");
-    document.dispatchEvent(new CustomEvent("ojt:open-daily-log", { detail }));
+    if (state.selectedWeekId === previousWeekId) {
+      renderJournalContext();
+    }
+
+    document.dispatchEvent(new CustomEvent("ojt:open-daily-log", {
+      detail: {
+        weekId: containingWeek.id,
+        entryDate: today
+      }
+    }));
   }
 
-  async function loadWeeks() {
+  async function loadJournalData() {
     try {
-      const [weeks, dailyLogs, dailyTasks] = await Promise.all([
+      const results = await Promise.all([
         window.OJTStorage.getWeeks(),
-        window.OJTStorage.getDailyLogs(),
-        window.OJTStorage.getDailyTasks()
+        window.OJTStorage.getDailyLogs()
       ]);
-      state.weeks = weeks;
-      state.dailyLogs = dailyLogs;
-      state.dailyTasks = dailyTasks;
+      state.weeks = results[0] || [];
+      state.dailyLogs = results[1] || [];
       state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || null;
-      renderWeeksList();
+      renderJournal();
       window.OJTUI.updateWeeksSummary(state.weeks);
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("week-form-message"), "Saved weeks could not be loaded. Please refresh and try again.", "error");
+      window.OJTUI.showFormMessage(getElement("journal-message"), "Journal data could not be loaded. Refresh and try again.", "error");
+      console.error(error);
+    }
+  }
+
+  async function refreshJournalContextData() {
+    try {
+      const results = await Promise.all([
+        window.OJTStorage.getWeeks(),
+        window.OJTStorage.getDailyLogs()
+      ]);
+      state.weeks = results[0] || [];
+      state.dailyLogs = results[1] || [];
+
+      const selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
+      state.selectedWeekId = state.weeks.some((week) => week.id === selectedWeekId)
+        ? selectedWeekId
+        : window.OJTSelectedWeek?.initialize(state.weeks) || null;
+
+      renderJournalContext();
+      window.OJTUI.updateWeeksSummary(state.weeks);
+    } catch (error) {
+      window.OJTUI.showFormMessage(getElement("journal-message"), "Journal data could not be refreshed. Please try again.", "error");
       console.error(error);
     }
   }
 
   function bindWeekEvents() {
     getElement("week-form")?.addEventListener("submit", saveWeek);
-    getElement("cancel-week-edit-button")?.addEventListener("click", resetWeekForm);
+    getElement("cancel-week-edit-button")?.addEventListener("click", () => resetWeekForm());
+    getElement("journal-new-week")?.addEventListener("click", openNewWeekForm);
+    getElement("journal-empty-new-week")?.addEventListener("click", openNewWeekForm);
+    getElement("journal-edit-week")?.addEventListener("click", () => startEditWeek(getSelectedWeek()));
+    getElement("journal-all-weeks")?.addEventListener("click", toggleHistory);
+    getElement("journal-log-today")?.addEventListener("click", logToday);
+    getElement("journal-previous-week")?.addEventListener("click", () => selectAdjacentWeek("previous"));
+    getElement("journal-next-week")?.addEventListener("click", () => selectAdjacentWeek("next"));
+    getElement("journal-week-select")?.addEventListener("change", (event) => {
+      selectWeek(event.target.value, "journal:selector");
+    });
     getElement("weeks-list")?.addEventListener("click", handleWeekAction);
-    getElement("weeks-list")?.addEventListener("click", handleOpenDailyLog);
-    getElement("weeks-list")?.addEventListener("submit", (event) => {
+    getElement("journal-weekly-summary")?.addEventListener("submit", (event) => {
       if (event.target.matches("[data-week-summary-form]")) {
         saveWeeklySummary(event);
       }
@@ -560,20 +739,36 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bindWeekEvents();
-    loadWeeks();
+    loadJournalData();
   });
 
   document.addEventListener("ojt:selected-week-change", (event) => {
-    state.selectedWeekId = event.detail?.weekId || null;
-    if (state.selectedWeekId && state.weeks.some((week) => week.id === state.selectedWeekId)) {
-      state.expandedWeekId = state.selectedWeekId;
+    const weekId = event.detail?.weekId || null;
+
+    if (weekId && !state.weeks.some((week) => week.id === weekId)) {
+      loadJournalData();
+      return;
     }
-    renderWeeksList();
+
+    const selectionChanged = state.selectedWeekId !== weekId;
+    if (selectionChanged) {
+      resetWeekForm();
+    }
+
+    state.selectedWeekId = weekId;
+
+    if (selectionChanged) {
+      renderJournal();
+    } else {
+      renderJournalContext();
+    }
   });
 
+  document.addEventListener("ojt:daily-log-data-change", refreshJournalContextData);
+
   document.addEventListener("ojt:section-change", (event) => {
-    if (event.detail?.sectionId === "weeks") {
-      loadWeeks();
+    if (event.detail?.sectionId === "journal") {
+      loadJournalData();
     }
   });
 })();

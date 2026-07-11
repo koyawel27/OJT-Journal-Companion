@@ -19,19 +19,13 @@
         <h1>OJT Journal Companion</h1>
       </div>
       <div class="header-actions">
-        <button class="nav-button mobile-profile-button" type="button" data-section="profile" aria-label="Open Profile">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
-            <path d="M5 20a7 7 0 0 1 14 0"></path>
-          </svg>
-        </button>
         <p class="header-note">Saved only in this browser</p>
       </div>
     </header>
     <nav class="mobile-section-tabs" aria-label="Primary mobile navigation">
       <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Home</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="weeks">Weeks</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="daily-logs">Logs</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="profile">Profile</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="journal">Journal</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="backup">Backup</button>
     </nav>
@@ -56,23 +50,14 @@
           </span>
           <span>Profile</span>
         </button>
-        <button class="nav-button" type="button" data-section="weeks">
+        <button class="nav-button" type="button" data-section="journal">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
               <path d="M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5Z"></path>
               <path d="M8 3.5v3M16 3.5v3M4.5 9h15M8 13h2.5M13.5 13H16M8 16.5h2.5"></path>
             </svg>
           </span>
-          <span>Weeks</span>
-        </button>
-        <button class="nav-button" type="button" data-section="daily-logs">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M7.5 4.5h7l3.5 3.5V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
-              <path d="M14.5 4.5v3.5H18M9 12h6M9 15.5h6"></path>
-            </svg>
-          </span>
-          <span>Daily Logs</span>
+          <span>Journal</span>
         </button>
         <button class="nav-button" type="button" data-section="weekly-preview">
           <span class="nav-icon" aria-hidden="true">
@@ -101,11 +86,11 @@
               <p class="section-kicker">Start here</p>
               <h2 id="dashboard-title">Dashboard</h2>
               <p class="dashboard-lead">
-                See your OJT hours, this week's progress, and what to do next.
+                See your OJT hours, selected-week progress, and what to do next.
               </p>
             </div>
             <div class="dashboard-actions" aria-label="Quick actions">
-              <button class="primary-button dashboard-action-primary" type="button" id="dashboard-go-daily-logs">Go to Daily Logs</button>
+              <button class="primary-button dashboard-action-primary" type="button" id="dashboard-go-journal">Open Journal</button>
               <button class="secondary-button" type="button" id="dashboard-action-weekly-preview">Open Weekly Preview</button>
               <button class="secondary-button dashboard-action-backup" type="button" id="dashboard-action-backup" hidden>Go to Backup</button>
             </div>
@@ -186,7 +171,7 @@
               </div>
             </header>
 
-            <div class="dashboard-week-band dashboard-week-band--stats" aria-label="Current week progress summary">
+            <div class="dashboard-week-band dashboard-week-band--stats" aria-label="Selected week progress summary">
               <div class="dashboard-week-stat">
                 <span>Days logged</span>
                 <strong id="dashboard-week-logged-days">0 of 0</strong>
@@ -208,7 +193,7 @@
                   <h4 id="dashboard-week-progress-title">Daily progress</h4>
                 </div>
                 <ul class="dashboard-day-list" id="dashboard-week-days">
-                  <li class="empty-state">Create an OJT week, then log each day in Daily Logs.</li>
+                  <li class="empty-state">Create an OJT week, then log each day in Journal.</li>
                 </ul>
               </section>
               <section class="dashboard-week-panel dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
@@ -349,88 +334,142 @@
           </div>
         </section>
 
-                <section class="app-section" id="weeks" aria-labelledby="weeks-title" hidden>
-          <p class="section-kicker">Journal periods</p>
-          <h2 id="weeks-title">Weeks</h2>
-          <p>
-            Weeks organize your Daily Logs and Weekly Preview. Create one week at a time with its number and date range.
-          </p>
+        <section class="app-section" id="journal" aria-labelledby="journal-title" hidden>
+          <p class="section-kicker">Selected-week workspace</p>
+          <h2 id="journal-title">Journal</h2>
+          <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
 
-          <div class="weeks-layout">
-            <form class="profile-form" id="week-form" novalidate>
-              <div class="form-header">
+          <div class="journal-layout">
+            <section class="week-panel journal-toolbar" aria-labelledby="journal-toolbar-title">
+              <div class="panel-header journal-toolbar-header">
                 <div>
-                  <span class="card-label">OJT week</span>
-                  <h3 id="week-form-title">Create week</h3>
+                  <span class="card-label">Selected week</span>
+                  <h3 id="journal-toolbar-title">Journal controls</h3>
                 </div>
-                <p>Match your school journal week number and inclusive dates.</p>
+                <p>Move through saved weeks in chronological order or create a new one.</p>
               </div>
 
-              <input type="hidden" id="week-id">
-              <div class="form-grid">
-                <label class="field">
-                  <span>Week number</span>
-                  <input type="number" id="week-number" min="1" step="1" inputmode="numeric" required>
-                </label>
-                <label class="field">
-                  <span>Inclusive start date</span>
-                  <input type="date" id="inclusive-start-date" required>
-                </label>
-                <label class="field">
-                  <span>Inclusive end date</span>
-                  <input type="date" id="inclusive-end-date" required>
-                </label>
+              <div class="journal-toolbar-controls">
+                <div class="selected-week-navigation" id="journal-week-navigation">
+                  <button class="secondary-button week-step-button" type="button" id="journal-previous-week" aria-label="Select previous older week">Previous</button>
+                  <label class="field journal-week-picker">
+                    <span>Selected OJT week</span>
+                    <select id="journal-week-select"></select>
+                  </label>
+                  <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">Next</button>
+                </div>
+                <div class="journal-toolbar-actions">
+                  <button class="primary-button" type="button" id="journal-new-week">New Week</button>
+                  <button class="secondary-button" type="button" id="journal-all-weeks" aria-controls="all-weeks-panel" aria-expanded="false">All Weeks</button>
+                  <button class="secondary-button" type="button" id="journal-log-today">Log Today</button>
+                </div>
               </div>
+              <p class="form-message" id="journal-message" aria-live="polite" hidden></p>
+            </section>
 
-              <div class="form-actions">
-                <button class="primary-button" type="submit" id="save-week-button">Save week</button>
-                <button class="secondary-button" type="button" id="cancel-week-edit-button" hidden>Cancel edit</button>
-                <p class="form-message" id="week-form-message" hidden></p>
-              </div>
-            </form>
+            <section class="journal-empty-state" id="journal-empty-state" aria-labelledby="journal-empty-title" hidden>
+              <span class="card-label">Start your journal</span>
+              <h3 id="journal-empty-title">Create an OJT week before logging daily records</h3>
+              <p>A week provides the date range used to generate your daily record rows.</p>
+              <button class="primary-button" type="button" id="journal-empty-new-week">New Week</button>
+            </section>
 
-            <section class="week-panel" aria-labelledby="weeks-list-title">
+            <section class="journal-panel" id="week-form-panel" aria-labelledby="week-form-title" hidden>
+              <form class="profile-form" id="week-form" novalidate>
+                <div class="form-header">
+                  <div>
+                    <span class="card-label">OJT week</span>
+                    <h3 id="week-form-title">Create week</h3>
+                  </div>
+                  <p>Match your school journal week number and inclusive dates.</p>
+                </div>
+
+                <input type="hidden" id="week-id">
+                <div class="form-grid">
+                  <label class="field">
+                    <span>Week number</span>
+                    <input type="number" id="week-number" min="1" step="1" inputmode="numeric" required>
+                  </label>
+                  <label class="field">
+                    <span>Inclusive start date</span>
+                    <input type="date" id="inclusive-start-date" required>
+                  </label>
+                  <label class="field">
+                    <span>Inclusive end date</span>
+                    <input type="date" id="inclusive-end-date" required>
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button class="primary-button" type="submit" id="save-week-button">Save week</button>
+                  <button class="secondary-button" type="button" id="cancel-week-edit-button">Cancel</button>
+                  <p class="form-message" id="week-form-message" hidden></p>
+                </div>
+              </form>
+            </section>
+
+            <section class="week-panel journal-history-panel" id="all-weeks-panel" aria-labelledby="weeks-list-title" hidden>
               <div class="panel-header">
                 <div>
-                  <span class="card-label">Saved weeks</span>
-                  <h3 id="weeks-list-title">Weeks list</h3>
+                  <span class="card-label">Journal history</span>
+                  <h3 id="weeks-list-title">All Weeks</h3>
                 </div>
-                <p id="weeks-count-label">No weeks yet — create your first OJT week above.</p>
+                <p id="weeks-count-label">No weeks yet.</p>
               </div>
               <div class="weeks-list" id="weeks-list"></div>
             </section>
 
-            <p class="phase-note weeks-list-note">Expand a saved week to review its days and weekly summary. Log daily work in Daily Logs. Delete daily logs first before removing a week.</p>
-          </div>
-        </section>
-
-        <section class="app-section" id="daily-logs" aria-labelledby="daily-logs-title" hidden>
-          <p class="section-kicker">Daily record keeping</p>
-          <h2 id="daily-logs-title">Daily Logs</h2>
-          <p>
-            Choose a week, open each day, save your rendered time and status, then add task items and photos as needed.
-          </p>
-
-          <div class="daily-logs-layout">
-            <section class="week-panel" aria-labelledby="daily-log-week-title">
-              <div class="panel-header">
-                <div>
-                  <span class="card-label">Week journal</span>
-                  <h3 id="daily-log-week-title">Choose a saved week</h3>
+            <div class="journal-selected-workspace" id="journal-selected-workspace" hidden>
+              <section class="week-panel journal-overview" aria-labelledby="journal-overview-title">
+                <div class="panel-header journal-overview-header">
+                  <div>
+                    <span class="card-label">Selected-week overview</span>
+                    <h3 id="journal-overview-title">No week selected</h3>
+                    <p id="journal-overview-dates"></p>
+                  </div>
+                  <button class="secondary-button" type="button" id="journal-edit-week">Edit Week</button>
                 </div>
-                <p id="daily-log-week-help">Choose a week, then open each day to record your work and rendered hours.</p>
-              </div>
+                <dl class="journal-overview-grid">
+                  <div>
+                    <dt>Rendered total</dt>
+                    <dd id="journal-overview-rendered">0h 0m</dd>
+                  </div>
+                  <div>
+                    <dt>Logged days</dt>
+                    <dd id="journal-overview-logged-days">0 of 0</dd>
+                  </div>
+                  <div>
+                    <dt>Weekly summary</dt>
+                    <dd id="journal-overview-summary-state">Not started</dd>
+                  </div>
+                </dl>
+              </section>
 
-              <label class="field">
-                <span>OJT week</span>
-                <select id="daily-log-week-select"></select>
-              </label>
-              <p class="journal-week-summary" id="daily-log-count-label" aria-live="polite"></p>
-            </section>
+              <section class="week-panel journal-daily-panel" aria-labelledby="journal-daily-records-title">
+                <div class="panel-header">
+                  <div>
+                    <span class="card-label">Daily records</span>
+                    <h3 id="journal-daily-records-title">Selected week days</h3>
+                  </div>
+                  <p id="journal-daily-summary" aria-live="polite"></p>
+                </div>
+                <div class="journal-week-accordions" id="journal-week-accordions" aria-live="polite"></div>
+              </section>
 
-            <div class="journal-week-accordions" id="journal-week-accordions" aria-live="polite"></div>
+              <section class="week-panel journal-summary-panel" aria-labelledby="journal-weekly-summary-title">
+                <div class="panel-header">
+                  <div>
+                    <span class="card-label">Weekly reflection</span>
+                    <h3 id="journal-weekly-summary-title">Weekly summary</h3>
+                  </div>
+                  <p>Save the selected week's required summary fields before previewing your final journal.</p>
+                </div>
+                <div id="journal-weekly-summary"></div>
+              </section>
+            </div>
           </div>
         </section>
+
         <section class="app-section" id="weekly-preview" aria-labelledby="weekly-preview-title" hidden>
           <p class="section-kicker">Prepared journal content</p>
           <h2 id="weekly-preview-title">Weekly Preview</h2>
@@ -553,25 +592,16 @@
         </span>
         <span>Profile</span>
       </button>
-      <button class="nav-button" type="button" data-section="weeks">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5Z"></path>
-            <path d="M8 3.5v3M16 3.5v3M4.5 9h15M8 13h2.5M13.5 13H16M8 16.5h2.5"></path>
-          </svg>
-        </span>
-        <span>Weeks</span>
-      </button>
-      <button class="nav-button" type="button" data-section="daily-logs">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M7.5 4.5h7l3.5 3.5V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19V6a1.5 1.5 0 0 1 1.5-1.5Z"></path>
-            <path d="M14.5 4.5v3.5H18M9 12h6M9 15.5h6"></path>
-          </svg>
-        </span>
-        <span>Daily Logs</span>
-      </button>
-      <button class="nav-button" type="button" data-section="weekly-preview">
+      <button class="nav-button" type="button" data-section="journal">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5Z"></path>
+              <path d="M8 3.5v3M16 3.5v3M4.5 9h15M8 13h2.5M13.5 13H16M8 16.5h2.5"></path>
+            </svg>
+          </span>
+          <span>Journal</span>
+        </button>
+        <button class="nav-button" type="button" data-section="weekly-preview">
         <span class="nav-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false">
             <path d="M5.5 5.5h13v13h-13z"></path>

@@ -240,7 +240,7 @@ h1 {
 }
 
 #dashboard.app-section,
-#daily-logs.app-section,
+#journal.app-section,
 #weekly-preview.app-section {
   max-width: 960px;
 }
@@ -355,7 +355,6 @@ h1 {
   width: 100%;
 }
 
-.mobile-profile-button,
 .mobile-section-tabs {
   display: none;
 }
@@ -409,34 +408,6 @@ h1 {
 
   .menu-button {
     display: none;
-  }
-
-  .mobile-profile-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    min-height: 38px;
-    border-color: var(--accent-soft);
-    background: var(--panel);
-    color: var(--accent);
-    padding: 0;
-  }
-
-  .mobile-profile-button svg {
-    width: 19px;
-    height: 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.9;
-  }
-
-  .mobile-profile-button.is-active {
-    border-color: var(--accent);
-    background: var(--accent-soft);
   }
 
   .mobile-section-tabs {
@@ -1449,6 +1420,165 @@ h1 {
   line-height: 1.25;
 }
 
+.journal-layout,
+.journal-selected-workspace {
+  display: grid;
+  gap: 18px;
+}
+
+.journal-layout {
+  margin-top: 24px;
+}
+
+.journal-toolbar-header {
+  margin-bottom: 14px;
+}
+
+.journal-toolbar-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.selected-week-navigation {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.journal-week-picker {
+  margin: 0;
+}
+
+.journal-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.journal-toolbar-actions .primary-button,
+.journal-toolbar-actions .secondary-button {
+  min-height: 44px;
+}
+
+.journal-toolbar .form-message {
+  margin-top: 12px;
+}
+
+.journal-empty-state {
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.journal-empty-state h3 {
+  margin: 5px 0 6px;
+  font-size: 1.15rem;
+}
+
+.journal-empty-state p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.journal-panel .profile-form {
+  margin: 0;
+}
+
+.journal-overview-header p {
+  margin-top: 5px;
+}
+
+.journal-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.journal-overview-grid div {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  padding: 12px;
+}
+
+.journal-overview-grid dt {
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.journal-overview-grid dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.journal-history-item.is-selected {
+  border-color: var(--accent);
+  background: var(--surface-accent);
+}
+
+.journal-summary-panel .weekly-summary-form {
+  margin-top: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.journal-history-panel[hidden],
+.journal-empty-state[hidden],
+.journal-panel[hidden],
+.journal-selected-workspace[hidden],
+.selected-week-navigation[hidden] {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .journal-layout,
+  .journal-selected-workspace {
+    gap: 14px;
+  }
+
+  .journal-layout {
+    margin-top: 18px;
+  }
+
+  .selected-week-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-week-picker {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .week-step-button {
+    width: 100%;
+  }
+
+  .journal-toolbar-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .journal-toolbar-actions .primary-button,
+  .journal-toolbar-actions .secondary-button,
+  .journal-overview-header .secondary-button,
+  .journal-empty-state .primary-button {
+    width: 100%;
+  }
+
+  .journal-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .weekly-preview-layout {
   display: grid;
   gap: 18px;
@@ -2439,5 +2569,29 @@ body.daily-log-editor-open {
 
   .photo-caption-details summary {
     min-height: 44px;
+  }
+}
+@media (min-width: 761px) and (max-width: 900px) {
+  .dashboard-page-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .dashboard-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .selected-week-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-week-picker {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .week-step-button {
+    width: 100%;
   }
 }

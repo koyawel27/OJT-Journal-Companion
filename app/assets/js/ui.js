@@ -155,7 +155,7 @@
       setText("dashboard-week-logged-days", "0 of 0");
       setText("dashboard-week-worked-days", "0");
       setText("dashboard-week-open-days", "0");
-      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Daily Logs.</li>';
+      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Journal.</li>';
       summaryElement.innerHTML = `
         <li class="is-missing">Skills Learned: missing</li>
         <li class="is-missing">Problems Encountered: missing</li>
@@ -212,7 +212,7 @@
           </li>
         `;
       }).join("")
-      : '<li class="empty-state">This week has no dates saved. Edit the week in Weeks to fix the date range.</li>';
+      : '<li class="empty-state">This week has no dates saved. Edit the week in Journal to fix the date range.</li>';
 
     summaryElement.innerHTML = [
       renderSummaryStatusItem("Skills Learned", week.weeklySkillsLearned),
@@ -353,7 +353,7 @@
     setText("summary-week-count", label);
     setText(
       "summary-week-detail",
-      count > 0 ? "Saved weeks are ready for Daily Logs and Weekly Preview." : "Create your first OJT week before adding daily logs."
+      count > 0 ? "Saved weeks are ready in Journal and Weekly Preview." : "Create your first OJT week in Journal before adding daily records."
     );
     refreshDashboardWeekProgress();
   }
@@ -367,7 +367,7 @@
     setText("summary-daily-log-count", label);
     setText(
       "summary-daily-log-detail",
-      count > 0 ? "Daily logs are grouped by OJT week." : "Create a week first, then log each day in Daily Logs."
+      count > 0 ? "Daily records are grouped by the selected OJT week." : "Create a week in Journal, then log each day."
     );
     updateRenderedProgressSummary();
     refreshDashboardWeekProgress();
@@ -405,8 +405,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     refreshDashboardWeekProgress();
-    document.getElementById("dashboard-go-daily-logs")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("daily-logs");
+    document.getElementById("dashboard-go-journal")?.addEventListener("click", () => {
+      window.OJTApp?.showSection("journal");
     });
     document.getElementById("dashboard-action-weekly-preview")?.addEventListener("click", () => {
       window.OJTApp?.showSection("weekly-preview");

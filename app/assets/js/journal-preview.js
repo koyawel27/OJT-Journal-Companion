@@ -388,7 +388,7 @@
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
+      sortedWeeks.length === 0 ? "Create a week in Journal first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
     );
   }
 
