@@ -928,6 +928,31 @@ h1 {
   background: var(--surface-accent);
 }
 
+.dashboard-day-action {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.48fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-day-action:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-day-action:hover .dashboard-day-main {
+  color: var(--accent);
+}
+
 .dashboard-day-main,
 .dashboard-day-result {
   display: block;
@@ -1490,6 +1515,14 @@ h1 {
 .journal-overview-header p {
   margin-top: 5px;
 }
+
+.journal-overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 
 .journal-overview-grid {
   display: grid;

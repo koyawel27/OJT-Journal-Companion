@@ -722,6 +722,10 @@
     getElement("journal-new-week")?.addEventListener("click", openNewWeekForm);
     getElement("journal-empty-new-week")?.addEventListener("click", openNewWeekForm);
     getElement("journal-edit-week")?.addEventListener("click", () => startEditWeek(getSelectedWeek()));
+    getElement("journal-focus-weekly-summary")?.addEventListener("click", () => {
+      document.dispatchEvent(new CustomEvent("ojt:focus-weekly-summary", { detail: { source: "journal" } }));
+    });
+    getElement("journal-open-preview")?.addEventListener("click", () => window.OJTApp?.showSection("weekly-preview"));
     getElement("journal-all-weeks")?.addEventListener("click", toggleHistory);
     getElement("journal-log-today")?.addEventListener("click", logToday);
     getElement("journal-previous-week")?.addEventListener("click", () => selectAdjacentWeek("previous"));
@@ -764,11 +768,34 @@
     }
   });
 
+  function focusWeeklySummary() {
+    const journalSection = getElement("journal");
+    if (!journalSection?.classList.contains("is-visible")) {
+      window.OJTApp?.showSection("journal");
+    }
+
+    const week = getSelectedWeek();
+    if (!week) {
+      window.OJTUI.showFormMessage(getElement("journal-message"), "Create or select a week before editing its weekly summary.", "info");
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      const summaryPanel = getElement("journal-weekly-summary");
+      const firstField = summaryPanel?.querySelector("textarea");
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      summaryPanel?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      firstField?.focus();
+    });
+  }
+
+  document.addEventListener("ojt:focus-weekly-summary", focusWeeklySummary);
+  document.addEventListener("ojt:log-today", logToday);
   document.addEventListener("ojt:daily-log-data-change", refreshJournalContextData);
 
   document.addEventListener("ojt:section-change", (event) => {
     if (event.detail?.sectionId === "journal") {
-      loadJournalData();
+      refreshJournalContextData();
     }
   });
 })();

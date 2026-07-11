@@ -26,7 +26,7 @@
       <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Home</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="profile">Profile</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="journal">Journal</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview &amp; Export</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="backup">Backup</button>
     </nav>
 
@@ -66,7 +66,7 @@
               <path d="M8.5 9h7M8.5 12h7M8.5 15h4"></path>
             </svg>
           </span>
-          <span>Weekly Preview</span>
+          <span>Preview &amp; Export</span>
         </button>
         <button class="nav-button" type="button" data-section="backup">
           <span class="nav-icon" aria-hidden="true">
@@ -91,7 +91,9 @@
             </div>
             <div class="dashboard-actions" aria-label="Quick actions">
               <button class="primary-button dashboard-action-primary" type="button" id="dashboard-go-journal">Open Journal</button>
-              <button class="secondary-button" type="button" id="dashboard-action-weekly-preview">Open Weekly Preview</button>
+              <button class="secondary-button" type="button" id="dashboard-log-today">Log Today</button>
+              <button class="secondary-button" type="button" id="dashboard-edit-weekly-summary" disabled>Edit weekly summary</button>
+              <button class="secondary-button" type="button" id="dashboard-action-weekly-preview">Preview &amp; Export</button>
               <button class="secondary-button dashboard-action-backup" type="button" id="dashboard-action-backup" hidden>Go to Backup</button>
             </div>
           </header>
@@ -427,7 +429,11 @@
                     <h3 id="journal-overview-title">No week selected</h3>
                     <p id="journal-overview-dates"></p>
                   </div>
-                  <button class="secondary-button" type="button" id="journal-edit-week">Edit Week</button>
+                  <div class="journal-overview-actions">
+                    <button class="secondary-button" type="button" id="journal-edit-week">Edit Week</button>
+                    <button class="secondary-button" type="button" id="journal-focus-weekly-summary">Edit weekly summary</button>
+                    <button class="secondary-button" type="button" id="journal-open-preview">Preview &amp; Export</button>
+                  </div>
                 </div>
                 <dl class="journal-overview-grid">
                   <div>
@@ -462,7 +468,7 @@
                     <span class="card-label">Weekly reflection</span>
                     <h3 id="journal-weekly-summary-title">Weekly summary</h3>
                   </div>
-                  <p>Save the selected week's required summary fields before previewing your final journal.</p>
+                  <p>Save the selected week's summary before Preview &amp; Export can reflect your latest changes.</p>
                 </div>
                 <div id="journal-weekly-summary"></div>
               </section>
@@ -472,9 +478,9 @@
 
         <section class="app-section" id="weekly-preview" aria-labelledby="weekly-preview-title" hidden>
           <p class="section-kicker">Prepared journal content</p>
-          <h2 id="weekly-preview-title">Weekly Preview</h2>
+          <h2 id="weekly-preview-title">Preview &amp; Export</h2>
           <p>
-            Pick a saved week to preview your journal, then copy the text into your official school template.
+            Pick a saved week to review, copy, or export your journal. Save summary changes in Journal first.
           </p>
 
           <div class="weekly-preview-layout">
@@ -484,7 +490,7 @@
                   <span class="card-label">Weekly journal</span>
                   <h3 id="weekly-preview-controls-title">Choose a saved week</h3>
                 </div>
-                <p id="weekly-preview-help">Choose a week to preview, then copy the journal text.</p>
+                <p id="weekly-preview-help">Choose a week to preview, copy, or export the journal.</p>
               </div>
 
               <label class="field">
@@ -493,6 +499,7 @@
               </label>
 
               <div class="form-actions weekly-preview-actions">
+                <button class="secondary-button" type="button" id="preview-edit-selected-week">Edit selected week in Journal</button>
                 <button class="primary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
                 <button class="secondary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" disabled>Export Official DOCX</button>
                 <p class="form-message" id="weekly-preview-message" hidden></p>
@@ -608,7 +615,7 @@
             <path d="M8.5 9h7M8.5 12h7M8.5 15h4"></path>
           </svg>
         </span>
-        <span>Weekly Preview</span>
+        <span>Preview &amp; Export</span>
       </button>
       <button class="nav-button" type="button" data-section="backup">
         <span class="nav-icon" aria-hidden="true">

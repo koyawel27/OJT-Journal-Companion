@@ -298,7 +298,7 @@
     }
 
     if (!week) {
-      output.innerHTML = '<p class="empty-state">Choose a saved week to preview your weekly journal.</p>';
+      output.innerHTML = '<p class="empty-state">Choose a saved week to preview and export your journal.</p>';
       copyButton.disabled = true;
       if (exportButton) {
         exportButton.disabled = true;
@@ -360,6 +360,15 @@
     `;
   }
 
+  function updateJournalHandoff(hasWeek) {
+    const button = getElement("preview-edit-selected-week");
+    if (!button) {
+      return;
+    }
+
+    button.textContent = hasWeek ? "Edit selected week in Journal" : "Open Journal to create a week";
+  }
+
   function setWeekOptions() {
     const select = getElement("weekly-preview-week-select");
     const sortedWeeks = sortWeeks(state.weeks);
@@ -388,8 +397,9 @@
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week in Journal first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
+      sortedWeeks.length === 0 ? "Create a week in Journal first, then return here to preview and export." : "Choose a week to preview, copy, or export the journal."
     );
+    updateJournalHandoff(sortedWeeks.length > 0);
   }
 
   async function copyTextToClipboard(text) {
@@ -505,6 +515,7 @@
       window.OJTSelectedWeek?.selectWeek(event.target.value, { weeks: state.weeks, source: "weekly-preview" });
     });
 
+    getElement("preview-edit-selected-week")?.addEventListener("click", () => window.OJTApp?.showSection("journal"));
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
     getElement("export-official-docx-button")?.addEventListener("click", exportOfficialDocx);
   }
