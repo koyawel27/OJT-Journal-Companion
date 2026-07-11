@@ -7,8 +7,8 @@ const directImageTypes = {
   "image/jpeg": ".jpg",
   "image/png": ".png"
 };
-const maxImageWidthCm = 13.2;
-const maxImageHeightCm = 10.5;
+const landscapeImageBoundsCm = { width: 13.2, height: 7.4 };
+const portraitImageBoundsCm = { width: 9.4, height: 10.2 };
 
 function createExportError(message, cause) {
   const error = new Error(message);
@@ -184,7 +184,8 @@ async function prepareImageBlob(photo) {
 function fitImage(widthPx, heightPx) {
   const naturalWidthCm = (widthPx / 96) * 2.54;
   const naturalHeightCm = (heightPx / 96) * 2.54;
-  const scale = Math.min(1, maxImageWidthCm / naturalWidthCm, maxImageHeightCm / naturalHeightCm);
+  const bounds = heightPx > widthPx ? portraitImageBoundsCm : landscapeImageBoundsCm;
+  const scale = Math.min(1, bounds.width / naturalWidthCm, bounds.height / naturalHeightCm);
 
   return {
     width: Number((naturalWidthCm * scale).toFixed(2)),
