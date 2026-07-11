@@ -186,7 +186,7 @@
   }
 
   function sortWeeks(weeks) {
-    return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
+    return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
   function sortDailyLogs(logs) {
@@ -275,7 +275,8 @@
 
   function selectWeek(weekId) {
     window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
-    state.selectedWeekId = weekId || "";
+    window.OJTSelectedWeek?.selectWeek(weekId, { weeks: state.weeks, source: "daily-logs" });
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || "";
     state.expandedDate = null;
     state.activeDailyLogId = null;
     setValue("daily-log-week-select", state.selectedWeekId);
@@ -1188,9 +1189,7 @@
       state.dailyTasks = dailyTasks;
       state.photoAttachments = photoAttachments;
 
-      if (!state.selectedWeekId || !state.weeks.some((week) => week.id === state.selectedWeekId)) {
-        state.selectedWeekId = sortWeeks(weeks)[0]?.id || "";
-      }
+      state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || "";
 
       renderWeekSelectors();
       renderJournalWeek();
@@ -1246,6 +1245,18 @@
     loadDailyLogData();
   });
 
+  document.addEventListener("ojt:selected-week-change", (event) => {
+    const weekId = event.detail?.weekId || "";
+    if (event.detail?.source === "weeks:delete" || (weekId && !state.weeks.some((week) => week.id === weekId))) {
+      loadDailyLogData();
+      return;
+    }
+    state.selectedWeekId = weekId;
+    renderWeekSelectors();
+    renderJournalWeek();
+    updateWeekSummary();
+  });
+
   document.addEventListener("ojt:section-change", (event) => {
     if (event.detail?.sectionId === "daily-logs") {
       loadDailyLogData();
@@ -1262,7 +1273,7 @@
     await loadDailyLogData();
 
     if (detail.weekId) {
-      state.selectedWeekId = detail.weekId;
+      selectWeek(detail.weekId);
       setValue("daily-log-week-select", state.selectedWeekId);
     }
 

@@ -103,25 +103,7 @@
   }
 
   function chooseCurrentWeek(weeks) {
-    const today = todayText();
-    const containingWeek = (weeks || []).find((week) => {
-      return week.inclusiveStartDate <= today && week.inclusiveEndDate >= today;
-    });
-
-    if (containingWeek) {
-      return containingWeek;
-    }
-
-    return [...(weeks || [])].sort((first, second) => {
-      const firstNumber = Number(first.weekNumber);
-      const secondNumber = Number(second.weekNumber);
-
-      if (Number.isFinite(firstNumber) && Number.isFinite(secondNumber) && firstNumber !== secondNumber) {
-        return secondNumber - firstNumber;
-      }
-
-      return String(second.inclusiveStartDate || "").localeCompare(String(first.inclusiveStartDate || ""));
-    })[0] || null;
+    return window.OJTSelectedWeek?.getSelectedWeek(weeks) || null;
   }
 
   function getLogsForWeek(weekId) {
@@ -256,6 +238,7 @@
       dashboardState.weeks = weeks || [];
       dashboardState.dailyLogs = dailyLogs || [];
       dashboardState.dailyTasks = dailyTasks || [];
+      window.OJTSelectedWeek?.initialize(dashboardState.weeks);
       renderDashboardWeekProgress();
       updateRenderedProgressSummary();
     } catch (error) {
@@ -414,6 +397,10 @@
     if (event.detail?.sectionId === "dashboard") {
       refreshDashboardWeekProgress();
     }
+  });
+
+  document.addEventListener("ojt:selected-week-change", () => {
+    refreshDashboardWeekProgress();
   });
 
   document.addEventListener("DOMContentLoaded", () => {

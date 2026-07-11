@@ -31,7 +31,7 @@
   }
 
   function sortWeeks(weeks) {
-    return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
+    return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
   function getSelectedWeek() {
@@ -373,16 +373,16 @@
     sortedWeeks.forEach((week) => {
       const option = document.createElement("option");
       option.value = week.id;
-      option.textContent = `Week ${week.weekNumber} (${week.inclusiveStartDate} to ${week.inclusiveEndDate})`;
+      option.textContent = "Week " + week.weekNumber + " (" + week.inclusiveStartDate + " to " + week.inclusiveEndDate + ")";
       select.appendChild(option);
     });
 
     select.disabled = sortedWeeks.length === 0;
 
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || "";
     if (state.selectedWeekId && sortedWeeks.some((week) => week.id === state.selectedWeekId)) {
       select.value = state.selectedWeekId;
     } else {
-      state.selectedWeekId = "";
       select.value = "";
     }
 
@@ -459,7 +459,7 @@
         exportButton.textContent = "Exporting DOCX...";
       }
 
-      await window.OJTDocxExportV2.exportWeekById(state.selectedWeekId);
+      await window.OJTDocxExportV2.exportWeekById(window.OJTSelectedWeek?.getSelectedWeekId() || state.selectedWeekId);
       window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");
@@ -487,6 +487,7 @@
       state.weeks = weeks;
       state.dailyLogs = dailyLogs;
       state.dailyTasks = dailyTasks;
+      state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || "";
 
       setWeekOptions();
       renderPreview();
@@ -501,8 +502,7 @@
 
   function bindPreviewEvents() {
     getElement("weekly-preview-week-select")?.addEventListener("change", (event) => {
-      state.selectedWeekId = event.target.value;
-      renderPreview();
+      window.OJTSelectedWeek?.selectWeek(event.target.value, { weeks: state.weeks, source: "weekly-preview" });
     });
 
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
@@ -512,6 +512,17 @@
   document.addEventListener("DOMContentLoaded", () => {
     bindPreviewEvents();
     loadPreviewData();
+  });
+
+  document.addEventListener("ojt:selected-week-change", (event) => {
+    const weekId = event.detail?.weekId || "";
+    if (event.detail?.source === "weeks:delete" || (weekId && !state.weeks.some((week) => week.id === weekId))) {
+      loadPreviewData();
+      return;
+    }
+    state.selectedWeekId = weekId;
+    setWeekOptions();
+    renderPreview();
   });
 
   document.addEventListener("ojt:section-change", (event) => {

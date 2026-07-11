@@ -3,7 +3,8 @@
     weeks: [],
     dailyLogs: [],
     dailyTasks: [],
-    selectedWeekId: null
+    selectedWeekId: null,
+    expandedWeekId: null
   };
 
   function getElement(id) {
@@ -80,7 +81,7 @@
   }
 
   function sortWeeks(weeks) {
-    return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
+    return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
   function getCurrentWeek() {
@@ -297,7 +298,7 @@
     }
 
     sortedWeeks.forEach((week) => {
-      const isExpanded = state.selectedWeekId === week.id;
+      const isExpanded = state.expandedWeekId === week.id;
       const detailButtonLabel = isExpanded ? "Collapse" : "View";
       const logCount = state.dailyLogs.filter((log) => log.weekId === week.id).length;
       const weeklyRenderedMinutes = getWeekRenderedMinutes(week.id);
@@ -326,12 +327,14 @@
   }
 
   function showWeekDetail(week) {
-    state.selectedWeekId = week.id;
+    window.OJTSelectedWeek?.selectWeek(week.id, { weeks: state.weeks, source: "weeks:view" });
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || week.id;
+    state.expandedWeekId = week.id;
     renderWeeksList();
   }
 
   function hideWeekDetail() {
-    state.selectedWeekId = null;
+    state.expandedWeekId = null;
     renderWeeksList();
   }
 
@@ -365,17 +368,29 @@
       return;
     }
 
-    const confirmed = window.confirm(`Delete Week ${week.weekNumber}? This only removes the week record — it cannot be undone.`);
+    const confirmed = window.confirm("Delete Week " + week.weekNumber + "? This only removes the week record — it cannot be undone.");
 
     if (!confirmed) {
       return;
     }
 
     try {
+      const wasSelected = window.OJTSelectedWeek?.getSelectedWeekId() === week.id;
+      const previousWeek = window.OJTSelectedWeek?.getPreviousWeek(state.weeks, week.id);
+      const nextWeek = window.OJTSelectedWeek?.getNextWeek(state.weeks, week.id);
       await window.OJTStorage.deleteWeek(week.id);
       state.weeks = state.weeks.filter((savedWeek) => savedWeek.id !== week.id);
-      if (state.selectedWeekId === week.id) {
-        hideWeekDetail();
+      if (state.expandedWeekId === week.id) {
+        state.expandedWeekId = null;
+      }
+      if (wasSelected) {
+        const fallbackWeek = state.weeks.find((savedWeek) => savedWeek.id === previousWeek?.id) ||
+          state.weeks.find((savedWeek) => savedWeek.id === nextWeek?.id) || null;
+        if (fallbackWeek) {
+          window.OJTSelectedWeek?.selectWeek(fallbackWeek.id, { weeks: state.weeks, source: "weeks:delete" });
+        } else {
+          window.OJTSelectedWeek?.clearSelection({ weeks: state.weeks, source: "weeks:delete" });
+        }
       } else {
         renderWeeksList();
       }
@@ -392,6 +407,7 @@
     const messageElement = getElement("week-form-message");
     window.OJTUI.clearFormMessage(messageElement);
 
+    const isNewWeek = !getValue("week-id");
     const weekRecord = buildWeekRecord();
     const validationMessage = validateWeek(weekRecord);
 
@@ -403,12 +419,14 @@
     try {
       const savedWeek = await window.OJTStorage.saveWeek(weekRecord);
       state.weeks = state.weeks.filter((week) => week.id !== savedWeek.id).concat(savedWeek);
-      window.OJTUI.updateWeeksSummary(state.weeks);
-      if (state.selectedWeekId === savedWeek.id) {
-        showWeekDetail(savedWeek);
+      if (isNewWeek || window.OJTSelectedWeek?.getSelectedWeekId() === savedWeek.id) {
+        window.OJTSelectedWeek?.selectWeek(savedWeek.id, { weeks: state.weeks, source: isNewWeek ? "weeks:new-week" : "weeks:edit" });
       } else {
-        renderWeeksList();
+        window.OJTSelectedWeek?.initialize(state.weeks);
       }
+      state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || null;
+      window.OJTUI.updateWeeksSummary(state.weeks);
+      renderWeeksList();
       resetWeekForm();
       window.OJTUI.showFormMessage(messageElement, "Week saved.", "success");
     } catch (error) {
@@ -451,7 +469,9 @@
     try {
       const savedWeek = await window.OJTStorage.saveWeek(summaryRecord);
       state.weeks = state.weeks.filter((week) => week.id !== savedWeek.id).concat(savedWeek);
-      state.selectedWeekId = savedWeek.id;
+      window.OJTSelectedWeek?.selectWeek(savedWeek.id, { weeks: state.weeks, source: "weeks:summary" });
+      state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || savedWeek.id;
+      state.expandedWeekId = savedWeek.id;
       renderWeeksList();
       window.OJTUI.updateWeeksSummary(state.weeks);
       window.OJTUI.showFormMessage(getElement("weekly-summary-message"), "Weekly summary saved.", "success");
@@ -517,6 +537,7 @@
       state.weeks = weeks;
       state.dailyLogs = dailyLogs;
       state.dailyTasks = dailyTasks;
+      state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || null;
       renderWeeksList();
       window.OJTUI.updateWeeksSummary(state.weeks);
     } catch (error) {
@@ -540,6 +561,14 @@
   document.addEventListener("DOMContentLoaded", () => {
     bindWeekEvents();
     loadWeeks();
+  });
+
+  document.addEventListener("ojt:selected-week-change", (event) => {
+    state.selectedWeekId = event.detail?.weekId || null;
+    if (state.selectedWeekId && state.weeks.some((week) => week.id === state.selectedWeekId)) {
+      state.expandedWeekId = state.selectedWeekId;
+    }
+    renderWeeksList();
   });
 
   document.addEventListener("ojt:section-change", (event) => {
