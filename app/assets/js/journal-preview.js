@@ -450,8 +450,8 @@
     const originalButtonText = exportButton?.textContent || "Export Official DOCX";
 
     try {
-      if (!window.OJTDocxExport?.exportPayload) {
-        throw new Error("DOCX export module is not loaded.");
+      if (!window.OJTDocxExportV2?.exportPayload) {
+        throw new Error("DOCX v2 export module is not loaded.");
       }
 
       if (exportButton) {
@@ -459,7 +459,7 @@
         exportButton.textContent = "Exporting DOCX...";
       }
 
-      await window.OJTDocxExport.exportPayload(state.currentPayload);
+      await window.OJTDocxExportV2.exportWeekById(state.selectedWeekId);
       window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");

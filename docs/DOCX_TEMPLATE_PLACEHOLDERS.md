@@ -1,61 +1,83 @@
-# DOCX Template Placeholders
+# Active DOCX v2 Template Contract
 
-This document lists the placeholders used by the DOCX export templates.
+## Active engine and template paths
 
-Current implementation: `app/assets/js/docx-export.js` builds the template data, and `app/assets/js/journal-payload.js` builds the shared day/accomplishment payload.
-
-## Template Files
+The sole production engine is **docx-templates 4.15.0**, loaded from the locally vendored browser bundle.
 
 | Path | Purpose | Git status |
 | --- | --- | --- |
-| `app/assets/templates/bpc-ojt-weekly-journal.docx` | Sanitized public template committed to the repository. It preserves an official-like weekly journal structure without restricted BPC branding, logos, or private institutional content. | Tracked |
-| `app/assets/templates/bpc-ojt-weekly-journal.private.docx` | Optional local real official template for private use on the maintainer's machine. | Gitignored |
+| app/assets/templates/bpc-ojt-weekly-journal.v2.docx | Sanitized v2 template and public fallback. | Tracked |
+| app/assets/templates/bpc-ojt-weekly-journal.private.v2.docx | Optional approved official v2 template for local use. | Ignored |
 
-The export engine tries the private official template first. If that file is missing or returns `404`, it falls back to the sanitized public template.
+The exporter loads the private v2 template first and falls back to the sanitized v2 template only when the private file returns HTTP 404.
 
-Do not commit the private official template unless public sharing is explicitly confirmed.
+The private official template is ignored. Never stage or commit it. The old v1 template and its Docxtemplater syntax are no longer production contracts.
 
-## Header Fields
+## Command syntax
 
-| Placeholder | Source |
+Active templates use docx-templates commands delimited by +++.
+
+### Journal fields
+
+| Template command | Data field |
 | --- | --- |
-| `{studentName}` | `StudentProfile.studentName` |
-| `{companyName}` | `CompanyProfile.companyName` |
-| `{weekNumberDisplay}` | Derived from `OJTWeek.weekNumber`, such as `#1` |
-| `{inclusiveDatesDisplay}` | `OJTWeek.inclusiveStartDate` to `OJTWeek.inclusiveEndDate` |
+| +++studentName+++ | StudentProfile studentName |
+| +++companyName+++ | CompanyProfile companyName |
+| +++weekNumberDisplay+++ | Display derived from OJTWeek weekNumber |
+| +++inclusiveDatesDisplay+++ | Selected week inclusive start and end dates |
+| +++totalRenderedDisplay+++ | Sum of related DailyLog renderedMinutes |
+| +++weeklySkillsLearned+++ | OJTWeek weeklySkillsLearned |
+| +++problemsEncountered+++ | OJTWeek problemsEncountered |
+| +++reflectionOrPointsOfLearning+++ | OJTWeek reflectionOrPointsOfLearning |
 
-## Daily Accomplishments Loop
+### Dynamic daily rows
 
-The template uses a docxtemplater loop around one table row:
+~~~text
++++FOR day IN days+++
++++$day.dayLabel+++
++++$day.docxAccomplishmentText+++
++++END-FOR day+++
+~~~
 
-```text
-{#days}
-{dayLabel}
-{docxAccomplishmentText}
-{/days}
-```
+Each day object has a date-inclusive label such as Day 1 July 7, 2026. Accomplishment text contains the task description, optional task duration, and status. Task duration never changes rendered-hours calculations.
 
-| Placeholder | Source |
-| --- | --- |
-| `{dayLabel}` | DOCX display label built from the derived day label and selected week date, such as `Day 1 July 7, 2026` |
-| `{docxAccomplishmentText}` | Accomplishment text from the shared journal payload, with worked-day task lines formatted as description, optional duration, and status |
+### Conditional photo appendix
 
-`dayLabel` is date-inclusive only in the DOCX template data. Weekly Preview and Copy Weekly Journal keep their existing date display/output.
+~~~text
++++IF hasPhotos+++
+  [appendix page break and Photo Documentation heading]
++++END-IF+++
 
-`docxAccomplishmentText` includes worked-day task lines as `• description (optional duration) - status`, such as `• Bible Reading & Devotion (30m) - Completed`. Task duration may appear because it is documentation text, but it must not affect rendered hours.
++++FOR group IN photoDays+++
++++$group.dayLabel+++
++++FOR row IN $group.photoRows+++
++++IMAGE getImage($row.leftPhoto)+++
++++$row.leftPhoto.captionDisplay+++
++++IMAGE getImage($row.rightPhoto)+++
++++$row.rightPhoto.captionDisplay+++
++++END-FOR row+++
++++END-FOR group+++
+~~~
 
-## Summary Fields
+hasPhotos is true only when selected-week photos exist. The conditional includes the appendix page break, so a no-photo export has no heading, no photo grid, and no generated photo media.
 
-| Placeholder | Source |
-| --- | --- |
-| `{totalRenderedDisplay}` | Sum of related `DailyLog.renderedMinutes`, formatted with `OJTCalculations.formatRenderedTime()` |
-| `{weeklySkillsLearned}` | `OJTWeek.weeklySkillsLearned` |
-| `{problemsEncountered}` | `OJTWeek.problemsEncountered` |
-| `{reflectionOrPointsOfLearning}` | `OJTWeek.reflectionOrPointsOfLearning` |
+Each photo-day group represents one selected-week DailyLog and its date. photoRows pairs prepared photos into left and right table-cell values. Each photo exposes image data plus captionDisplay. An odd final row uses a deliberately tiny placeholder image in the right cell so the cell remains structurally present but visually empty.
 
-## Intentional Exclusions
+## Layout and image rules
 
-- Photos are not included.
-- Time in, time out, and break columns are not included.
-- Task status is included in DOCX accomplishment text for worked-day task lines, but it remains personal tracking and is not supervisor approval, official validation, grading, or a signature.
-- Signature lines remain blank.
+- The photo appendix follows the journal and blank signature section.
+- Day headings use keep-with-next behavior.
+- Photo rows are non-splittable; an image and caption remain in the same table cell.
+- Landscape and square images are bounded at 7.2 by 5.4 cm.
+- Portrait images are bounded at 6.8 by 8.5 cm.
+- Aspect ratio is preserved; images are not cropped, stretched, or upscaled.
+- JPEG and PNG are inserted directly. WebP is converted temporarily to PNG without modifying the stored Blob.
+- Captions are optional and long captions wrap naturally.
+
+## Template authoring and security requirements
+
+The template must remain developer-controlled. Users must not upload executable DOCX templates.
+
+docx-templates evaluates template commands in its sandbox. Do not set noSandbox: true. The document body must retain the WordprocessingDrawing namespace needed for IMAGE commands.
+
+The private and sanitized templates must use the same active v2 command contract. Do not mix the retired v1 brace placeholders such as {studentName}, {#days}, or {/days} with +++ commands.
