@@ -23,11 +23,10 @@
       </div>
     </header>
     <nav class="mobile-section-tabs" aria-label="Primary mobile navigation">
-      <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Home</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="profile">Profile</button>
+      <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Dashboard</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="journal">Journal</button>
       <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview &amp; Export</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="backup">Backup</button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="settings">Settings</button>
     </nav>
 
     <div class="app-layout">
@@ -40,15 +39,6 @@
             </svg>
           </span>
           <span>Dashboard</span>
-        </button>
-        <button class="nav-button" type="button" data-section="profile">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
-              <path d="M5 20a7 7 0 0 1 14 0"></path>
-            </svg>
-          </span>
-          <span>Profile</span>
         </button>
         <button class="nav-button" type="button" data-section="journal">
           <span class="nav-icon" aria-hidden="true">
@@ -68,14 +58,14 @@
           </span>
           <span>Preview &amp; Export</span>
         </button>
-        <button class="nav-button" type="button" data-section="backup">
+        <button class="nav-button" type="button" data-section="settings">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M6 9.5a5.5 5.5 0 0 1 10.7-1.8A4.3 4.3 0 0 1 18 16H8a4 4 0 0 1-2-7.5Z"></path>
-              <path d="M12 12v6M9.5 15.5 12 18l2.5-2.5"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"></path>
             </svg>
           </span>
-          <span>Backup</span>
+          <span>Settings</span>
         </button>
       </nav>
 
@@ -94,7 +84,7 @@
               <button class="secondary-button" type="button" id="dashboard-log-today">Log Today</button>
               <button class="secondary-button" type="button" id="dashboard-edit-weekly-summary" disabled>Edit weekly summary</button>
               <button class="secondary-button" type="button" id="dashboard-action-weekly-preview">Preview &amp; Export</button>
-              <button class="secondary-button dashboard-action-backup" type="button" id="dashboard-action-backup" hidden>Go to Backup</button>
+              <button class="secondary-button dashboard-action-backup" type="button" id="dashboard-action-backup" hidden>Data &amp; Recovery</button>
             </div>
           </header>
 
@@ -102,7 +92,7 @@
             <p class="reminder-text">
               <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal lives only in this browser — export a copy to keep it safe.
             </p>
-            <button class="primary-button" type="button" onclick="window.OJTApp.showSection('backup')">Go to Backup</button>
+            <button class="primary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
           </div>
 
           <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title" aria-live="polite">
@@ -140,7 +130,7 @@
               </div>
             </dl>
             <p class="dashboard-ojt-empty" id="dashboard-ojt-empty">
-              Add your required OJT hours in Profile to track overall progress here.
+              Add your required OJT hours in Settings to track overall progress here.
             </p>
           </section>
 
@@ -150,12 +140,12 @@
               <article class="summary-card summary-card--identity">
                 <span class="card-label">Student</span>
                 <strong id="summary-student-name">Not set yet</strong>
-                <p id="summary-student-detail">Add your student details in Profile so they appear on your journal.</p>
+                <p id="summary-student-detail">Add your student details in Settings so they appear on your journal.</p>
               </article>
               <article class="summary-card summary-card--identity">
                 <span class="card-label">Company</span>
                 <strong id="summary-company-name">Not set yet</strong>
-                <p id="summary-company-detail">Add your company details in Profile so they appear on your weekly journal preview.</p>
+                <p id="summary-company-detail">Add your company details in Settings so they appear on your weekly journal preview.</p>
               </article>
             </div>
           </section>
@@ -213,15 +203,22 @@
           </section>
         </section>
 
-                <section class="app-section" id="profile" aria-labelledby="profile-title" hidden>
-          <p class="section-kicker">Student, company, and settings</p>
-          <h2 id="profile-title">Profile</h2>
+        <section class="app-section" id="settings" aria-labelledby="settings-title" hidden>
+          <p class="section-kicker">Profile, preferences, and recovery</p>
+          <h2 id="settings-title">Settings</h2>
           <p>
-            Set up your student info, company placement, and app preferences. These details appear on your weekly journal preview and help track your OJT progress.
+            Manage the details used in your journal, app preferences, and local backup and recovery tools.
           </p>
 
-          <div class="form-stack">
-            <form class="profile-form" id="student-profile-form" novalidate>
+          <nav class="settings-tabs" aria-label="Settings areas" role="tablist">
+            <button class="settings-tab" type="button" role="tab" id="settings-tab-student" data-settings-tab="student" aria-controls="settings-panel-student" aria-selected="true">Student details</button>
+            <button class="settings-tab" type="button" role="tab" id="settings-tab-company" data-settings-tab="company" aria-controls="settings-panel-company" aria-selected="false" tabindex="-1">Company / OJT placement</button>
+            <button class="settings-tab" type="button" role="tab" id="settings-tab-preferences" data-settings-tab="preferences" aria-controls="settings-panel-preferences" aria-selected="false" tabindex="-1">App preferences</button>
+            <button class="settings-tab" type="button" role="tab" id="settings-tab-recovery" data-settings-tab="recovery" aria-selected="false" tabindex="-1" aria-controls="settings-panel-recovery">Data &amp; Recovery</button>
+          </nav>
+
+          <div class="form-stack settings-stack">
+            <section class="settings-panel" id="settings-panel-student" role="tabpanel" aria-labelledby="settings-tab-student"><form class="profile-form settings-area" id="student-profile-form" novalidate>
               <div class="form-header">
                 <div>
                   <span class="card-label">Student profile</span>
@@ -257,9 +254,9 @@
                 <button class="primary-button" type="submit">Save student profile</button>
                 <p class="form-message" id="student-profile-message" hidden></p>
               </div>
-            </form>
+            </form></section>
 
-            <form class="profile-form" id="company-profile-form" novalidate>
+            <section class="settings-panel" id="settings-panel-company" role="tabpanel" aria-labelledby="settings-tab-company" hidden><form class="profile-form settings-area" id="company-profile-form" novalidate>
               <div class="form-header">
                 <div>
                   <span class="card-label">Company profile</span>
@@ -295,13 +292,13 @@
                 <button class="primary-button" type="submit">Save company profile</button>
                 <p class="form-message" id="company-profile-message" hidden></p>
               </div>
-            </form>
+            </form></section>
 
-            <form class="profile-form" id="app-settings-form" novalidate>
+            <section class="settings-panel" id="settings-panel-preferences" role="tabpanel" aria-labelledby="settings-tab-preferences" hidden><form class="profile-form settings-area" id="app-settings-form" novalidate>
               <div class="form-header">
                 <div>
-                  <span class="card-label">Settings</span>
-                  <h3>Simple preferences</h3>
+                  <span class="card-label">App preferences</span>
+                  <h3>Journal preferences</h3>
                 </div>
                 <p>Small defaults for how weeks and times are shown in the app.</p>
               </div>
@@ -332,9 +329,58 @@
                 <button class="primary-button" type="submit">Save settings</button>
                 <p class="form-message" id="app-settings-message" hidden></p>
               </div>
-            </form>
+            </form></section>
           </div>
-        </section>
+
+          <section class="settings-panel" id="settings-panel-recovery" role="tabpanel" aria-labelledby="settings-tab-recovery" hidden><section class="settings-area settings-recovery" id="settings-recovery" aria-labelledby="settings-recovery-title">
+            <header class="settings-area-header">
+              <span class="card-label">Data &amp; Recovery</span>
+              <h3 id="settings-recovery-title">Backup, restore, and reset</h3>
+              <p>Your journal is stored only in this browser. Export a backup before clearing browser data or switching devices.</p>
+            </header>
+
+          <div class="backup-grid">
+            <section class="backup-panel" aria-labelledby="export-backup-title">
+              <span class="card-label">Export</span>
+              <h3 id="export-backup-title">Save a JSON backup</h3>
+              <p>Download a JSON file with all your journal data, including photos.</p>
+              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
+            </section>
+
+            <section class="backup-panel" aria-labelledby="restore-backup-title">
+              <span class="card-label">Restore</span>
+              <h3 id="restore-backup-title">Restore from JSON</h3>
+              <p>Replace everything in this browser with a backup file. Restore does not merge — it overwrites your current data.</p>
+              <label class="field">
+                <span>Backup file</span>
+                <input type="file" id="restore-backup-file" accept="application/json,.json">
+              </label>
+            </section>
+          </div>
+
+          <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
+            <span class="card-label">Danger zone</span>
+            <h3 id="reset-local-data-title">Reset Local App Data</h3>
+            <p>
+              Your journal lives only in this browser. Reset permanently removes all local OJT data — profile, weeks, daily logs, tasks, photos, and settings. Export a backup first if you may need it later.
+            </p>
+
+            <label class="reset-confirm-field" for="reset-confirm-checkbox">
+              <input type="checkbox" id="reset-confirm-checkbox">
+              <span>I understand this will permanently delete my local OJT journal data from this browser.</span>
+            </label>
+
+            <label class="field">
+              <span>Type RESET to confirm</span>
+              <input type="text" id="reset-confirm-text" autocomplete="off" spellcheck="false" inputmode="text" placeholder="RESET">
+            </label>
+
+            <button class="danger-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
+          </section>
+
+          <p class="form-message" id="backup-message" hidden></p>
+          </section>
+        </section></section>
 
         <section class="app-section" id="journal" aria-labelledby="journal-title" hidden>
           <p class="section-kicker">Selected-week workspace</p>
@@ -344,19 +390,15 @@
           <div class="journal-layout">
             <section class="week-panel journal-toolbar" aria-labelledby="journal-toolbar-title">
               <div class="panel-header journal-toolbar-header">
-                <div>
-                  <span class="card-label">Selected week</span>
-                  <h3 id="journal-toolbar-title">Journal controls</h3>
-                </div>
-                <p>Move through saved weeks in chronological order or create a new one.</p>
+                <h3 id="journal-toolbar-title">Week navigation</h3>
+                <p>Choose a saved week or move between weeks.</p>
               </div>
 
               <div class="journal-toolbar-controls">
                 <div class="selected-week-navigation" id="journal-week-navigation">
                   <button class="secondary-button week-step-button" type="button" id="journal-previous-week" aria-label="Select previous older week">Previous</button>
                   <label class="field journal-week-picker">
-                    <span>Selected OJT week</span>
-                    <select id="journal-week-select"></select>
+                    <select id="journal-week-select" aria-label="Selected OJT week"></select>
                   </label>
                   <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">Next</button>
                 </div>
@@ -513,54 +555,7 @@
           </div>
         </section>
 
-        <section class="app-section" id="backup" aria-labelledby="backup-title" hidden>
-          <p class="section-kicker">Manual protection</p>
-          <h2 id="backup-title">Backup</h2>
-          <p>
-            Your journal is stored only in this browser. Export a backup before clearing browser data or switching devices. Photo-heavy backups may take longer to download.
-          </p>
 
-          <div class="backup-grid">
-            <section class="backup-panel" aria-labelledby="export-backup-title">
-              <span class="card-label">Export</span>
-              <h3 id="export-backup-title">Save a JSON backup</h3>
-              <p>Download a JSON file with all your journal data, including photos.</p>
-              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
-            </section>
-
-            <section class="backup-panel" aria-labelledby="restore-backup-title">
-              <span class="card-label">Restore</span>
-              <h3 id="restore-backup-title">Restore from JSON</h3>
-              <p>Replace everything in this browser with a backup file. Restore does not merge — it overwrites your current data.</p>
-              <label class="field">
-                <span>Backup file</span>
-                <input type="file" id="restore-backup-file" accept="application/json,.json">
-              </label>
-            </section>
-          </div>
-
-          <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
-            <span class="card-label">Danger zone</span>
-            <h3 id="reset-local-data-title">Reset Local App Data</h3>
-            <p>
-              Your journal lives only in this browser. Reset permanently removes all local OJT data — profile, weeks, daily logs, tasks, photos, and settings. Export a backup first if you may need it later.
-            </p>
-
-            <label class="reset-confirm-field" for="reset-confirm-checkbox">
-              <input type="checkbox" id="reset-confirm-checkbox">
-              <span>I understand this will permanently delete my local OJT journal data from this browser.</span>
-            </label>
-
-            <label class="field">
-              <span>Type RESET to confirm</span>
-              <input type="text" id="reset-confirm-text" autocomplete="off" spellcheck="false" inputmode="text" placeholder="RESET">
-            </label>
-
-            <button class="danger-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
-          </section>
-
-          <p class="form-message" id="backup-message" hidden></p>
-        </section>
       </main>
     </div>
   </div>
@@ -590,15 +585,6 @@
         </span>
         <span>Dashboard</span>
       </button>
-      <button class="nav-button" type="button" data-section="profile">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
-            <path d="M5 20a7 7 0 0 1 14 0"></path>
-          </svg>
-        </span>
-        <span>Profile</span>
-      </button>
       <button class="nav-button" type="button" data-section="journal">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -617,16 +603,16 @@
         </span>
         <span>Preview &amp; Export</span>
       </button>
-      <button class="nav-button" type="button" data-section="backup">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M6 9.5a5.5 5.5 0 0 1 10.7-1.8A4.3 4.3 0 0 1 18 16H8a4 4 0 0 1-2-7.5Z"></path>
-            <path d="M12 12v6M9.5 15.5 12 18l2.5-2.5"></path>
-          </svg>
-        </span>
-        <span>Backup</span>
-      </button>
-    </nav>
+        <button class="nav-button" type="button" data-section="settings">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"></path>
+            </svg>
+          </span>
+          <span>Settings</span>
+        </button>
+      </nav>
   </aside>
 
   <script src="assets/js/db.js"></script>

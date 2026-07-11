@@ -241,7 +241,8 @@ h1 {
 
 #dashboard.app-section,
 #journal.app-section,
-#weekly-preview.app-section {
+#weekly-preview.app-section,
+#settings.app-section {
   max-width: 960px;
 }
 
@@ -412,7 +413,7 @@ h1 {
 
   .mobile-section-tabs {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     margin-top: 8px;
     overflow: hidden;
@@ -2626,5 +2627,248 @@ body.daily-log-editor-open {
 
   .week-step-button {
     width: 100%;
+  }
+}
+
+.settings-jump-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.settings-stack {
+  margin-top: 0;
+}
+
+.settings-area {
+  scroll-margin-top: 18px;
+}
+
+.settings-area-header {
+  margin-bottom: 16px;
+}
+
+.settings-area-header h3 {
+  margin: 5px 0 6px;
+  font-size: 1.15rem;
+}
+
+.settings-area-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.settings-recovery {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.settings-recovery .backup-grid {
+  margin-top: 0;
+}
+
+.preview-warning-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-warning-item + .preview-warning-item {
+  margin-top: 10px;
+}
+
+.preview-warning-item .secondary-button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .mobile-tab-button {
+    min-height: 48px;
+    line-height: 1.15;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .settings-jump-nav {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-jump-nav .secondary-button,
+  .preview-warning-item .secondary-button {
+    width: 100%;
+  }
+
+  .settings-recovery {
+    padding: 15px;
+  }
+
+  .preview-warning-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* Phase 1 Part 4 UI correction: keep the Dashboard introduction readable and actions discoverable. */
+.dashboard-page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.dashboard-intro {
+  max-width: 62rem;
+}
+
+.dashboard-intro h2 {
+  white-space: nowrap;
+}
+
+.dashboard-actions {
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Settings uses the existing button language as a local tab strip. */
+.settings-jump-nav {
+  display: none;
+}
+
+.settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+
+.settings-tab {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  color: var(--label);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 42px;
+  padding: 9px 13px;
+}
+
+.settings-tab[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--panel);
+  color: var(--accent-deep);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.settings-tab:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.settings-panel[hidden] {
+  display: none !important;
+}
+
+@media (min-width: 761px) {
+  .dashboard-page-header {
+    margin-bottom: 20px;
+  }
+
+  .dashboard-actions .primary-button,
+  .dashboard-actions .secondary-button {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-tab {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
+/* Final Part 4 visual correction: let each Dashboard day button use the full row. */
+.dashboard-day-action {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(120px, max-content) minmax(0, 1fr);
+  column-gap: 18px;
+}
+
+.dashboard-day-main {
+  justify-self: start;
+}
+
+.dashboard-day-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.dashboard-day-result small {
+  display: inline;
+  margin-top: 0;
+}
+
+.journal-toolbar-header {
+  display: grid;
+  gap: 4px;
+}
+
+.journal-toolbar-header h3 {
+  margin: 0;
+}
+
+.journal-toolbar-controls .selected-week-navigation {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.journal-toolbar .journal-week-picker {
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+}
+
+.journal-toolbar .week-step-button {
+  width: auto;
+  padding-inline: 10px;
+}
+
+.journal-toolbar-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.journal-toolbar-actions .primary-button,
+.journal-toolbar-actions .secondary-button {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .dashboard-day-action {
+    grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .dashboard-day-result {
+    justify-content: flex-end;
+    text-align: right;
   }
 }

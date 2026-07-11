@@ -278,8 +278,8 @@
       stats.hidden = true;
       empty.hidden = false;
       empty.textContent = totalRenderedMinutes > 0
-        ? "Add your required OJT hours in Profile to see completion progress."
-        : "Add your required OJT hours in Profile to track overall progress here.";
+        ? "Add your required OJT hours in Settings to see completion progress."
+        : "Add your required OJT hours in Settings to track overall progress here.";
       return;
     }
 
@@ -323,13 +323,13 @@
     setText("summary-student-name", studentProfile?.studentName || "Not set yet");
     setText(
       "summary-student-detail",
-      studentProfile?.courseOrProgram || "Add your student details in Profile so they appear on your journal."
+      studentProfile?.courseOrProgram || "Add your student details in Settings so they appear on your journal."
     );
 
     setText("summary-company-name", companyProfile?.companyName || "Not set yet");
     setText(
       "summary-company-detail",
-      companyProfile?.departmentOrAssignedArea || "Add your company details in Profile so they appear on your weekly journal preview."
+      companyProfile?.departmentOrAssignedArea || "Add your company details in Settings so they appear on your weekly journal preview."
     );
 
     const reminderElement = document.getElementById("dashboard-backup-reminder");
@@ -443,7 +443,10 @@
       window.OJTApp?.showSection("weekly-preview");
     });
     document.getElementById("dashboard-action-backup")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("backup");
+      document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
+    });
+    document.getElementById("dashboard-reminder-recovery")?.addEventListener("click", () => {
+      document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
     });
   });
 

@@ -113,7 +113,7 @@
         missingFields.push("company name");
       }
 
-      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Profile before final submission.`);
+      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Settings before final submission.`);
     }
 
     if (emptySummaryLabels.length > 0) {
@@ -142,11 +142,19 @@
     const warnings = [];
 
     if (!state.studentProfile?.studentName) {
-      warnings.push("Student profile is missing. Save it in Profile before copying your final journal.");
+      warnings.push({
+        message: "Student details are missing. Add them in Settings before copying your final journal.",
+        target: "student",
+        action: "Open Student Details"
+      });
     }
 
     if (!state.companyProfile?.companyName) {
-      warnings.push("Company profile is missing. Save it in Profile so your journal shows the right placement.");
+      warnings.push({
+        message: "Company details are missing. Add them in Settings so your journal shows the right placement.",
+        target: "company",
+        action: "Open Company / OJT Placement"
+      });
     }
 
     if (warnings.length === 0) {
@@ -155,7 +163,12 @@
 
     return `
       <div class="preview-warnings">
-        ${warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("")}
+        ${warnings.map((warning) => `
+          <div class="preview-warning-item">
+            <p>${escapeHtml(warning.message)}</p>
+            <button class="secondary-button" type="button" data-settings-focus="${escapeHtml(warning.target)}">${escapeHtml(warning.action)}</button>
+          </div>
+        `).join("")}
       </div>
     `;
   }
@@ -516,6 +529,14 @@
     });
 
     getElement("preview-edit-selected-week")?.addEventListener("click", () => window.OJTApp?.showSection("journal"));
+    getElement("weekly-preview-output")?.addEventListener("click", (event) => {
+      const button = event.target.closest?.("button[data-settings-focus]");
+      if (button) {
+        document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", {
+          detail: { target: button.dataset.settingsFocus }
+        }));
+      }
+    });
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
     getElement("export-official-docx-button")?.addEventListener("click", exportOfficialDocx);
   }
