@@ -2,7 +2,7 @@
 
 Use this document to continue development or onboard a developer.
 
-**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released as v1.1. Final regression passed. The v1.1 Git tag is the remaining repository release action.
+**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released and tagged as v1.1. Final regression passed, and v1.1 is the stable rollback baseline.
 
 ## Project summary
 
@@ -48,8 +48,12 @@ Key globals include window.OJTDB, window.OJTStorage, window.OJTCalculations, win
 | Dashboard, mobile tabs, backup/restore/reset | Complete |
 | Official DOCX Export | v1.1 released and merged into master |
 | Automatic photo appendix | v1.1 released and merged into master |
-| v1.1 tag/release | Tag creation and push remain |
-| PDF export, PWA, cloud workflows | Deferred |
+| v1.1 tag/release | Released and tagged; stable post-release baseline |
+| PDF export and cloud workflows | Deferred; PWA is scheduled in roadmap Phase 6 |
+
+## Post-v1.1 roadmap
+
+`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. After roadmap approval, the next implementation phase is **Phase 1 — Journal UX Architecture**, which consolidates Weeks and Daily Logs into one Journal workspace with shared selected-week behavior. Review that phase before coding; do not treat deferred items below as a competing implementation order.
 
 ## Data rules that must not change
 
@@ -154,11 +158,10 @@ Open <http://127.0.0.1:8765/>. Direct file:// opening is not supported for relia
 
 The compact two-column appendix layout was manually accepted. Configurable image sizing is a possible future polish item, not a v1.1 requirement.
 
-## Release steps
+## Next development step
 
-1. Create and push the v1.1 Git tag.
-2. Keep release notes synchronized with the active v2 export path.
+Review and approve Phase 1 — Journal UX Architecture in `docs/POLISH_ROADMAP.md`, then implement it on a dedicated branch while preserving the v1.1 regression baseline.
 
 ## Deferred work
 
-PDF export, PWA installability, stronger photo compression, search, configurable image sizing, login, cloud sync, online submission, supervisor dashboards, and multi-user deployment remain out of scope unless explicitly approved.
+PDF export, stronger photo compression, search, configurable image sizing, login, cloud sync, online submission, supervisor dashboards, and multi-user deployment remain out of scope unless explicitly approved. PWA work is planned only through the ordered phases in `docs/POLISH_ROADMAP.md`.
