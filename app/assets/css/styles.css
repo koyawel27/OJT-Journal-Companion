@@ -2081,6 +2081,46 @@ h1 {
   font-style: italic;
 }
 
+.photo-set-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 12px;
+}
+
+.photo-set-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.photo-set-image-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-set-image-list .photo-attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.photo-item-actions {
+  flex-shrink: 0;
+}
+
+.photo-selection-count {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
 .photo-caption-form {
   margin-top: 12px;
 }
@@ -2567,6 +2607,16 @@ body.daily-log-editor-open {
     min-height: 44px;
   }
 
+  .photo-set-header,
+  .photo-set-image-list .photo-attachment-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .photo-item-actions,
+  .photo-item-actions button {
+    width: 100%;
+  }
   .photo-caption-details summary {
     min-height: 44px;
   }
