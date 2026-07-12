@@ -72,9 +72,3 @@ Historical migration work may be retained in ignored spikes, but it is not activ
 The completed regression covered selected-week correctness, no-photo output, JPEG, PNG, WebP conversion, portrait/landscape sizing, odd and multiple photo layouts, captions, 5/6/7-day behavior, warning accept/cancel behavior, command-leak checks, Word opening, LibreOffice conversion, private-template safety, and preservation of Weekly Preview, copy text, dashboard, Daily Logs, photos, backup, restore, and reset.
 
 The current compact layout was manually accepted. Exported DOCX files remain editable, and manual photo sizing is allowed when needed.
-
-## Remaining release action
-
-v1.1 implementation is merged and release validation is complete. The remaining repository action is creating and pushing the v1.1 tag.
-
-Do not claim that the v1.1 tag exists until it is actually created and pushed.

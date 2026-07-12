@@ -57,12 +57,12 @@ Key globals include `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations
 | Journal workspace | Complete; Weeks, Daily Logs, tasks, photos, summaries, and Log Today are consolidated |
 | Preview & Export | Complete; review, copy, Official DOCX, and return-to-Journal handoffs remain available |
 | Settings | Complete; Student, Company, Preferences, and Data & Recovery handoffs are available |
-| Phase 2 Photo Documentation Groups | Next; focused migration/compatibility design review required before implementation |
+| Phase 2 Batch Photo Documentation | Next; lightweight additive design accepted, implementation not started |
 | PDF export and cloud workflows | Deferred; PWA is scheduled in roadmap Phase 6 |
 
 ## Post-v1.1 roadmap
 
-`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 — Journal UX Architecture is complete: Weeks and Daily Logs are consolidated into one Journal workspace with shared selected-week behavior. The next approved work is Phase 2 planning; do not treat deferred items below as a competing implementation order.
+`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 — Journal UX Architecture is complete: Weeks and Daily Logs are consolidated into one Journal workspace with shared selected-week behavior. The next approved phase is Phase 2 — Batch Photo Documentation; its lightweight additive design is accepted, but implementation has not started.
 
 ## Current UI architecture
 
@@ -183,14 +183,18 @@ The compact two-column appendix layout was manually accepted. Configurable image
 
 ## Next development step
 
-The next development step is **Phase 2 — Photo Documentation Groups**, but implementation must not start from this closeout. Begin with the focused migration and compatibility design review described in `docs/POLISH_ROADMAP.md`, covering:
+The next development step is **Phase 2 — Batch Photo Documentation**. The accepted lightweight design is:
 
-- group and attachment shapes, IndexedDB versioning, and migration of existing `PhotoAttachment` records, including implicit one-photo legacy groups;
-- ordering, cascade behavior, backup version/format, old-backup restore, rollback/recovery, and populated v1.1 database/legacy-backup tests; and
-- Preview/DOCX payload compatibility and representative no-photo/photo export coverage.
+- one or multiple JPEG, PNG, or WebP files per upload action;
+- one optional `photoSetId` and automatic `photoSetIndex` for each new upload action, including a single-image upload;
+- one shared category and caption copied to every attachment in the set;
+- atomic batch creation and shared metadata edits;
+- existing photos without a set ID treated as independent singleton sets;
+- Journal caption/category display once per set;
+- DOCX caption output only on the first ordered image in each set;
+- no new object store, IndexedDB version increase, migration, backupVersion change, template change, regular payload change, or visible Preview photo expansion.
 
-Do not approve a final schema or change application code until that review is complete. Preserve the v1.1 rollback baseline and the accepted Phase 1 architecture.
-
+Implementation has not started. Preserve the v1.1 rollback baseline and accepted Phase 1 architecture while validating one/multiple uploads, legacy photos, deletion behavior, backup/restore, and DOCX output.
 ## Deferred work
 
 PDF export, stronger photo compression, search, configurable image sizing, login, cloud sync, online submission, supervisor dashboards, and multi-user deployment remain out of scope unless explicitly approved. PWA work is planned only through the ordered phases in `docs/POLISH_ROADMAP.md`.

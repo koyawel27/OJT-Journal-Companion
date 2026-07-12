@@ -18,7 +18,7 @@ Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboar
 | Capabilities | Profiles/settings, week management, daily records, tasks, photos, weekly summaries, preview/copy, JSON backup/restore/reset, and Official DOCX Export. |
 | DOCX | Client-side `docx-templates` v2 export with a private-first official template and tracked sanitized fallback. |
 | Strengths | Mature single-user feature set, offline-first data ownership, official rendered-hours rules, editable output, responsive foundations, and no server dependency. |
-| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow; Photo Documentation Groups are the next active concern. |
+| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow; Batch Photo Documentation is the next active concern. |
 
 ## 3. Product Principles
 
@@ -43,7 +43,7 @@ These decisions are approved and must not be reopened unless the current code re
 - Selection priority: week containing today, last valid selected week, latest week, then no selection. A new week becomes selected immediately.
 - Journal owns week CRUD, selected-week overview, daily records, tasks, photos, and weekly-summary editing. A quick Log Today action remains easy to reach.
 - Preview & Export remains a review/copy/export destination, not the primary summary editor.
-- `PhotoDocumentationGroup` is the future direction: shared caption, multiple ordered images, optional individual captions, and v1.1 photos as implicit one-photo groups.
+- Batch Photo Documentation is the accepted Phase 2 direction: one upload action may create one or more normal PhotoAttachment records sharing an optional `photoSetId`, `photoSetIndex`, category, and caption. Existing photos without the identifier remain independent singleton sets.
 - Data/recovery hardening occurs before broad public reliance. Restore remains replace-style; cloud sync is excluded.
 - A static hosted installable PWA is the primary distribution target, with GitHub Pages first.
 - The generic core identity is OJT Journal Companion. BPC identity requires authoritative assets and permission.
@@ -56,7 +56,7 @@ These decisions are approved and must not be reopened unless the current code re
 | --- | --- | --- | --- | --- | --- | --- |
 | 0 | Baseline and Roadmap Alignment | Establish one accurate post-v1.1 plan and regression baseline. | None | Released/tagged v1.1 | Roadmap approval | Complete |
 | 1 | Journal UX Architecture | Unify the weekly workflow and selected-week state. | None expected | Phase 0 | Journal workflow acceptance | Complete |
-| 2 | Photo Documentation Groups | Support related image groups, captions, and ordering. | IndexedDB and backup version changes | Phase 1 | Migration/export acceptance | Next |
+| 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | None expected; additive optional attachment metadata only | Phase 1 | Batch upload/export acceptance | Next |
 | 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Planned |
 | 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1–3 | Accessibility/responsive acceptance | Planned |
 | 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Planned |
@@ -113,7 +113,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Likely files/modules:** `app/index.html`, `styles.css`, `app.js`, `ui.js`, `weeks.js`, `daily-logs.js`, `journal-preview.js`, and possibly a small shared selection module after review. Touch `journal-payload.js`/`docx-export-v2.js` only for a narrow handoff need.
 
-**Data-model impact:** No IndexedDB schema change is expected. Last-valid selection must use existing or transient browser state; no new object store.
+**Data-model impact:** No IndexedDB database-version increase, new object store, or object-store migration is required. `PhotoAttachment` gains optional additive `photoSetId` and `photoSetIndex` properties for new uploads, while existing records without those properties remain valid. Existing JSON backup and restore behavior remains compatible.
 
 **Migration/backward-compatibility considerations:** Existing weeks, logs, tasks, photos, summaries, backups, preview/copy, and DOCX must work unchanged. Missing/deleted/invalid selected IDs must fall back safely.
 
@@ -129,38 +129,37 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Dependencies on earlier phases:** Phase 0 approval and regression baseline.
 
-### Phase 2 — Photo Documentation Groups
+### Phase 2 — Batch Photo Documentation
 
-**Phase 2 planning boundary:** Before implementation, perform a focused migration and compatibility design review covering group/attachment shapes, the IndexedDB version, migration of existing `PhotoAttachment` records including implicit one-photo legacy groups, ordering and cascade behavior, backup version/format, old-backup restore, rollback/recovery, and Preview/DOCX payload compatibility. Do not finalize the schema or begin implementation in this closeout.
+**Objective:** Let a student select one or multiple related JPEG, PNG, or WebP images in one upload action, apply one category and shared caption, and display that caption once in Journal and Official DOCX Export.
 
-**Objective:** Represent one documentation moment with a shared caption and multiple ordered images while preserving v1.1 photos.
+**Problem being solved:** The current upload accepts one image and edits captions/categories per attachment, while related images need a lightweight shared batch identity.
 
-**Problem being solved:** v1.1 stores and captions each related image independently.
+**In scope:** Enable one or multiple files per upload; assign one generated `photoSetId` per new upload action and automatic `photoSetIndex` values based on captured file-selection order; copy the shared category and caption to every attachment in the set; validate the complete batch before writing; use atomic IndexedDB transactions for batch creation and shared edits; render set metadata once in Journal; emit the DOCX caption only on the first ordered image; preserve singleton behavior for existing photos without set metadata.
 
-**In scope:** Review and add `PhotoDocumentationGroup` with candidate fields `id`, `dailyLogId`, `caption`, `sortOrder`, `createdAt`, `updatedAt`; add `groupId`, `sortOrder`, and optional individual caption to PhotoAttachment; group/image CRUD and ordering; non-drag controls; implicit one-photo groups for legacy records; cascade rules; Preview/DOCX and backup support.
 
-**Out of scope:** Final gallery styling, cloud photos, image editing, attendance verification, or an irreversible schema before implementation review.
+**Out of scope:** A `PhotoDocumentationGroup` object store, IndexedDB version increase, database migration, backupVersion change, individual image captions, adding images later to an existing set, manual set/image ordering, drag-and-drop, empty sets, visible Preview photo expansion, template changes, and the Phase 4 visual redesign.
 
-**Likely files/modules:** `db.js`, `storage.js`, `daily-logs.js`, `photos.js`, `backup.js`, `journal-payload.js`, `docx-export-v2.js`, reviewed templates, and related data/workflow/DOCX docs.
+**Likely files/modules:** `photos.js`, `storage.js`, `daily-logs.js`, `styles.css`, and `docx-export-v2.js`. `db.js`, `backup.js`, `journal-payload.js`, `journal-preview.js`, `app/index.html`, and DOCX templates should remain unchanged unless source evidence reveals a narrow compatibility need.
 
-**Data-model impact:** IndexedDB version change, a reviewed durable group representation, attachment fields, and backup format/version change.
+**Data-model impact:** No IndexedDB schema change is expected. Optional attachment properties are additive; existing records without `photoSetId` remain valid. Backup serialization already preserves additional attachment metadata, so no backupVersion change is expected.
 
-**Migration/backward-compatibility considerations:** Idempotent upgrade; preserve blobs/metadata; support grouped and ungrouped records; define old-backup normalization/restore support; test rollback/recovery before final schema approval.
+**Migration/backward-compatibility considerations:** No database migration is planned. Existing photos remain unchanged and are treated as independent singleton sets at read time. Existing JSON backups restore through the current path; missing optional batch metadata must remain valid.
 
-**Risks:** Orphans, lost blobs/captions, ambiguous order, backup incompatibility, unsafe cascades, or DOCX pagination regressions.
+**Risks:** Partial batch writes, shared-metadata drift, equal timestamps, large multi-file selections, deleting the first image that carries the DOCX caption, and confusing set boundaries in two-column output.
 
-**Required testing:** Fresh and populated v1.1 databases; old/current backups; mixed grouped/ungrouped photos; one/many/odd counts; keyboard/touch ordering; group/attachment/daily-log deletes; JPEG/PNG/WebP and no-photo DOCX; Word/LibreOffice.
+**Required testing:** One and multiple files; complete-batch validation; atomic creation and shared edits; legacy singleton photos; deletion of first, middle, and final images; equal timestamps and FileList order; JPEG/PNG/WebP; backup/restore; no-photo DOCX; private and sanitized templates; Word/LibreOffice; desktop/tablet/mobile Journal behavior.
 
-**Exit criteria:** Migration preserves every legacy photo; CRUD/cascades are predictable; supported backups restore; Preview/DOCX photo regression passes.
+**Exit criteria:** A user can upload one or multiple images as one lightweight batch, edit the shared category/caption atomically, delete individual images safely, see the caption once in Journal, export it once in DOCX, and preserve all v1.1 photo/backup behavior without a schema or template change.
 
-**Dependencies on earlier phases:** Phase 1 Journal structure.
+**Dependencies on earlier phases:** Phase 1 Journal structure and selected-week architecture.
 ### Phase 3 — Data and Recovery Hardening
 
 **Objective:** Make restore and browser-local storage risks understandable, validated, and recoverable before hosted reliance.
 
 **Problem being solved:** Restore currently checks basic shape then replaces data; it lacks comprehensive semantic validation, a restore report, persistence status, and storage-pressure guidance.
 
-**In scope:** Supported backup-version checks; duplicate IDs; week/log/task/photo/group relationships; enum/status, required-ID, date/range, time-derived, and image-data validation; pre-restore counts/warnings/errors report; preserve current data on failed validation; persistent-storage request; quota/usage feedback; reviewed backup reminders and recovery guidance.
+**In scope:** Supported backup-version checks; duplicate IDs; week/log/task/photo relationships and optional batch metadata; enum/status, required-ID, date/range, time-derived, and image-data validation; pre-restore counts/warnings/errors report; preserve current data on failed validation; persistent-storage request; quota/usage feedback; reviewed backup reminders and recovery guidance.
 
 **Out of scope:** Cloud sync, accounts, merge restore, remote backups, or guarantees of browser-storage permanence.
 
@@ -176,7 +175,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Exit criteria:** Unsupported/invalid data cannot replace current data; valid supported backups restore with a clear report; storage risk is visible; recovery drill passes.
 
-**Dependencies on earlier phases:** Phase 2 final schema and backup version.
+**Dependencies on earlier phases:** Phase 2 batch-photo compatibility behavior and regression evidence.
 
 ### Phase 4 — Accessible Responsive Visual Redesign
 
@@ -188,7 +187,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 - Desktop, tablet, and mobile shells and responsive navigation.
 - Reusable components and semantic tokens for typography, spacing, color roles, borders, elevation, and feedback.
-- Selected-week summary, compact day rows, day-editor sections, photo groups, weekly-summary editor, empty states, and feedback.
+- Selected-week summary, compact day rows, day-editor sections, batch-photo controls, weekly-summary editor, empty states, and feedback.
 - Desktop visible/expanded summary editing; tablet full-width expandable panel; mobile focused accordion or full-height sheet.
 - Dialog/sheet focus trapping, Escape, background inertness, focus restoration, visible focus, status meaning beyond color, reduced motion, touch targets, and non-drag ordering.
 
@@ -206,7 +205,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Exit criteria:** The stable Journal is usable at target sizes; critical dialogs/sheets meet the accessibility contract; responsive/accessibility review passes.
 
-**Dependencies on earlier phases:** Phase 1 architecture, Phase 2 group behavior, and known Phase 3 feedback requirements.
+**Dependencies on earlier phases:** Phase 1 architecture, Phase 2 batch-photo behavior, and known Phase 3 feedback requirements.
 
 ### Phase 5 — Brand Architecture
 
@@ -329,7 +328,8 @@ These decisions are approved and must not be reopened unless the current code re
 
 ## 7. Cross-Phase Dependencies
 
-- Phase 4 must build on the settled Phase 1 Journal architecture and must not reopen it without a documented direct conflict.- Photo-group schema before final gallery styling and before Phase 3 finalizes current backup validation.
+- Phase 4 must build on the settled Phase 1 Journal architecture and must not reopen it without a documented direct conflict.
+- Batch-photo behavior before final photo presentation and before Phase 3 finalizes current backup validation.
 - Data hardening before broad public reliance.
 - Responsive/accessibility and generic or authorized branding readiness before public-facing beta material.
 - PWA before friend beta.

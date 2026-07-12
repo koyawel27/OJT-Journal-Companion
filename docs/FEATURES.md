@@ -6,7 +6,7 @@ OJT Journal Companion is a personal offline-first journal companion for one stud
 
 **v1.0 status:** released baseline.
 
-**v1.1 status:** Released after merge and final regression. Official DOCX Export with an automatic photo appendix is included. The v1.1 Git tag remains the final repository release action.
+**v1.1 status:** Released, merged, and tagged after final regression. Official DOCX Export with an automatic photo appendix is included. v1.1 remains the stable released rollback baseline.
 
 The app is not an internship management system. It has no accounts, approval workflow, online submission, or automatic cross-device sync.
 
