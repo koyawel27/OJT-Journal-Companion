@@ -2,7 +2,7 @@
 
 A lightweight, offline-first personal browser app for students and interns. Record daily OJT activities, track rendered hours, attach photo documentation, and prepare a weekly journal for copying or official DOCX submission.
 
-**v1.0 is the original baseline release.** **v1.1 is released** with Official DOCX Export and an automatic Photo Documentation appendix. The v1.1 Git tag is the remaining repository release action.
+**v1.0 is the original baseline release.** **v1.1 is released and tagged** with Official DOCX Export and an automatic Photo Documentation appendix. v1.1 remains the latest tagged stable release. Batch Photo Documentation is completed post-v1.1 roadmap work and is not a new release or tag.
 
 ## What this app is
 
@@ -14,15 +14,16 @@ Export JSON backups regularly. Browser storage can be cleared by you, the browse
 
 - Profile, company details, and OJT settings
 - OJT weeks, Daily Logs, task items, and rendered-hours tracking
-- Photo documentation with JPEG, PNG, or WebP files, captions, categories, download, and removal
+- Photo documentation with JPEG, PNG, or WebP files: one or multiple images per upload, shared category and caption per set, individual download and removal
 - Weekly Preview and Copy Weekly Journal
 - **Official DOCX Export** for the selected week:
   - Dynamic Day 1 through Day N rows with dates
   - Task description, optional duration, and status
   - Weekly rendered-hours total and weekly summaries
-  - Automatic Photo Documentation appendix with optional captions
-  - JPEG and PNG support; WebP is converted temporarily during export
-  - Editable Word output for any permitted manual photo resizing or rearrangement
+  - Automatic Photo Documentation appendix with one shared caption per photo set
+  - Set-aware layout: one centered image, two columns, three columns, or two-column rows for four or more images
+  - JPEG and PNG support; WebP is converted temporarily during export without changing the stored Blob
+  - Editable Word output for any permitted manual photo resizing or document adjustments
 - JSON backup, restore, and guarded local-data reset
 - Dashboard progress and responsive mobile navigation
 
@@ -51,6 +52,8 @@ A DOCX is not a restorable app backup. Keep JSON backups somewhere safe outside 
 ## Template safety
 
 A private approved official template may be used locally when available. It is ignored by Git and must never be committed. The tracked sanitized v2 template remains the public fallback.
+
+Do not mutate active DOCX template XML with a generic serializer that may rewrite WordprocessingML prefixes. Use a prefix-preserving OOXML/package workflow and validate a real application export after every template change. See `docs/DOCX_TEMPLATE_PLACEHOLDERS.md`.
 
 ## Scope boundaries
 
