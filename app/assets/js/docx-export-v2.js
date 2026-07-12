@@ -7,8 +7,24 @@ const directImageTypes = {
   "image/jpeg": ".jpg",
   "image/png": ".png"
 };
-const landscapeImageBoundsCm = { width: 7.2, height: 5.4 };
-const portraitImageBoundsCm = { width: 6.8, height: 8.5 };
+const photoImageBoundsCm = {
+  single: {
+    landscape: { width: 13.5, height: 8.5 },
+    portrait: { width: 8.5, height: 11.5 }
+  },
+  double: {
+    landscape: { width: 7.2, height: 5.4 },
+    portrait: { width: 6.8, height: 8.5 }
+  },
+  triple: {
+    landscape: { width: 4.6, height: 3.5 },
+    portrait: { width: 4.5, height: 6.0 }
+  },
+  grid: {
+    landscape: { width: 7.2, height: 5.4 },
+    portrait: { width: 6.8, height: 8.5 }
+  }
+};
 
 function createExportError(message, cause) {
   const error = new Error(message);
@@ -95,10 +111,70 @@ function buildPhotoDayLabel(day) {
   return [day.dayLabel, formatDocxDayDate(day.date)].filter(Boolean).join(` ${separator} `);
 }
 
-function sortPhotosForDailyLog(photos, dailyLogId) {
-  return [...(photos || [])]
+function isValidPhotoDate(value) {
+  return Boolean(value) && Number.isFinite(new Date(value).getTime());
+}
+
+function isValidPhotoSetId(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function comparePhotoImages(first, second) {
+  const firstIndexValid = Number.isInteger(first.photoSetIndex) && first.photoSetIndex >= 0;
+  const secondIndexValid = Number.isInteger(second.photoSetIndex) && second.photoSetIndex >= 0;
+
+  if (firstIndexValid !== secondIndexValid) {
+    return firstIndexValid ? -1 : 1;
+  }
+
+  if (firstIndexValid && first.photoSetIndex !== second.photoSetIndex) {
+    return first.photoSetIndex - second.photoSetIndex;
+  }
+
+  const firstTime = isValidPhotoDate(first.createdAt) ? new Date(first.createdAt).getTime() : Number.POSITIVE_INFINITY;
+  const secondTime = isValidPhotoDate(second.createdAt) ? new Date(second.createdAt).getTime() : Number.POSITIVE_INFINITY;
+  return firstTime - secondTime || String(first.id || "").localeCompare(String(second.id || ""));
+}
+
+function getEarliestPhotoTimestamp(photos) {
+  return photos.reduce((earliest, photo) => {
+    if (!isValidPhotoDate(photo.createdAt)) {
+      return earliest;
+    }
+
+    return Math.min(earliest, new Date(photo.createdAt).getTime());
+  }, Number.POSITIVE_INFINITY);
+}
+
+function buildPhotoSetsForDailyLog(photos, dailyLogId) {
+  const groups = new Map();
+
+  (photos || [])
     .filter((photo) => photo.dailyLogId === dailyLogId)
-    .sort((first, second) => String(first.createdAt || "").localeCompare(String(second.createdAt || "")));
+    .forEach((photo) => {
+      const hasPhotoSetId = isValidPhotoSetId(photo.photoSetId);
+      const key = hasPhotoSetId ? `set:${photo.photoSetId}` : `legacy:${photo.id}`;
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          key,
+          photoSetId: hasPhotoSetId ? photo.photoSetId : "",
+          photos: []
+        });
+      }
+
+      groups.get(key).photos.push(photo);
+    });
+
+  return [...groups.values()]
+    .map((photoSet) => ({
+      ...photoSet,
+      photos: photoSet.photos.sort(comparePhotoImages)
+    }))
+    .sort((first, second) => {
+      return getEarliestPhotoTimestamp(first.photos) - getEarliestPhotoTimestamp(second.photos) ||
+        first.key.localeCompare(second.key);
+    });
 }
 
 function loadImage(blob) {
@@ -186,10 +262,11 @@ async function prepareImageBlob(photo) {
   }
 }
 
-function fitImage(widthPx, heightPx) {
+function fitImage(widthPx, heightPx, layout) {
   const naturalWidthCm = (widthPx / 96) * 2.54;
   const naturalHeightCm = (heightPx / 96) * 2.54;
-  const bounds = heightPx > widthPx ? portraitImageBoundsCm : landscapeImageBoundsCm;
+  const layoutBounds = photoImageBoundsCm[layout] || photoImageBoundsCm.grid;
+  const bounds = heightPx > widthPx ? layoutBounds.portrait : layoutBounds.landscape;
   const scale = Math.min(1, bounds.width / naturalWidthCm, bounds.height / naturalHeightCm);
 
   return {
@@ -229,6 +306,52 @@ function buildPhotoRows(photos) {
   return rows;
 }
 
+function getPhotoSetLayout(photoCount) {
+  return photoCount === 1
+    ? "single"
+    : photoCount === 2
+    ? "double"
+    : photoCount === 3
+    ? "triple"
+    : "grid";
+}
+
+async function preparePhotoSet(photoSet) {
+  const sharedCaption = String(photoSet.photos[0]?.caption ?? "").trim();
+  const layout = getPhotoSetLayout(photoSet.photos.length);
+  const preparedPhotos = [];
+
+  for (const [index, photo] of photoSet.photos.entries()) {
+    const prepared = await prepareImageBlob(photo);
+    preparedPhotos.push({
+      image: {
+        data: await prepared.blob.arrayBuffer(),
+        extension: prepared.extension,
+        widthPx: prepared.widthPx,
+        heightPx: prepared.heightPx,
+        ...fitImage(prepared.widthPx, prepared.heightPx, layout)
+      },
+      captionDisplay: index === 0 ? sharedCaption : ""
+    });
+  }
+
+  return {
+    key: photoSet.key,
+    photoSetId: photoSet.photoSetId,
+    captionDisplay: sharedCaption,
+    photos: preparedPhotos,
+    layout,
+    isSingle: layout === "single",
+    isDouble: layout === "double",
+    isTriple: layout === "triple",
+    isGrid: layout === "grid",
+    singlePhoto: layout === "single" ? preparedPhotos[0] : null,
+    doublePhotos: layout === "double" ? preparedPhotos : [],
+    triplePhotos: layout === "triple" ? preparedPhotos : [],
+    gridRows: layout === "grid" ? buildPhotoRows(preparedPhotos) : [],
+    compatibilityPhotoRows: buildPhotoRows(preparedPhotos)
+  };
+}
 async function buildPhotoDays(payload) {
   const relatedPhotos = payload.photoAttachments || [];
   const photoDays = [];
@@ -238,32 +361,23 @@ async function buildPhotoDays(payload) {
       continue;
     }
 
-    const photos = sortPhotosForDailyLog(relatedPhotos, day.dailyLog.id);
+    const photoSets = buildPhotoSetsForDailyLog(relatedPhotos, day.dailyLog.id);
 
-    if (photos.length === 0) {
+    if (photoSets.length === 0) {
       continue;
     }
 
-    const preparedPhotos = [];
+    const preparedSets = [];
 
-    for (const photo of photos) {
-      const prepared = await prepareImageBlob(photo);
-      preparedPhotos.push({
-        image: {
-          data: await prepared.blob.arrayBuffer(),
-          extension: prepared.extension,
-          widthPx: prepared.widthPx,
-          heightPx: prepared.heightPx,
-          ...fitImage(prepared.widthPx, prepared.heightPx)
-        },
-        captionDisplay: String(photo.caption || "").trim()
-      });
+    for (const photoSet of photoSets) {
+      preparedSets.push(await preparePhotoSet(photoSet));
     }
 
     photoDays.push({
       dayLabel: buildPhotoDayLabel(day),
-      photos: preparedPhotos,
-      photoRows: buildPhotoRows(preparedPhotos)
+      photos: preparedSets.flatMap((photoSet) => photoSet.photos),
+      photoSets: preparedSets,
+      photoRows: preparedSets.flatMap((photoSet) => photoSet.compatibilityPhotoRows)
     });
   }
 
@@ -397,6 +511,7 @@ window.OJTDocxExportV2 = {
   buildFilename,
   buildPayloadForWeek,
   buildPhotoDays,
+  buildPhotoSetsForDailyLog,
   buildPhotoRows,
   buildTemplateData,
   exportPayload,

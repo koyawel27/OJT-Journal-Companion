@@ -8,6 +8,8 @@ OJT Journal Companion is a personal offline-first journal companion for one stud
 
 **v1.1 status:** Released, merged, and tagged after final regression. Official DOCX Export with an automatic photo appendix is included. v1.1 remains the stable released rollback baseline.
 
+**Post-v1.1 Phase 2 — Batch Photo Documentation:** Complete. This is completed roadmap work, not a new release or tag.
+
 The app is not an internship management system. It has no accounts, approval workflow, online submission, or automatic cross-device sync.
 
 ## Implemented features
@@ -17,14 +19,18 @@ The app is not an internship management system. It has no accounts, approval wor
 - Daily Logs with worked, absent, and rest-day handling
 - Rendered-hours calculation from DailyLog time records
 - Structured tasks with description, optional duration, and personal status
-- JPEG, PNG, and WebP photo attachments with optional captions
+- JPEG, PNG, and WebP photo attachments: one or multiple images per upload, shared category and caption per set, once-per-set Journal display, individual download and removal
 - Weekly Preview and Copy Weekly Journal
 - Dashboard OJT progress and backup reminder
 - JSON backup/export, replace-style restore, and guarded reset
 
-## Official DOCX Export - v1.1 released
+## Batch Photo Documentation — Phase 2 complete
 
-The Weekly Preview export button creates one editable Word document for the selected week.
+One upload action may select one or multiple JPEG, PNG, or WebP files. The app creates one generated `photoSetId` per upload action and assigns `photoSetIndex` in native file-selection order. Every image remains a normal `PhotoAttachment`; shared category and caption are duplicated across set records. Journal displays shared metadata once per set, and shared metadata edits are atomic. Each image remains individually downloadable and deletable. Deleting the first image preserves shared metadata; stored indices are not renumbered; deleting the final image removes the set naturally. Legacy records without set metadata behave as runtime singleton sets. There is no separate group entity or store, no migration, `DB_VERSION` remains `4`, backup version remains `1.0`, and older supported backups remain compatible.
+
+## Official DOCX Export — v1.1 released, Phase 2 appendix updated
+
+The Official DOCX button in Preview & Export creates one editable Word document for the selected week.
 
 The export includes:
 
@@ -34,13 +40,20 @@ The export includes:
 - Total weekly rendered hours
 - Skills Learned, Problems Encountered, and Reflection / Points of Learning
 - Blank student and supervisor signature areas
-- Optional Photo Documentation appendix after the journal section
+- Optional Photo Documentation appendix after the journal section when photos exist
 
-Photo documentation is grouped by day and date in a compact two-column layout. Images and captions stay together, rows do not split across pages, and an odd final photo leaves the right side visually empty.
+Photo documentation is grouped by day and date, then by photo set within each day:
 
-JPEG and PNG images are used directly. WebP images are converted temporarily to PNG for the export; the original saved photo is not changed. Captions are optional, long captions wrap naturally, and the resulting DOCX stays editable.
+- One image: larger centered layout
+- Two images: two columns
+- Three images: three columns
+- Four or more images: two-column rows within the set
+- One shared caption below the complete set; category is not exported
+- Images from separate sets never share one row
 
-The exporter tries a locally ignored private approved v2 template first, then uses the tracked sanitized v2 fallback. It requires local HTTP serving for reliable template loading.
+JPEG and PNG images are used directly. WebP images are converted temporarily to PNG for the export; the original saved photo is not changed. Aspect ratio is preserved; images are not cropped, stretched, or upscaled. Captions are optional, long captions wrap naturally, and the resulting DOCX stays editable. No-photo exports contain no photo appendix structure or generated image media.
+
+The exporter tries a locally ignored private approved v2 template first, then uses the tracked sanitized v2 fallback. It requires local HTTP serving for reliable template loading. Microsoft Word and LibreOffice regression passed.
 
 ## Boundaries
 

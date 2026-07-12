@@ -223,12 +223,75 @@
     return sortTasks(state.dailyTasks.filter((task) => task.dailyLogId === dailyLogId));
   }
 
-  function getPhotosForDailyLog(dailyLogId) {
-    return [...state.photoAttachments]
-      .filter((photo) => photo.dailyLogId === dailyLogId)
-      .sort((first, second) => String(first.createdAt || "").localeCompare(String(second.createdAt || "")));
+  function isValidPhotoDate(value) {
+    return Boolean(value) && Number.isFinite(new Date(value).getTime());
   }
 
+  function comparePhotoDates(first, second) {
+    const firstTime = isValidPhotoDate(first.createdAt) ? new Date(first.createdAt).getTime() : Number.POSITIVE_INFINITY;
+    const secondTime = isValidPhotoDate(second.createdAt) ? new Date(second.createdAt).getTime() : Number.POSITIVE_INFINITY;
+    return firstTime - secondTime || String(first.id || "").localeCompare(String(second.id || ""));
+  }
+
+  function comparePhotoImages(first, second) {
+    const firstIndexValid = Number.isInteger(first.photoSetIndex) && first.photoSetIndex >= 0;
+    const secondIndexValid = Number.isInteger(second.photoSetIndex) && second.photoSetIndex >= 0;
+
+    if (firstIndexValid !== secondIndexValid) {
+      return firstIndexValid ? -1 : 1;
+    }
+
+    if (firstIndexValid && first.photoSetIndex !== second.photoSetIndex) {
+      return first.photoSetIndex - second.photoSetIndex;
+    }
+
+    return comparePhotoDates(first, second);
+  }
+
+  function getEarliestPhotoTimestamp(photos) {
+    return photos.reduce((earliest, photo) => {
+      if (!isValidPhotoDate(photo.createdAt)) {
+        return earliest;
+      }
+
+      return Math.min(earliest, new Date(photo.createdAt).getTime());
+    }, Number.POSITIVE_INFINITY);
+  }
+
+  function getPhotoSetsForDailyLog(dailyLogId) {
+    const groups = new Map();
+
+    state.photoAttachments
+      .filter((photo) => photo.dailyLogId === dailyLogId)
+      .forEach((photo) => {
+        const hasPhotoSetId = typeof photo.photoSetId === "string" && photo.photoSetId.trim() !== "";
+        const key = hasPhotoSetId ? `set:${photo.photoSetId}` : `legacy:${photo.id}`;
+
+        if (!groups.has(key)) {
+          groups.set(key, {
+            key,
+            photoSetId: hasPhotoSetId ? photo.photoSetId : "",
+            photos: []
+          });
+        }
+
+        groups.get(key).photos.push(photo);
+      });
+
+    return [...groups.values()]
+      .map((photoSet) => ({
+        ...photoSet,
+        photos: photoSet.photos.sort(comparePhotoImages)
+      }))
+      .sort((first, second) => {
+        const firstTimestamp = getEarliestPhotoTimestamp(first.photos);
+        const secondTimestamp = getEarliestPhotoTimestamp(second.photos);
+        return firstTimestamp - secondTimestamp || first.key.localeCompare(second.key);
+      });
+  }
+  function getPhotosForDailyLog(dailyLogId) {
+    return state.photoAttachments.filter((photo) => photo.dailyLogId === dailyLogId);
+  }
   function updateWeekSummary() {
     const logs = getLogsForWeek(state.selectedWeekId);
     const countLabel = getElement("journal-daily-summary");
@@ -350,45 +413,86 @@
     });
   }
 
-  function renderPhotoList(photos) {
-    if (photos.length === 0) {
-      return '<p class="empty-state">No photos attached yet. Save the day record first, then add photos below.</p>';
-    }
+  function renderPhotoSet(photoSet) {
+    const firstPhoto = photoSet.photos[0];
+    const isSharedSet = Boolean(photoSet.photoSetId);
+    const category = normalizePhotoCategory(firstPhoto.photoCategory);
+    const caption = String(firstPhoto.caption ?? "");
+    const setLabel = isSharedSet ? "Photo set" : "Photo";
+    const editForm = isSharedSet
+      ? `
+        <form class="photo-caption-form photo-set-edit-form" data-photo-set-form data-photo-set-id="${escapeHtml(photoSet.photoSetId)}" novalidate>
+          <label class="field">
+            <span>Shared category</span>
+            <select name="photoCategory">${renderOptions(window.OJTPhotos.photoCategories, category)}</select>
+          </label>
+          <label class="field">
+            <span>Shared caption</span>
+            <textarea name="caption" rows="2">${escapeHtml(caption)}</textarea>
+          </label>
+          <div class="form-actions">
+            <button class="secondary-button" type="submit">Save shared details</button>
+            <p class="form-message" hidden></p>
+          </div>
+        </form>
+      `
+      : `
+        <form class="photo-caption-form" data-photo-caption-form data-photo-id="${escapeHtml(firstPhoto.id)}" novalidate>
+          <label class="field">
+            <span>Category</span>
+            <select name="photoCategory">${renderOptions(window.OJTPhotos.photoCategories, category)}</select>
+          </label>
+          <label class="field">
+            <span>Caption</span>
+            <textarea name="caption" rows="2">${escapeHtml(caption)}</textarea>
+          </label>
+          <div class="form-actions">
+            <button class="secondary-button" type="submit">Save details</button>
+            <p class="form-message" hidden></p>
+          </div>
+        </form>
+      `;
 
     return `
-      <ul class="photo-attachment-list">
-        ${photos.map((photo) => `
-          <li class="photo-attachment-item">
-            <div class="photo-attachment-main">
-              <strong>${escapeHtml(photo.fileName || "Untitled photo")}</strong>
-              <p class="item-meta">
-                ${escapeHtml(photo.fileType || "Unknown type")} - ${escapeHtml(window.OJTPhotos.formatFileSize(photo.fileSize))} - ${escapeHtml(formatPhotoCreatedAt(photo.createdAt))}
-              </p>
-              <p class="photo-category">Category: ${escapeHtml(normalizePhotoCategory(photo.photoCategory))}</p>
-              ${photo.caption ? `<p class="photo-caption">${escapeHtml(photo.caption)}</p>` : '<p class="photo-caption empty-caption">No caption saved.</p>'}
-            </div>
-
-            <details class="photo-caption-details">
-              <summary>Edit caption and photo actions</summary>
-              <form class="photo-caption-form" data-photo-caption-form data-photo-id="${escapeHtml(photo.id)}" novalidate>
-                <label class="field">
-                  <span>Caption</span>
-                  <textarea name="caption" rows="2">${escapeHtml(photo.caption)}</textarea>
-                </label>
-                <div class="form-actions">
-                  <button class="secondary-button" type="submit">Save caption</button>
-                  <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
-                  <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
-                  <p class="form-message" hidden></p>
-                </div>
-              </form>
-            </details>
-          </li>
-        `).join("")}
-      </ul>
+      <li class="photo-set-item">
+        <div class="photo-set-header">
+          <div>
+            <strong>${escapeHtml(setLabel)}${photoSet.photos.length > 1 ? ` (${photoSet.photos.length} images)` : ""}</strong>
+            <p class="photo-category">Category: ${escapeHtml(category)}</p>
+            ${caption ? `<p class="photo-caption">${escapeHtml(caption)}</p>` : '<p class="photo-caption empty-caption">No caption saved.</p>'}
+          </div>
+          <details class="photo-caption-details">
+            <summary>Edit ${isSharedSet ? "shared details" : "details"}</summary>
+            ${editForm}
+          </details>
+        </div>
+        <ul class="photo-set-image-list">
+          ${photoSet.photos.map((photo) => `
+            <li class="photo-attachment-item">
+              <div class="photo-attachment-main">
+                <strong>${escapeHtml(photo.fileName || "Untitled photo")}</strong>
+                <p class="item-meta">
+                  ${escapeHtml(photo.fileType || "Unknown type")} - ${escapeHtml(window.OJTPhotos.formatFileSize(photo.fileSize))} - ${escapeHtml(formatPhotoCreatedAt(photo.createdAt))}
+                </p>
+              </div>
+              <div class="form-actions photo-item-actions">
+                <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
+                <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      </li>
     `;
   }
 
+  function renderPhotoList(photoSets) {
+    if (photoSets.length === 0) {
+      return '<p class="empty-state">No photos attached yet. Save the day record first, then add photos below.</p>';
+    }
+
+    return `<ul class="photo-attachment-list">${photoSets.map(renderPhotoSet).join("")}</ul>`;
+  }
   function renderPhotoSection(dailyLog) {
     if (!dailyLog) {
       return `
@@ -402,7 +506,7 @@
       `;
     }
 
-    const photos = getPhotosForDailyLog(dailyLog.id);
+    const photoSets = getPhotoSetsForDailyLog(dailyLog.id);
 
     return `
       <section class="photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
@@ -413,14 +517,15 @@
         </div>
 
         <div class="photo-attachment-list-wrap" id="photo-attachment-list">
-          ${renderPhotoList(photos)}
+          ${renderPhotoList(photoSets)}
         </div>
 
         <form class="photo-upload-form" id="photo-upload-form" data-daily-log-id="${escapeHtml(dailyLog.id)}" novalidate>
           <div class="form-grid">
             <label class="field">
-              <span>Photo file</span>
-              <input type="file" id="photo-upload-file" accept="image/jpeg,image/png,image/webp">
+              <span>Photo files</span>
+              <input type="file" id="photo-upload-file" accept="image/jpeg,image/png,image/webp" multiple>
+              <p class="photo-selection-count" id="photo-upload-selection" aria-live="polite">No photos selected.</p>
             </label>
             <label class="field">
               <span>Category</span>
@@ -435,7 +540,7 @@
           </div>
 
           <div class="form-actions">
-            <button class="primary-button" type="submit">Attach photo</button>
+            <button class="primary-button" type="submit">Attach photos</button>
             <p class="form-message" id="photo-upload-message" hidden></p>
           </div>
         </form>
@@ -1004,15 +1109,24 @@
     }
   }
 
+  function updatePhotoSelectionCount() {
+    const fileInput = getElement("photo-upload-file");
+    const countElement = getElement("photo-upload-selection");
+    const count = fileInput?.files?.length || 0;
+    if (countElement) {
+      countElement.textContent = count === 0 ? "No photos selected." : `${count} ${count === 1 ? "photo" : "photos"} selected.`;
+    }
+  }
+
   async function savePhotoAttachment(event) {
     event.preventDefault();
     const form = event.target;
     const messageElement = getElement("photo-upload-message");
     const selectedLog = getActiveDailyLog();
     const fileInput = getElement("photo-upload-file");
+    const files = Array.from(fileInput?.files || []);
     const caption = getValue("photo-upload-caption");
     const photoCategory = normalizePhotoCategory(getValue("photo-upload-category"));
-    const file = fileInput?.files?.[0] || null;
 
     window.OJTUI.clearFormMessage(messageElement);
 
@@ -1021,24 +1135,59 @@
       return;
     }
 
-    const validationMessage = window.OJTPhotos.validatePhotoFile(file);
-
-    if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+    if (files.length === 0) {
+      window.OJTUI.showFormMessage(messageElement, "Choose at least one photo.", "error");
       return;
     }
 
+    for (const file of files) {
+      const validationMessage = window.OJTPhotos.validatePhotoFile(file);
+      if (validationMessage) {
+        window.OJTUI.showFormMessage(messageElement, `${file.name}: ${validationMessage}`, "error");
+        return;
+      }
+    }
+
     try {
-      const photoAttachment = window.OJTPhotos.buildPhotoAttachment(file, selectedLog.id, caption, photoCategory);
-      const savedPhoto = await window.OJTStorage.savePhotoAttachment(photoAttachment);
-      state.photoAttachments = state.photoAttachments.filter((photo) => photo.id !== savedPhoto.id).concat(savedPhoto);
+      const photoSetId = createId("photo-set");
+      const attachments = files.map((file, index) => {
+        return window.OJTPhotos.buildPhotoAttachment(file, selectedLog.id, caption, photoCategory, photoSetId, index);
+      });
+      const savedPhotos = await window.OJTStorage.savePhotoAttachments(attachments);
+      state.photoAttachments = state.photoAttachments
+        .filter((photo) => !savedPhotos.some((savedPhoto) => savedPhoto.id === photo.id))
+        .concat(savedPhotos);
       form.reset();
+      updatePhotoSelectionCount();
       renderJournalWeek();
       updateWeekSummary();
       notifyJournalDataChange();
-      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attached.", "success");
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), `${files.length} ${files.length === 1 ? "photo" : "photos"} attached.`, "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Could not attach photo. Try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Could not attach the selected photos. No photos were saved.", "error");
+      console.error(error);
+    }
+  }
+
+  async function savePhotoSetMetadata(form) {
+    const photoSetId = form.dataset.photoSetId;
+    const messageElement = form.querySelector(".form-message");
+    const formData = new FormData(form);
+    window.OJTUI.clearFormMessage(messageElement);
+
+    try {
+      const updatedPhotos = await window.OJTStorage.updatePhotoSetMetadata(photoSetId, {
+        caption: formData.get("caption"),
+        photoCategory: formData.get("photoCategory")
+      });
+      state.photoAttachments = state.photoAttachments
+        .filter((photo) => !updatedPhotos.some((updatedPhoto) => updatedPhoto.id === photo.id))
+        .concat(updatedPhotos);
+      renderJournalWeek();
+      notifyJournalDataChange();
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Shared photo details saved.", "success");
+    } catch (error) {
+      window.OJTUI.showFormMessage(messageElement, "Shared photo details could not be saved. No changes were applied.", "error");
       console.error(error);
     }
   }
@@ -1058,19 +1207,18 @@
     try {
       const savedPhoto = await window.OJTStorage.savePhotoAttachment({
         ...photo,
-        photoCategory: normalizePhotoCategory(photo.photoCategory),
-        caption: String(formData.get("caption") || "").trim()
+        photoCategory: normalizePhotoCategory(formData.get("photoCategory")),
+        caption: String(formData.get("caption") ?? "").trim()
       });
       state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== savedPhoto.id).concat(savedPhoto);
       renderJournalWeek();
       notifyJournalDataChange();
-      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo caption saved.", "success");
+      window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo details saved.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(messageElement, "Photo caption could not be saved. Please try again.", "error");
+      window.OJTUI.showFormMessage(messageElement, "Photo details could not be saved. Please try again.", "error");
       console.error(error);
     }
   }
-
   function downloadPhoto(photo) {
     try {
       window.OJTPhotos.downloadPhotoAttachment(photo);
@@ -1203,6 +1351,10 @@
       if (event.target.id === "daily-log-day-status") {
         updateDayStatusControls();
       }
+
+      if (event.target.id === "photo-upload-file") {
+        updatePhotoSelectionCount();
+      }
     });
     getElement("journal-week-accordions")?.addEventListener("submit", (event) => {
       if (event.target.id === "daily-log-form") {
@@ -1215,6 +1367,11 @@
 
       if (event.target.id === "photo-upload-form") {
         savePhotoAttachment(event);
+      }
+
+      if (event.target.matches("[data-photo-set-form]")) {
+        event.preventDefault();
+        savePhotoSetMetadata(event.target);
       }
 
       if (event.target.matches("[data-photo-caption-form]")) {

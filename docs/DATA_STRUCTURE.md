@@ -6,6 +6,8 @@ This document defines the local data structure for OJT Journal Companion v1.0 as
 
 **v1.0 status:** IndexedDB schema version 4 with the object stores below is in use.
 
+**Living document note:** This file preserves the v1.0 baseline. Accepted additive post-v1.1 behavior is included in place where the current application has evolved, without rewriting unrelated historical v1.0 boundaries.
+
 The app is a personal offline-first journal companion for one student. It should store student details, company details, weekly journal records, daily logs, basic photo documentation, and simple app settings using local browser storage.
 
 This is not a server database design. The structure should stay simple enough for a beginner-friendly HTML, CSS, and JavaScript app.
@@ -41,7 +43,7 @@ The v1.0 data model should include these main entities:
 - `AppSettings`
 - `BackupData`
 
-No extra entities should be added unless they clearly support the v1.0 journal workflow.
+No extra entities should be added unless they clearly support the v1.0 journal workflow. Post-v1.1 batch photo sets use optional fields on existing `PhotoAttachment` records only; there is no separate `PhotoDocumentationGroup` entity or store.
 
 ## 4. StudentProfile
 
@@ -156,10 +158,14 @@ Stores basic photo documentation information for a daily log.
 | `fileSize` | number | File size in bytes. |
 | `fileBlob` | Blob | Imported image data stored locally in IndexedDB. |
 | `photoCategory` | string | `General Documentation`, `Time In Photo`, `Time Out Photo`, `Task/Work Proof`, or `Other`. Missing older values should default to `General Documentation`. |
-| `caption` | string | Optional caption or description. |
+| `caption` | string | Optional caption or description. For batch uploads, the shared caption is duplicated on every attachment in the set. |
+| `photoSetId` | string | Optional. One generated ID per upload action for attachments created together in one batch. |
+| `photoSetIndex` | number | Optional non-negative integer. Native file-selection order within the set. |
 | `createdAt` | string | ISO timestamp for when the attachment record was created. |
 
 Photo storage needs testing because browser storage behavior and size limits vary across browsers and devices. v1.0 should store imported photo data in IndexedDB as a `Blob` or equivalent browser-supported file data, along with related metadata. v1.0 should support basic attach/import, category labels, metadata storage, and removal from a daily log. Time in and time out photo categories are documentation labels only; they are not verified attendance, GPS proof, supervisor validation, or official proof logic. Advanced preview, gallery, compression, and image editing are not required for v1.0.
+
+Post-v1.1 batch photo behavior: one upload action may create one or more `PhotoAttachment` records sharing optional `photoSetId` and ordered `photoSetIndex`. Shared category and caption are duplicated across set records; Journal displays them once per set; shared metadata updates are atomic. Image order within one logical set uses: (1) valid non-negative `photoSetIndex`; (2) valid `createdAt`; (3) attachment ID. Stored `photoSetIndex` values are not renumbered after an image is deleted. Deleting the final attachment removes the logical set naturally because no separate empty-set record exists. Records without set metadata are treated as runtime singleton sets at read time. There is no separate group entity or IndexedDB store, no migration was added, `DB_VERSION` remains `4`, backup version remains `1.0`, and older supported backups remain compatible.
 
 ## 10. AppSettings
 

@@ -55,8 +55,8 @@
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  function buildPhotoAttachment(file, dailyLogId, caption, photoCategory) {
-    return {
+  function buildPhotoAttachment(file, dailyLogId, caption, photoCategory, photoSetId, photoSetIndex) {
+    const photoAttachment = {
       id: createId("photo"),
       dailyLogId,
       fileName: file.name,
@@ -67,6 +67,26 @@
       caption: caption || "",
       createdAt: new Date().toISOString()
     };
+
+    if (photoSetId !== undefined) {
+      const normalizedPhotoSetId = String(photoSetId ?? "").trim();
+
+      if (!normalizedPhotoSetId) {
+        throw new Error("Photo set ID must contain non-whitespace characters.");
+      }
+
+      photoAttachment.photoSetId = normalizedPhotoSetId;
+    }
+
+    if (photoSetIndex !== undefined) {
+      if (!Number.isInteger(photoSetIndex) || photoSetIndex < 0) {
+        throw new TypeError("photoSetIndex must be a non-negative integer when supplied.");
+      }
+
+      photoAttachment.photoSetIndex = photoSetIndex;
+    }
+
+    return photoAttachment;
   }
 
   function downloadPhotoAttachment(photoAttachment) {

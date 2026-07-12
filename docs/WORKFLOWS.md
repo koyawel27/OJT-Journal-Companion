@@ -6,6 +6,8 @@ This document defines the main user workflows for OJT Journal Companion v1.0.
 
 **v1.0 status:** These workflows are implemented in the current app.
 
+**Living document note:** This file preserves the v1.0 baseline. Accepted additive post-v1.1 behavior is included in place where the current application has evolved, without rewriting unrelated historical v1.0 boundaries.
+
 The app is a personal offline-first journal companion for one student. It helps the student record daily OJT activities, calculate rendered time, attach basic photo documentation, prepare weekly journal content, and manually transfer that content into the official school template.
 
 The app does not replace official school forms, signatures, supervisor validation, or submission requirements.
@@ -100,20 +102,23 @@ Weekly total rendered time should be calculated from `DailyLog` records linked t
 
 ## 7. Photo Documentation Workflow
 
-The photo documentation workflow supports basic local photo documentation for daily logs.
+The photo documentation workflow supports local photo documentation for daily logs, including batch upload with shared metadata.
 
 1. User opens or creates a daily log.
-2. User attaches or imports photo documentation for that daily log.
-3. User chooses a photo category such as `General Documentation`, `Time In Photo`, `Time Out Photo`, `Task/Work Proof`, or `Other`.
-4. App stores photo metadata locally.
-5. App stores imported image data locally using IndexedDB as a `Blob` or equivalent browser-supported file data.
-6. User may add a caption.
-7. User may remove photo documentation from the daily log.
-8. App saves changes locally.
+2. User selects one or multiple JPEG, PNG, or WebP files in one upload action for that daily log.
+3. App assigns one generated `photoSetId` to the upload batch and `photoSetIndex` values in native file-selection order.
+4. User chooses one photo category such as `General Documentation`, `Time In Photo`, `Time Out Photo`, `Task/Work Proof`, or `Other` for the set.
+5. User may add one shared caption for the set.
+6. App validates the complete batch before writing.
+7. App stores each image as a normal `PhotoAttachment` with duplicated shared category and caption, using atomic IndexedDB transactions for batch creation.
+8. Journal displays shared category and caption once per set while each image remains individually downloadable and deletable.
+9. User may edit shared category and caption atomically for an existing set.
+10. User may delete individual images from a set; deleting the first image preserves shared metadata, stored indices are not renumbered, and deleting the final image removes the set naturally.
+11. App saves changes locally.
 
-Photo metadata may include file name, file type, file size, category, caption, related daily log ID, and created timestamp.
+Photo metadata may include file name, file type, file size, category, caption, optional `photoSetId`, optional `photoSetIndex`, related daily log ID, and created timestamp. Existing records without set metadata behave as runtime singleton sets. There is no separate group entity or store.
 
-Photo categories are simple documentation labels. Time in and time out photo categories should not be treated as verified attendance, GPS proof, supervisor validation, or official proof logic.
+Photo categories are simple documentation labels. Time in and time out photo categories should not be treated as verified attendance, GPS proof, supervisor validation, or official proof logic. Photo category is not exported in Official DOCX Export.
 
 When a photo is imported into the app and stored in IndexedDB as a `Blob` or equivalent browser-supported file data, the app should treat it as its own local copy. If the original photo is later deleted from the phone or laptop, the app may still retain the imported copy as long as browser storage has not been cleared.
 
@@ -225,7 +230,7 @@ The user can edit:
 - Daily logs
 - Daily task/work items
 - Weekly summary fields
-- Photo captions
+- Shared photo-set category and caption for attachments in the same set
 
 Deletion behavior should be simple:
 
@@ -233,6 +238,7 @@ Deletion behavior should be simple:
 - Deleting a daily log also deletes related task items and photo attachments.
 - Deleting a task item does not delete the daily log.
 - Deleting a photo does not delete the daily log.
+- Deleting an individual photo from a set does not delete the daily log; shared set metadata remains on surviving attachments until the final image in the set is removed.
 
 Before deleting larger records such as weeks or daily logs, the app warns the user about related records that will also be removed.
 

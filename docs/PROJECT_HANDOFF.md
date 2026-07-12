@@ -2,7 +2,7 @@
 
 Use this document to continue development or onboard a developer.
 
-**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released and tagged as v1.1. Final regression passed, and v1.1 is the stable rollback baseline. Phase 1 Journal UX Architecture is complete on the post-v1.1 roadmap; it is not a new tagged release. The next approved work is Phase 2 planning.
+**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released and tagged as v1.1. Final regression passed, and v1.1 is the stable rollback baseline and latest tagged stable release. Phase 1 Journal UX Architecture and Phase 2 Batch Photo Documentation are complete on the post-v1.1 roadmap; neither is a new tagged release. **Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.**
 
 ## Project summary
 
@@ -15,7 +15,7 @@ The app is a companion, not a school system. It has no backend, PHP application 
 | Layer | Current choice |
 | --- | --- |
 | App | HTML, CSS, vanilla JavaScript |
-| Storage | IndexedDB |
+| Storage | IndexedDB version 4 |
 | DOCX engine | Locally vendored docx-templates 4.15.0 browser build |
 | Server requirement | Local/static HTTP for template fetches |
 | Build/runtime install | None |
@@ -50,26 +50,27 @@ Key globals include `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations
 | v1.0 core workflow | Released baseline |
 | Dashboard, mobile tabs, backup/restore/reset | Complete |
 | Official DOCX Export | v1.1 released and merged into master |
-| Automatic photo appendix | v1.1 released and merged into master |
+| Automatic photo appendix | v1.1 released; Phase 2 set-aware layout complete |
 | v1.1 tag/release | Released and tagged; stable post-release baseline |
 | Phase 1 Journal UX Architecture | Complete; regression accepted on the post-v1.1 roadmap |
+| Phase 2 Batch Photo Documentation | Complete; accepted implementation at `a7a0775` |
 | Shared selected-week state | Complete through `window.OJTSelectedWeek` |
-| Journal workspace | Complete; Weeks, Daily Logs, tasks, photos, summaries, and Log Today are consolidated |
+| Journal workspace | Complete; Weeks, Daily Logs, tasks, batch photo sets, summaries, and Log Today are consolidated |
 | Preview & Export | Complete; review, copy, Official DOCX, and return-to-Journal handoffs remain available |
 | Settings | Complete; Student, Company, Preferences, and Data & Recovery handoffs are available |
-| Phase 2 Batch Photo Documentation | Next; lightweight additive design accepted, implementation not started |
+| Phase 3 Data and Recovery Hardening | Next approved roadmap phase |
 | PDF export and cloud workflows | Deferred; PWA is scheduled in roadmap Phase 6 |
 
 ## Post-v1.1 roadmap
 
-`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 — Journal UX Architecture is complete: Weeks and Daily Logs are consolidated into one Journal workspace with shared selected-week behavior. The next approved phase is Phase 2 — Batch Photo Documentation; its lightweight additive design is accepted, but implementation has not started.
+`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 — Journal UX Architecture and Phase 2 — Batch Photo Documentation are complete. **Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.**
 
 ## Current UI architecture
 
 The app has four top-level destinations:
 
 - **Dashboard:** Overall and selected-week progress, with a direct Daily Progress day-to-Journal handoff.
-- **Journal:** Selected-week navigation, Week CRUD, compact All Weeks, Daily Logs, tasks, current photo attachments, weekly summaries, and Log Today.
+- **Journal:** Selected-week navigation, Week CRUD, compact All Weeks, Daily Logs, tasks, batch photo sets, weekly summaries, and Log Today.
 - **Preview & Export:** Review, Copy Weekly Journal, Official DOCX export, and return-to-Journal correction handoffs.
 - **Settings:** Student Details, Company/OJT Placement, App Preferences, and Data & Recovery for backup, restore, and reset.
 
@@ -84,6 +85,7 @@ Weeks, Daily Logs, Profile, and Backup are not separate top-level destinations. 
 - Daily logs link to weeks; tasks and photos link to daily logs.
 - Deleting a daily log cascades to its tasks and photos.
 - JSON restore replaces all local data; reset clears all stores.
+- Batch photos use optional `photoSetId` and `photoSetIndex` on existing `PhotoAttachment` records only; there is no separate group store, no migration, `DB_VERSION` remains `4`, and backup version remains `1.0`.
 
 ## Official DOCX Export
 
@@ -107,7 +109,7 @@ Preview & Export
 -> selected week ID
 -> OJTDocxExportV2.exportWeekById(...)
 -> full journal payload and related PhotoAttachment loading
--> image processing
+-> image processing and photo-set grouping
 -> v2 DOCX template
 -> browser download
 
@@ -117,21 +119,29 @@ The visible button uses the selected week ID rather than a stale preview-only pa
 
 - Header fields, dynamic Day 1 through Day N rows, date-inclusive labels, task description/duration/status, totals, summaries, and blank signatures
 - Private-first v2 template loading with sanitized fallback on private-template 404
-- Only photos linked to DailyLogs in the selected week
-- Photo order follows existing createdAt ordering
+- Only photos linked to DailyLogs in the selected week, grouped into lightweight photo sets with legacy singleton handling
+- Photo-set order within one DailyLog: (1) earliest valid `createdAt` across all images in the set; (2) stable set key as tie-breaker
+- Image order within one set: (1) valid non-negative `photoSetIndex`; (2) valid `createdAt`; (3) attachment ID
 - JPEG and PNG direct handling; temporary WebP-to-PNG conversion without modifying the stored Blob
-- Aspect-ratio preservation and no upscaling
+- Aspect-ratio preservation; no cropping, stretching, or upscaling
 - Conditional appendix: no photos means no appendix heading, break, grid, or media
-- Two-column photo rows, same-cell captions, non-splitting rows, keep-with-next day headings, and visually empty odd right cells
+- Set-aware appendix layout: one centered image, two columns, three columns, or two-column rows for four or more images within a set
+- One shared caption below the complete set; category is not exported; images from separate sets never share one row
+- Keep-with-next day headings; non-splitting rows within grid sets; odd grid rows suppress the placeholder right image
 - Output remains editable; optional manual photo resizing is allowed
+- The original accepted Part 3B margins remain active. Moderate margins were evaluated but not adopted; templates were fully restored after the experiment, and no widened table layout was adopted
 
 Template commands execute only in the normal docx-templates sandbox. Templates are developer-controlled; do not add noSandbox: true or user template uploads.
+
+### Template XML maintenance warning
+
+A generic XML serializer rewrote WordprocessingML prefixes from `w:` to `ns0:`. The current DOCX command-processing path depends on the established `w:` command-containing elements, causing template commands to leak into generated exports. Do not mutate active DOCX template XML using a generic serializer that may rewrite prefixes. Use a prefix-preserving OOXML/package workflow and validate a real application export immediately after every template change.
 
 ## Student workflow
 
 1. Open Settings and save Student Details, Company/OJT Placement, and App Preferences; use Data & Recovery for backup, restore, and reset.
 2. Open Journal and create or select an OJT week; a newly created week becomes selected.
-3. Save Daily Logs, tasks, and current photo attachments in Journal.
+3. Save Daily Logs, tasks, and photo sets in Journal.
 4. Fill weekly summaries in Journal.
 5. Use Dashboard or Journal day handoffs to open the correct Journal date when correcting a daily entry.
 6. Open Preview & Export to review, copy text, or export the selected week DOCX; return to Journal when a correction is needed.
@@ -154,13 +164,15 @@ Open <http://127.0.0.1:8765/>. Direct file:// opening is not supported for relia
 
 **Phase 1 closeout:** The Journal UX Architecture regression is accepted. Static checks passed, and manual review covered selected-week synchronization, Week/DailyLog/task/photo/summary behavior, Dashboard handoffs and calculations, Preview & Export, Settings tabs and handoffs, backup/restore/reset, Copy Weekly Journal, and representative DOCX export across desktop, tablet, and mobile layouts. Native-browser paths that automated checks could not fully cover were manually checked. No confirmed Phase 1 defect remains. The checklist below remains a useful ongoing safety list; it does not claim that every future browser/image-matrix item was executed in this closeout.
 
+**Phase 2 closeout:** Batch Photo Documentation regression is accepted at implementation checkpoint `a7a0775`. Review covered one and multiple file uploads, shared metadata edits, legacy singleton photos, deletion of first/middle/final images in a set, backup/restore, 1/2/3/4+ image DOCX layouts, one caption per set, no category export, no cross-set row packing, private and sanitized templates, Microsoft Word and LibreOffice opening, and command-leak checks. **Resolved pagination finding:** Microsoft Word placed the sanitized fallback reflection and signature content on page 2. The page contained legitimate content and was not blank. No DOCX patch was required.
+
 ### Core safety
 
 - [ ] Preview & Export still renders
 - [ ] Copy Weekly Journal remains unchanged
 - [ ] Dashboard totals remain correct
 - [ ] Daily Log/task CRUD remains correct
-- [ ] Photo add, caption edit, download, and removal remain correct
+- [ ] Photo batch upload, shared metadata edit, download, and removal remain correct
 - [ ] JSON backup, restore, and reset remain unchanged
 
 ### DOCX export
@@ -168,8 +180,9 @@ Open <http://127.0.0.1:8765/>. Direct file:// opening is not supported for relia
 - [ ] No-photo week
 - [ ] JPEG, PNG, and WebP
 - [ ] Portrait and landscape images
-- [ ] Two photos, odd photo count, multiple photos, and multiple days
-- [ ] Missing and long captions
+- [ ] One-, two-, three-, and four-or-more-image photo sets
+- [ ] Multiple photo sets and multiple days
+- [ ] Missing and long shared captions
 - [ ] 5-, 6-, and 7-day weeks
 - [ ] Warning accept and cancel behavior
 - [ ] Correct rendered-hours total and task documentation fields
@@ -179,14 +192,12 @@ Open <http://127.0.0.1:8765/>. Direct file:// opening is not supported for relia
 - [ ] Private template remains ignored and unstaged
 - [ ] Sanitized v2 fallback works when the private template is unavailable
 
-The compact two-column appendix layout was manually accepted. Configurable image sizing is a possible future polish item, not a v1.1 requirement.
+Configurable image sizing is a possible future polish item, not a v1.1 requirement.
 
 ## Next development step
 
-The next development step is **Phase 2 — Batch Photo Documentation**. The accepted lightweight design uses one generated `photoSetId` per new upload action, automatic `photoSetIndex` values based on captured file-selection order, shared category/caption copied to each attachment, atomic batch operations, singleton handling for existing photos without set metadata, one Journal caption per set, and one DOCX caption on the first ordered image.
+**Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.** Preserve the v1.1 rollback baseline, accepted Phase 1 architecture, and completed Phase 2 batch photo behavior while improving restore validation, recovery visibility, and storage-risk guidance.
 
-
-Implementation has not started. Preserve the v1.1 rollback baseline and accepted Phase 1 architecture while validating one/multiple uploads, legacy photos, deletion behavior, backup/restore, and DOCX output.
 ## Deferred work
 
 PDF export, stronger photo compression, search, configurable image sizing, login, cloud sync, online submission, supervisor dashboards, and multi-user deployment remain out of scope unless explicitly approved. PWA work is planned only through the ordered phases in `docs/POLISH_ROADMAP.md`.
