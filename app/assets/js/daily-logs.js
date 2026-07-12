@@ -45,6 +45,10 @@
     return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
 
+  function notifyJournalDataChange() {
+    document.dispatchEvent(new CustomEvent("ojt:daily-log-data-change"));
+  }
+
   function escapeHtml(value) {
     return String(value ?? "")
       .replaceAll("&", "&amp;")
@@ -186,7 +190,7 @@
   }
 
   function sortWeeks(weeks) {
-    return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
+    return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
   function sortDailyLogs(logs) {
@@ -225,36 +229,9 @@
       .sort((first, second) => String(first.createdAt || "").localeCompare(String(second.createdAt || "")));
   }
 
-  function setSelectOptions(select, weeks) {
-    if (!select) {
-      return;
-    }
-
-    select.innerHTML = '<option value="">Choose a week</option>';
-    weeks.forEach((week) => {
-      const option = document.createElement("option");
-      option.value = week.id;
-      option.textContent = `Week ${week.weekNumber} (${week.inclusiveStartDate} to ${week.inclusiveEndDate})`;
-      select.appendChild(option);
-    });
-    select.disabled = weeks.length === 0;
-  }
-
-  function renderWeekSelectors() {
-    const sortedWeeks = sortWeeks(state.weeks);
-    setSelectOptions(getElement("daily-log-week-select"), sortedWeeks);
-    setValue("daily-log-week-select", state.selectedWeekId);
-
-    if (sortedWeeks.length === 0) {
-      setText("daily-log-week-help", "Create your first OJT week in Weeks, then come back to log each day.");
-    } else {
-      setText("daily-log-week-help", "Choose a week, then open each day to record your work and rendered hours.");
-    }
-  }
-
   function updateWeekSummary() {
     const logs = getLogsForWeek(state.selectedWeekId);
-    const countLabel = getElement("daily-log-count-label");
+    const countLabel = getElement("journal-daily-summary");
 
     if (!countLabel) {
       return;
@@ -275,10 +252,10 @@
 
   function selectWeek(weekId) {
     window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
-    state.selectedWeekId = weekId || "";
+    window.OJTSelectedWeek?.selectWeek(weekId, { weeks: state.weeks, source: "journal:daily-records" });
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || "";
     state.expandedDate = null;
     state.activeDailyLogId = null;
-    setValue("daily-log-week-select", state.selectedWeekId);
     renderJournalWeek();
     updateWeekSummary();
   }
@@ -635,9 +612,15 @@
   }
 
   function closeDailyLogEditor() {
+    const closingDate = state.expandedDate;
     state.expandedDate = null;
     state.activeDailyLogId = null;
     renderJournalWeek();
+    window.requestAnimationFrame(() => {
+      const dayButton = Array.from(document.querySelectorAll("button[data-day-action='open']"))
+        .find((button) => button.dataset.date === closingDate);
+      dayButton?.focus();
+    });
   }
 
   function syncDailyLogEditorState() {
@@ -924,6 +907,7 @@
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
+      notifyJournalDataChange();
       const saveMessage = savedLog.renderedMinutes !== null &&
         savedLog.renderedMinutes !== undefined &&
         Number.isFinite(Number(savedLog.renderedMinutes))
@@ -953,6 +937,7 @@
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Day log deleted.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Could not delete daily log. Try again.", "error");
@@ -979,6 +964,7 @@
       resetTaskFormFields();
       renderJournalWeek();
       updateWeekSummary();
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item saved.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Task item could not be saved. Please try again.", "error");
@@ -1010,6 +996,7 @@
       resetTaskFormFields();
       renderJournalWeek();
       updateWeekSummary();
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item deleted.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item could not be deleted. Please try again.", "error");
@@ -1048,6 +1035,7 @@
       form.reset();
       renderJournalWeek();
       updateWeekSummary();
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attached.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Could not attach photo. Try again.", "error");
@@ -1075,6 +1063,7 @@
       });
       state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== savedPhoto.id).concat(savedPhoto);
       renderJournalWeek();
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo caption saved.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Photo caption could not be saved. Please try again.", "error");
@@ -1103,6 +1092,7 @@
       state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== photo.id);
       renderJournalWeek();
       updateWeekSummary();
+      notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attachment deleted.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attachment could not be deleted. Please try again.", "error");
@@ -1188,11 +1178,8 @@
       state.dailyTasks = dailyTasks;
       state.photoAttachments = photoAttachments;
 
-      if (!state.selectedWeekId || !state.weeks.some((week) => week.id === state.selectedWeekId)) {
-        state.selectedWeekId = sortWeeks(weeks)[0]?.id || "";
-      }
+      state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || "";
 
-      renderWeekSelectors();
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
@@ -1206,10 +1193,6 @@
   }
 
   function bindDailyLogEvents() {
-    getElement("daily-log-week-select")?.addEventListener("change", (event) => {
-      selectWeek(event.target.value);
-    });
-
     getElement("journal-week-accordions")?.addEventListener("click", handleJournalClick);
     getElement("journal-week-accordions")?.addEventListener("input", (event) => {
       if (["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].includes(event.target.id)) {
@@ -1246,8 +1229,28 @@
     loadDailyLogData();
   });
 
+  document.addEventListener("ojt:selected-week-change", (event) => {
+    const weekId = event.detail?.weekId || "";
+    if (event.detail?.source === "weeks:delete" || (weekId && !state.weeks.some((week) => week.id === weekId))) {
+      loadDailyLogData();
+      return;
+    }
+    state.selectedWeekId = weekId;
+    state.expandedDate = null;
+    state.activeDailyLogId = null;
+    renderJournalWeek();
+    updateWeekSummary();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.expandedDate) {
+      closeDailyLogEditor();
+    }
+  });
+  document.addEventListener("ojt:weeks-data-change", loadDailyLogData);
+
   document.addEventListener("ojt:section-change", (event) => {
-    if (event.detail?.sectionId === "daily-logs") {
+    if (event.detail?.sectionId === "journal") {
       loadDailyLogData();
       return;
     }
@@ -1262,9 +1265,8 @@
     await loadDailyLogData();
 
     if (detail.weekId) {
-      state.selectedWeekId = detail.weekId;
-      setValue("daily-log-week-select", state.selectedWeekId);
-    }
+      selectWeek(detail.weekId);
+      }
 
     if (detail.entryDate) {
       openDay(detail.entryDate);

@@ -31,7 +31,7 @@
   }
 
   function sortWeeks(weeks) {
-    return [...weeks].sort((first, second) => first.weekNumber - second.weekNumber);
+    return window.OJTSelectedWeek?.sortWeeksChronologically(weeks) || [...(weeks || [])];
   }
 
   function getSelectedWeek() {
@@ -113,7 +113,7 @@
         missingFields.push("company name");
       }
 
-      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Profile before final submission.`);
+      warnings.push(`Missing ${missingFields.join(" and ")}. You can still export now, but add it in Settings before final submission.`);
     }
 
     if (emptySummaryLabels.length > 0) {
@@ -142,11 +142,19 @@
     const warnings = [];
 
     if (!state.studentProfile?.studentName) {
-      warnings.push("Student profile is missing. Save it in Profile before copying your final journal.");
+      warnings.push({
+        message: "Student details are missing. Add them in Settings before copying your final journal.",
+        target: "student",
+        action: "Open Student Details"
+      });
     }
 
     if (!state.companyProfile?.companyName) {
-      warnings.push("Company profile is missing. Save it in Profile so your journal shows the right placement.");
+      warnings.push({
+        message: "Company details are missing. Add them in Settings so your journal shows the right placement.",
+        target: "company",
+        action: "Open Company / OJT Placement"
+      });
     }
 
     if (warnings.length === 0) {
@@ -155,7 +163,12 @@
 
     return `
       <div class="preview-warnings">
-        ${warnings.map((warning) => `<p>${escapeHtml(warning)}</p>`).join("")}
+        ${warnings.map((warning) => `
+          <div class="preview-warning-item">
+            <p>${escapeHtml(warning.message)}</p>
+            <button class="secondary-button" type="button" data-settings-focus="${escapeHtml(warning.target)}">${escapeHtml(warning.action)}</button>
+          </div>
+        `).join("")}
       </div>
     `;
   }
@@ -298,7 +311,7 @@
     }
 
     if (!week) {
-      output.innerHTML = '<p class="empty-state">Choose a saved week to preview your weekly journal.</p>';
+      output.innerHTML = '<p class="empty-state">Choose a saved week to preview and export your journal.</p>';
       copyButton.disabled = true;
       if (exportButton) {
         exportButton.disabled = true;
@@ -360,6 +373,15 @@
     `;
   }
 
+  function updateJournalHandoff(hasWeek) {
+    const button = getElement("preview-edit-selected-week");
+    if (!button) {
+      return;
+    }
+
+    button.textContent = hasWeek ? "Edit selected week in Journal" : "Open Journal to create a week";
+  }
+
   function setWeekOptions() {
     const select = getElement("weekly-preview-week-select");
     const sortedWeeks = sortWeeks(state.weeks);
@@ -373,23 +395,24 @@
     sortedWeeks.forEach((week) => {
       const option = document.createElement("option");
       option.value = week.id;
-      option.textContent = `Week ${week.weekNumber} (${week.inclusiveStartDate} to ${week.inclusiveEndDate})`;
+      option.textContent = "Week " + week.weekNumber + " (" + week.inclusiveStartDate + " to " + week.inclusiveEndDate + ")";
       select.appendChild(option);
     });
 
     select.disabled = sortedWeeks.length === 0;
 
+    state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || "";
     if (state.selectedWeekId && sortedWeeks.some((week) => week.id === state.selectedWeekId)) {
       select.value = state.selectedWeekId;
     } else {
-      state.selectedWeekId = "";
       select.value = "";
     }
 
     setText(
       "weekly-preview-help",
-      sortedWeeks.length === 0 ? "Create a week in Weeks first, then return here to preview." : "Choose a week to preview, then copy or export the journal."
+      sortedWeeks.length === 0 ? "Create a week in Journal first, then return here to preview and export." : "Choose a week to preview, copy, or export the journal."
     );
+    updateJournalHandoff(sortedWeeks.length > 0);
   }
 
   async function copyTextToClipboard(text) {
@@ -459,7 +482,7 @@
         exportButton.textContent = "Exporting DOCX...";
       }
 
-      await window.OJTDocxExportV2.exportWeekById(state.selectedWeekId);
+      await window.OJTDocxExportV2.exportWeekById(window.OJTSelectedWeek?.getSelectedWeekId() || state.selectedWeekId);
       window.OJTUI.showFormMessage(messageElement, "Official DOCX downloaded. Review it in Word before signing or submitting.", "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "DOCX export failed. Refresh and try again.", "error");
@@ -487,6 +510,7 @@
       state.weeks = weeks;
       state.dailyLogs = dailyLogs;
       state.dailyTasks = dailyTasks;
+      state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || "";
 
       setWeekOptions();
       renderPreview();
@@ -501,10 +525,18 @@
 
   function bindPreviewEvents() {
     getElement("weekly-preview-week-select")?.addEventListener("change", (event) => {
-      state.selectedWeekId = event.target.value;
-      renderPreview();
+      window.OJTSelectedWeek?.selectWeek(event.target.value, { weeks: state.weeks, source: "weekly-preview" });
     });
 
+    getElement("preview-edit-selected-week")?.addEventListener("click", () => window.OJTApp?.showSection("journal"));
+    getElement("weekly-preview-output")?.addEventListener("click", (event) => {
+      const button = event.target.closest?.("button[data-settings-focus]");
+      if (button) {
+        document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", {
+          detail: { target: button.dataset.settingsFocus }
+        }));
+      }
+    });
     getElement("copy-weekly-journal-button")?.addEventListener("click", copyWeeklyJournal);
     getElement("export-official-docx-button")?.addEventListener("click", exportOfficialDocx);
   }
@@ -512,6 +544,17 @@
   document.addEventListener("DOMContentLoaded", () => {
     bindPreviewEvents();
     loadPreviewData();
+  });
+
+  document.addEventListener("ojt:selected-week-change", (event) => {
+    const weekId = event.detail?.weekId || "";
+    if (event.detail?.source === "weeks:delete" || (weekId && !state.weeks.some((week) => week.id === weekId))) {
+      loadPreviewData();
+      return;
+    }
+    state.selectedWeekId = weekId;
+    setWeekOptions();
+    renderPreview();
   });
 
   document.addEventListener("ojt:section-change", (event) => {

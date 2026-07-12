@@ -103,25 +103,7 @@
   }
 
   function chooseCurrentWeek(weeks) {
-    const today = todayText();
-    const containingWeek = (weeks || []).find((week) => {
-      return week.inclusiveStartDate <= today && week.inclusiveEndDate >= today;
-    });
-
-    if (containingWeek) {
-      return containingWeek;
-    }
-
-    return [...(weeks || [])].sort((first, second) => {
-      const firstNumber = Number(first.weekNumber);
-      const secondNumber = Number(second.weekNumber);
-
-      if (Number.isFinite(firstNumber) && Number.isFinite(secondNumber) && firstNumber !== secondNumber) {
-        return secondNumber - firstNumber;
-      }
-
-      return String(second.inclusiveStartDate || "").localeCompare(String(first.inclusiveStartDate || ""));
-    })[0] || null;
+    return window.OJTSelectedWeek?.getSelectedWeek(weeks) || null;
   }
 
   function getLogsForWeek(weekId) {
@@ -140,17 +122,6 @@
     const filled = Boolean(String(value || "").trim());
     const statusText = filled ? "filled" : "missing";
     return `<li class="${filled ? "is-filled" : "is-missing"}">${escapeHtml(label)}: ${statusText}</li>`;
-  }
-
-  function setWeeklyPreviewButtonsEnabled(enabled) {
-    document.getElementById("dashboard-action-weekly-preview")?.toggleAttribute("disabled", !enabled);
-  }
-
-  function syncDashboardBackupAction(showReminder) {
-    const backupAction = document.getElementById("dashboard-action-backup");
-    if (backupAction) {
-      backupAction.hidden = !showReminder;
-    }
   }
 
   function normalizeDayStatus(value) {
@@ -173,13 +144,12 @@
       setText("dashboard-week-logged-days", "0 of 0");
       setText("dashboard-week-worked-days", "0");
       setText("dashboard-week-open-days", "0");
-      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Daily Logs.</li>';
+      daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Journal.</li>';
       summaryElement.innerHTML = `
         <li class="is-missing">Skills Learned: missing</li>
         <li class="is-missing">Problems Encountered: missing</li>
         <li class="is-missing">Reflection: missing</li>
       `;
-      setWeeklyPreviewButtonsEnabled(false);
       return;
     }
 
@@ -208,8 +178,10 @@
         if (!log) {
           return `
             <li class="dashboard-day-row is-empty${todayClass}">
-              <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
-              <strong class="dashboard-day-result">Not logged yet</strong>
+              <button class="dashboard-day-action" type="button" data-dashboard-day-date="${escapeHtml(dateText)}" data-dashboard-week-id="${escapeHtml(week.id)}" aria-label="Open Day ${index + 1}${todayLabel}, ${escapeHtml(dateText)}: Not logged yet in Journal Daily Log">
+                <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
+                <strong class="dashboard-day-result">Not logged yet</strong>
+              </button>
             </li>
           `;
         }
@@ -221,16 +193,18 @@
 
         return `
           <li class="dashboard-day-row${todayClass}">
-            <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
-            <strong class="dashboard-day-result">
-              <span class="dashboard-day-status">${escapeHtml(dayStatus)}</span>
-              <span>${escapeHtml(renderedText)}</span>
-              <small>${escapeHtml(taskText)}</small>
-            </strong>
+            <button class="dashboard-day-action" type="button" data-dashboard-day-date="${escapeHtml(dateText)}" data-dashboard-week-id="${escapeHtml(week.id)}" aria-label="Open Day ${index + 1}${todayLabel}, ${escapeHtml(dateText)}: ${escapeHtml(dayStatus)}, ${escapeHtml(renderedText)}, ${escapeHtml(taskText)} in Journal Daily Log">
+              <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
+              <strong class="dashboard-day-result">
+                <span class="dashboard-day-status">${escapeHtml(dayStatus)}</span>
+                <span>${escapeHtml(renderedText)}</span>
+                <small>${escapeHtml(taskText)}</small>
+              </strong>
+            </button>
           </li>
         `;
       }).join("")
-      : '<li class="empty-state">This week has no dates saved. Edit the week in Weeks to fix the date range.</li>';
+      : '<li class="empty-state">This week has no dates saved. Edit the week in Journal to fix the date range.</li>';
 
     summaryElement.innerHTML = [
       renderSummaryStatusItem("Skills Learned", week.weeklySkillsLearned),
@@ -238,7 +212,6 @@
       renderSummaryStatusItem("Reflection", week.reflectionOrPointsOfLearning)
     ].join("");
 
-    setWeeklyPreviewButtonsEnabled(true);
   }
 
   async function refreshDashboardWeekProgress() {
@@ -256,6 +229,7 @@
       dashboardState.weeks = weeks || [];
       dashboardState.dailyLogs = dailyLogs || [];
       dashboardState.dailyTasks = dailyTasks || [];
+      window.OJTSelectedWeek?.initialize(dashboardState.weeks);
       renderDashboardWeekProgress();
       updateRenderedProgressSummary();
     } catch (error) {
@@ -289,8 +263,8 @@
       stats.hidden = true;
       empty.hidden = false;
       empty.textContent = totalRenderedMinutes > 0
-        ? "Add your required OJT hours in Profile to see completion progress."
-        : "Add your required OJT hours in Profile to track overall progress here.";
+        ? "Add your required OJT hours in Settings to see completion progress."
+        : "Add your required OJT hours in Settings to track overall progress here.";
       return;
     }
 
@@ -334,13 +308,13 @@
     setText("summary-student-name", studentProfile?.studentName || "Not set yet");
     setText(
       "summary-student-detail",
-      studentProfile?.courseOrProgram || "Add your student details in Profile so they appear on your journal."
+      studentProfile?.courseOrProgram || "Add your student details in Settings so they appear on your journal."
     );
 
     setText("summary-company-name", companyProfile?.companyName || "Not set yet");
     setText(
       "summary-company-detail",
-      companyProfile?.departmentOrAssignedArea || "Add your company details in Profile so they appear on your weekly journal preview."
+      companyProfile?.departmentOrAssignedArea || "Add your company details in Settings so they appear on your weekly journal preview."
     );
 
     const reminderElement = document.getElementById("dashboard-backup-reminder");
@@ -357,7 +331,6 @@
         }
       }
       reminderElement.hidden = !showReminder;
-      syncDashboardBackupAction(showReminder);
     }
 
     updateRenderedProgressSummary();
@@ -370,7 +343,7 @@
     setText("summary-week-count", label);
     setText(
       "summary-week-detail",
-      count > 0 ? "Saved weeks are ready for Daily Logs and Weekly Preview." : "Create your first OJT week before adding daily logs."
+      count > 0 ? "Saved weeks are ready in Journal and Preview & Export." : "Create your first OJT week in Journal before adding daily records."
     );
     refreshDashboardWeekProgress();
   }
@@ -384,7 +357,7 @@
     setText("summary-daily-log-count", label);
     setText(
       "summary-daily-log-detail",
-      count > 0 ? "Daily logs are grouped by OJT week." : "Create a week first, then log each day in Daily Logs."
+      count > 0 ? "Daily records are grouped by the selected OJT week." : "Create a week in Journal, then log each day."
     );
     updateRenderedProgressSummary();
     refreshDashboardWeekProgress();
@@ -416,16 +389,33 @@
     }
   });
 
+  document.addEventListener("ojt:selected-week-change", () => {
+    refreshDashboardWeekProgress();
+  });
+
+  function openDashboardDay(event) {
+    const button = event.target.closest?.("button[data-dashboard-day-date]");
+    if (!button) {
+      return;
+    }
+
+    const week = dashboardState.weeks.find((savedWeek) => savedWeek.id === button.dataset.dashboardWeekId);
+    if (!week) {
+      return;
+    }
+
+    window.OJTSelectedWeek?.selectWeek(week.id, { weeks: dashboardState.weeks, source: "dashboard:day" });
+    window.OJTApp?.showSection("journal");
+    document.dispatchEvent(new CustomEvent("ojt:open-daily-log", {
+      detail: { weekId: week.id, entryDate: button.dataset.dashboardDayDate }
+    }));
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     refreshDashboardWeekProgress();
-    document.getElementById("dashboard-go-daily-logs")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("daily-logs");
-    });
-    document.getElementById("dashboard-action-weekly-preview")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("weekly-preview");
-    });
-    document.getElementById("dashboard-action-backup")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("backup");
+    document.getElementById("dashboard-week-days")?.addEventListener("click", openDashboardDay);
+    document.getElementById("dashboard-reminder-recovery")?.addEventListener("click", () => {
+      document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
     });
   });
 

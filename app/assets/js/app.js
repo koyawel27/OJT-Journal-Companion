@@ -4,6 +4,23 @@ const menuButton = document.querySelector(".menu-button");
 const drawer = document.querySelector(".mobile-drawer");
 const drawerOverlay = document.querySelector(".drawer-overlay");
 const drawerCloseButton = document.querySelector(".drawer-close");
+const settingsTabs = document.querySelectorAll("[data-settings-tab]");
+const settingsPanels = document.querySelectorAll(".settings-panel");
+
+function activateSettingsTab(target) {
+  const tab = Array.from(settingsTabs).find((candidate) => candidate.dataset.settingsTab === target) || document.querySelector("[data-settings-tab=\"student\"]");
+  const controlsId = tab?.getAttribute("aria-controls");
+
+  settingsTabs.forEach((settingsTab) => {
+    const isActive = settingsTab === tab;
+    settingsTab.setAttribute("aria-selected", String(isActive));
+    settingsTab.tabIndex = isActive ? 0 : -1;
+  });
+
+  settingsPanels.forEach((panel) => {
+    panel.hidden = panel.id !== controlsId;
+  });
+}
 
 function openDrawer() {
   if (!drawer || !drawerOverlay || !menuButton) {
@@ -53,8 +70,28 @@ function showSection(sectionId) {
   }));
 }
 
+function focusSettingsArea(target) {
+  const targetIds = {
+    student: "student-name",
+    company: "company-name",
+    preferences: "preferred-week-start-day",
+    recovery: "export-backup-button"
+  };
+  const targetId = targetIds[target] || targetIds.student;
+
+  showSection("settings");
+  activateSettingsTab(target);
+  window.requestAnimationFrame(() => {
+    const control = document.getElementById(targetId);
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    control?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+    control?.focus();
+  });
+}
+
 window.OJTApp = {
-  showSection
+  showSection,
+  focusSettingsArea
 };
 
 navButtons.forEach((button) => {
@@ -73,3 +110,25 @@ document.addEventListener("keydown", (event) => {
     closeDrawer();
   }
 });
+
+document.addEventListener("ojt:focus-settings-section", (event) => {
+  focusSettingsArea(event.detail?.target);
+});
+
+document.getElementById("settings")?.addEventListener("click", (event) => {
+  const tab = event.target.closest?.("button[data-settings-tab]");
+  if (tab) {
+    activateSettingsTab(tab.dataset.settingsTab);
+  }
+});
+
+settingsTabs.forEach((tab) => {
+  tab.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activateSettingsTab(tab.dataset.settingsTab);
+    }
+  });
+});
+
+activateSettingsTab("student");

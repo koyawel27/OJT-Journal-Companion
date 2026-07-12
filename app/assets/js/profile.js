@@ -140,7 +140,7 @@
       populateSettingsForm(appSettings);
       window.OJTUI.updateDashboardSummary(studentProfile, companyProfile, appSettings);
     } catch (error) {
-      const message = "Could not load your profile. Refresh and try again.";
+      const message = "Could not load Settings data. Refresh and try again.";
       window.OJTUI.showFormMessage(document.getElementById("student-profile-message"), message, "error");
       console.error(error);
     }

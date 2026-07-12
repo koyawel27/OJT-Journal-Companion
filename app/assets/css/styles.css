@@ -240,8 +240,9 @@ h1 {
 }
 
 #dashboard.app-section,
-#daily-logs.app-section,
-#weekly-preview.app-section {
+#journal.app-section,
+#weekly-preview.app-section,
+#settings.app-section {
   max-width: 960px;
 }
 
@@ -355,7 +356,6 @@ h1 {
   width: 100%;
 }
 
-.mobile-profile-button,
 .mobile-section-tabs {
   display: none;
 }
@@ -411,37 +411,9 @@ h1 {
     display: none;
   }
 
-  .mobile-profile-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    min-height: 38px;
-    border-color: var(--accent-soft);
-    background: var(--panel);
-    color: var(--accent);
-    padding: 0;
-  }
-
-  .mobile-profile-button svg {
-    width: 19px;
-    height: 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.9;
-  }
-
-  .mobile-profile-button.is-active {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-  }
-
   .mobile-section-tabs {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     margin-top: 8px;
     overflow: hidden;
@@ -642,15 +614,6 @@ h1 {
   max-width: 58ch;
 }
 
-.dashboard-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.dashboard-action-backup[hidden] {
-  display: none !important;
-}
 
 .dashboard-identity-strip {
   margin-bottom: 18px;
@@ -957,6 +920,31 @@ h1 {
   background: var(--surface-accent);
 }
 
+.dashboard-day-action {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.48fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-day-action:focus-visible {
+  outline: 3px solid var(--marker);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-day-action:hover .dashboard-day-main {
+  color: var(--accent);
+}
+
 .dashboard-day-main,
 .dashboard-day-result {
   display: block;
@@ -1013,17 +1001,6 @@ h1 {
     align-items: end;
     gap: 20px;
     margin-bottom: 20px;
-  }
-
-  .dashboard-actions {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
-  }
-
-  .dashboard-actions .primary-button,
-  .dashboard-actions .secondary-button {
-    min-height: 42px;
-    white-space: nowrap;
   }
 
   .dashboard-ojt-progress-card {
@@ -1134,20 +1111,6 @@ h1 {
 
   .dashboard-lead {
     margin-top: 0;
-  }
-
-  .dashboard-actions {
-    flex-direction: column;
-  }
-
-  .dashboard-actions .primary-button,
-  .dashboard-actions .secondary-button {
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .dashboard-action-backup:not([hidden]) {
-    display: inline-flex;
   }
 
   .dashboard-ojt-progress-card {
@@ -1449,6 +1412,173 @@ h1 {
   line-height: 1.25;
 }
 
+.journal-layout,
+.journal-selected-workspace {
+  display: grid;
+  gap: 18px;
+}
+
+.journal-layout {
+  margin-top: 24px;
+}
+
+.journal-toolbar-header {
+  margin-bottom: 14px;
+}
+
+.journal-toolbar-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.selected-week-navigation {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.journal-week-picker {
+  margin: 0;
+}
+
+.journal-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.journal-toolbar-actions .primary-button,
+.journal-toolbar-actions .secondary-button {
+  min-height: 44px;
+}
+
+.journal-toolbar .form-message {
+  margin-top: 12px;
+}
+
+.journal-empty-state {
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.journal-empty-state h3 {
+  margin: 5px 0 6px;
+  font-size: 1.15rem;
+}
+
+.journal-empty-state p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.journal-panel .profile-form {
+  margin: 0;
+}
+
+.journal-overview-header p {
+  margin-top: 5px;
+}
+
+.journal-overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+
+.journal-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.journal-overview-grid div {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  padding: 12px;
+}
+
+.journal-overview-grid dt {
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.journal-overview-grid dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.journal-history-item.is-selected {
+  border-color: var(--accent);
+  background: var(--surface-accent);
+}
+
+.journal-summary-panel .weekly-summary-form {
+  margin-top: 0;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.journal-history-panel[hidden],
+.journal-empty-state[hidden],
+.journal-panel[hidden],
+.journal-selected-workspace[hidden],
+.selected-week-navigation[hidden] {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .journal-layout,
+  .journal-selected-workspace {
+    gap: 14px;
+  }
+
+  .journal-layout {
+    margin-top: 18px;
+  }
+
+  .selected-week-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-week-picker {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .week-step-button {
+    width: 100%;
+  }
+
+  .journal-toolbar-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .journal-toolbar-actions .primary-button,
+  .journal-toolbar-actions .secondary-button,
+  .journal-overview-header .secondary-button,
+  .journal-empty-state .primary-button {
+    width: 100%;
+  }
+
+  .journal-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .weekly-preview-layout {
   display: grid;
   gap: 18px;
@@ -2439,5 +2569,259 @@ body.daily-log-editor-open {
 
   .photo-caption-details summary {
     min-height: 44px;
+  }
+}
+@media (min-width: 761px) and (max-width: 900px) {
+  .dashboard-page-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .selected-week-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .journal-week-picker {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .week-step-button {
+    width: 100%;
+  }
+}
+
+.settings-jump-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.settings-stack {
+  margin-top: 0;
+}
+
+.settings-area {
+  scroll-margin-top: 18px;
+}
+
+.settings-area-header {
+  margin-bottom: 16px;
+}
+
+.settings-area-header h3 {
+  margin: 5px 0 6px;
+  font-size: 1.15rem;
+}
+
+.settings-area-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.settings-recovery {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.settings-recovery .backup-grid {
+  margin-top: 0;
+}
+
+.preview-warning-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-warning-item + .preview-warning-item {
+  margin-top: 10px;
+}
+
+.preview-warning-item .secondary-button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+  .mobile-tab-button {
+    min-height: 48px;
+    line-height: 1.15;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .settings-jump-nav {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-jump-nav .secondary-button,
+  .preview-warning-item .secondary-button {
+    width: 100%;
+  }
+
+  .settings-recovery {
+    padding: 15px;
+  }
+
+  .preview-warning-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* Phase 1 Part 4 UI correction: keep the Dashboard introduction compact. */
+.dashboard-page-header {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.dashboard-intro {
+  max-width: 62rem;
+}
+
+.dashboard-intro h2 {
+  white-space: nowrap;
+}
+
+/* Settings uses the existing button language as a local tab strip. */
+.settings-jump-nav {
+  display: none;
+}
+
+.settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.settings-tab {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  color: var(--label);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 7px 11px;
+  line-height: 1.2;
+}
+
+.settings-tab[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--panel);
+  color: var(--accent-deep);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.settings-tab:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.settings-panel[hidden] {
+  display: none !important;
+}
+
+@media (min-width: 761px) {
+  .dashboard-page-header {
+    margin-bottom: 20px;
+  }
+
+}
+
+@media (max-width: 760px) {
+  .settings-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .settings-tab {
+    width: 100%;
+    min-height: 42px;
+    padding: 7px 9px;
+    line-height: 1.15;
+  }
+}
+
+/* Final Part 4 visual correction: let each Dashboard day button use the full row. */
+.dashboard-day-action {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(120px, max-content) minmax(0, 1fr);
+  column-gap: 18px;
+}
+
+.dashboard-day-main {
+  justify-self: start;
+}
+
+.dashboard-day-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.dashboard-day-result small {
+  display: inline;
+  margin-top: 0;
+}
+
+.journal-toolbar-header {
+  display: grid;
+  gap: 4px;
+}
+
+.journal-toolbar-header h3 {
+  margin: 0;
+}
+
+.journal-toolbar-controls .selected-week-navigation {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.journal-toolbar .journal-week-picker {
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+}
+
+.journal-toolbar .week-step-button {
+  width: auto;
+  padding-inline: 10px;
+}
+
+.journal-toolbar-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.journal-toolbar-actions .primary-button,
+.journal-toolbar-actions .secondary-button {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .dashboard-day-action {
+    grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .dashboard-day-result {
+    justify-content: flex-end;
+    text-align: right;
   }
 }

@@ -6,7 +6,7 @@ This is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadma
 
 v1.1 is the stable released and tagged baseline. Future work must be phased, reviewable, reversible where practical, and protected by regression checks. This roadmap defines sequencing and outcomes, not implementation code. Implementation details remain governed by the current app and its source documents, including `PROJECT_BRIEF.md`, `FEATURES.md`, `DATA_STRUCTURE.md`, `WORKFLOWS.md`, and the DOCX documents.
 
-Completed pre-v1.1 polish—backup safety, Weekly Preview formatting, Dashboard progress, the Daily Logs editor, the muted theme, intern-focused microcopy, reset, and Official DOCX Export—is now regression history, not active work. The deferred broad utility/IndexedDB refactor is not an approved standalone phase; any maintainability change must be justified within an active phase and kept narrow.
+Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboard progress, the Daily Logs editor, the muted theme, intern-focused microcopy, reset, and Official DOCX Export—is now regression history, not active work. The deferred broad utility/IndexedDB refactor is not an approved standalone phase; any maintainability change must be justified within an active phase and kept narrow.
 
 ## 2. Current Baseline
 
@@ -18,7 +18,7 @@ Completed pre-v1.1 polish—backup safety, Weekly Preview formatting, Dashboard 
 | Capabilities | Profiles/settings, week management, daily records, tasks, photos, weekly summaries, preview/copy, JSON backup/restore/reset, and Official DOCX Export. |
 | DOCX | Client-side `docx-templates` v2 export with a private-first official template and tracked sanitized fallback. |
 | Strengths | Mature single-user feature set, offline-first data ownership, official rendered-hours rules, editable output, responsive foundations, and no server dependency. |
-| Main weakness | The weekly workflow is split across Weeks, Daily Logs, Dashboard, and Weekly Preview, with independent week selection. |
+| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow; Photo Documentation Groups are the next active concern. |
 
 ## 3. Product Principles
 
@@ -42,7 +42,7 @@ These decisions are approved and must not be reopened unless the current code re
 - Journal shows one selected week's full daily list; previous weeks stay compact and selectable.
 - Selection priority: week containing today, last valid selected week, latest week, then no selection. A new week becomes selected immediately.
 - Journal owns week CRUD, selected-week overview, daily records, tasks, photos, and weekly-summary editing. A quick Log Today action remains easy to reach.
-- Weekly Preview remains a review/copy/export destination, not the primary summary editor.
+- Preview & Export remains a review/copy/export destination, not the primary summary editor.
 - `PhotoDocumentationGroup` is the future direction: shared caption, multiple ordered images, optional individual captions, and v1.1 photos as implicit one-photo groups.
 - Data/recovery hardening occurs before broad public reliance. Restore remains replace-style; cloud sync is excluded.
 - A static hosted installable PWA is the primary distribution target, with GitHub Pages first.
@@ -52,18 +52,18 @@ These decisions are approved and must not be reopened unless the current code re
 
 ## 5. Phase Overview
 
-| Phase | Name | Objective | Data-model impact | Major dependency | Release/beta gate |
-| --- | --- | --- | --- | --- | --- |
-| 0 | Baseline and Roadmap Alignment | Establish one accurate post-v1.1 plan and regression baseline. | None | Released/tagged v1.1 | Roadmap approval |
-| 1 | Journal UX Architecture | Unify the weekly workflow and selected-week state. | None expected | Phase 0 | Journal workflow acceptance |
-| 2 | Photo Documentation Groups | Support related image groups, captions, and ordering. | IndexedDB and backup version changes | Phase 1 | Migration/export acceptance |
-| 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes |
-| 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1–3 | Accessibility/responsive acceptance |
-| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback |
-| 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3–5 | Hosted/PWA readiness |
-| 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met |
-| 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance |
-| 9 | Native Packaging Decision | Decide whether PWA limitations justify one native path. | Decision-dependent | Phase 7 evidence | Explicit adoption or deferral |
+| Phase | Name | Objective | Data-model impact | Major dependency | Release/beta gate | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | Baseline and Roadmap Alignment | Establish one accurate post-v1.1 plan and regression baseline. | None | Released/tagged v1.1 | Roadmap approval | Complete |
+| 1 | Journal UX Architecture | Unify the weekly workflow and selected-week state. | None expected | Phase 0 | Journal workflow acceptance | Complete |
+| 2 | Photo Documentation Groups | Support related image groups, captions, and ordering. | IndexedDB and backup version changes | Phase 1 | Migration/export acceptance | Next |
+| 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Planned |
+| 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1–3 | Accessibility/responsive acceptance | Planned |
+| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Planned |
+| 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3–5 | Hosted/PWA readiness | Planned |
+| 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
+| 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance | Planned |
+| 9 | Native Packaging Decision | Decide whether PWA limitations justify one native path. | Decision-dependent | Phase 7 evidence | Explicit adoption or deferral | Planned |
 
 ## 6. Detailed Phase Plans
 
@@ -87,7 +87,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Required testing:** Documentation review; branch/tag/status verification; duplicate heading/phase checks; stale DOCX/photo wording search; table review; `git diff --check`; confirm no app file changed.
 
-**Exit criteria:** Roadmap is approved as authoritative, handoff names Phase 1 next, v1.1 is the stable baseline, and Phase 0 QA passes.
+**Exit criteria:** Roadmap is authoritative, v1.1 is the stable baseline, and Phase 0 QA passes.
 
 **Dependencies on earlier phases:** None.
 
@@ -95,7 +95,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Objective:** Create one Journal workspace with shared selected-week context.
 
-**Problem being solved:** Weeks, Daily Logs, Dashboard, and Weekly Preview independently choose or retain week context, increasing effort and wrong-week risk.
+**Problem being solved:** Weeks, Daily Logs, Dashboard, and Preview & Export independently chose or retained week context, increasing effort and wrong-week risk.
 
 **In scope:**
 
@@ -123,9 +123,15 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Exit criteria:** A user can create/select one week, complete daily/summary work in Journal, and open Preview & Export without reselecting or changing weeks; v1.1 regression passes.
 
+**Completion status:** Complete and accepted. Phase 1 now provides shared selected-week state through `window.OJTSelectedWeek`; one Journal workspace owns Weeks and Daily Logs, including Previous/Next/dropdown navigation, New Week and compact All Weeks actions, the selected-week overview, Daily Log/task/photo/weekly-summary editing, and Log Today. Dashboard day handoffs open Journal on the correct date, and Preview & Export receives the selected week without re-selection. Top-level navigation is Dashboard, Journal, Preview & Export, and Settings; Settings owns profile, company, preferences, backup, restore, and reset. No IndexedDB schema or backup-format changes were made, and v1.1 data/export behavior remains preserved.
+
+**Phase 1 verification evidence:** The four reviewed Phase 1 parts passed static checks and manual regression for selected-week synchronization, Week/DailyLog/task/photo/summary behavior, Dashboard handoffs/calculations, Preview & Export, Settings tabs/handoffs, backup/restore/reset, Copy Weekly Journal, and representative DOCX export. Desktop, tablet, and mobile layouts were reviewed, including native-browser paths that automated checks could not fully cover. No confirmed Phase 1 defect remains; this note does not claim a full image-matrix rerun.
+
 **Dependencies on earlier phases:** Phase 0 approval and regression baseline.
 
 ### Phase 2 — Photo Documentation Groups
+
+**Phase 2 planning boundary:** Before implementation, perform a focused migration and compatibility design review covering group/attachment shapes, the IndexedDB version, migration of existing `PhotoAttachment` records including implicit one-photo legacy groups, ordering and cascade behavior, backup version/format, old-backup restore, rollback/recovery, and Preview/DOCX payload compatibility. Do not finalize the schema or begin implementation in this closeout.
 
 **Objective:** Represent one documentation moment with a shared caption and multiple ordered images while preserving v1.1 photos.
 
@@ -323,8 +329,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 ## 7. Cross-Phase Dependencies
 
-- Journal architecture before visual redesign; Phase 4 must not hide unresolved Phase 1 architecture.
-- Photo-group schema before final gallery styling and before Phase 3 finalizes current backup validation.
+- Phase 4 must build on the settled Phase 1 Journal architecture and must not reopen it without a documented direct conflict.- Photo-group schema before final gallery styling and before Phase 3 finalizes current backup validation.
 - Data hardening before broad public reliance.
 - Responsive/accessibility and generic or authorized branding readiness before public-facing beta material.
 - PWA before friend beta.
@@ -341,7 +346,7 @@ Future phases must preserve:
 - DailyTask description, optional duration, personal status, and ordering behavior.
 - Local photos, captions/categories, download, and deletion.
 - Weekly summaries.
-- Weekly Preview and Copy Weekly Journal.
+- Preview & Export and Copy Weekly Journal.
 - JSON backup/export, replace-style restore, and guarded reset.
 - Official DOCX Export: dynamic day rows, summaries, editable output, blank signatures, and selected-week correctness.
 - Automatic Photo Documentation appendix and dynamic two-column layout.
@@ -360,7 +365,7 @@ Future phases must preserve:
 - No premature Capacitor/Tauri work or parallel Android/Windows packaging.
 - No unversioned PWA caching or journal/photo data in Cache Storage.
 - No data migration without legacy database and backup compatibility tests.
-- No visual redesign before Journal architecture settles.
+- No visual redesign that bypasses or reopens the settled Journal architecture.
 - No duplicate post-v1.1, UX, or PWA roadmap.
 
 ## 10. Open Decisions
@@ -369,7 +374,6 @@ Only these remain unresolved:
 
 - Authoritative BPC assets, palette, guidance, and permissions for repository, hosted app, icons, screenshots, and promotion.
 - Exact GitHub Pages repository/project URL.
-- Detailed Phase 1 interaction pattern and selected-week persistence mechanism after implementation review, within accepted direction and no-schema-change constraint.
 - Exact backup reminder, quota, and storage-warning thresholds after browser testing.
 - Whether official template import remains necessary after beta.
 - Whether beta evidence supports one native path or continued PWA-only use.
@@ -377,9 +381,9 @@ Only these remain unresolved:
 ## 11. Roadmap Change Control
 
 - v1.1 remains the stable rollback/regression baseline.
-- Use a dedicated branch per phase; the recommended first branch is `feature/journal-ux-architecture` after roadmap approval.
+- Phase 1 Journal architecture is settled. Use a dedicated branch per phase; the next recommended branch is `feature/photo-documentation-groups` after Phase 2 planning review.
 - Review phase scope, current code, likely files, risks, and tests before coding.
 - Data-model phases require explicit IndexedDB migration, backup-version, restore-compatibility, and rollback/recovery review.
 - Keep changes phase-scoped; do not combine opportunistic framework/platform work.
-- On phase completion, update this roadmap and minimally update `PROJECT_HANDOFF.md` with current state and next phase.
+- On phase completion, update this roadmap and minimally update `PROJECT_HANDOFF.md` with current state and next phase. Phase 4 builds on the settled Phase 1 Journal architecture; do not reopen that architecture during visual redesign.
 - Do not reopen accepted decisions or completed phases without a documented direct conflict from current implementation evidence.

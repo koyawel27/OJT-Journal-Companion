@@ -333,6 +333,7 @@
 
     try {
       await window.OJTStorage.clearAllData();
+      window.OJTSelectedWeek?.clearSelection({ source: "reset" });
       window.OJTUI.showFormMessage(messageElement, "Local data reset. Reloading...", "success");
       window.setTimeout(() => {
         window.location.reload();
