@@ -7,8 +7,24 @@ const directImageTypes = {
   "image/jpeg": ".jpg",
   "image/png": ".png"
 };
-const landscapeImageBoundsCm = { width: 7.2, height: 5.4 };
-const portraitImageBoundsCm = { width: 6.8, height: 8.5 };
+const photoImageBoundsCm = {
+  single: {
+    landscape: { width: 13.5, height: 8.5 },
+    portrait: { width: 8.5, height: 11.5 }
+  },
+  double: {
+    landscape: { width: 7.2, height: 5.4 },
+    portrait: { width: 6.8, height: 8.5 }
+  },
+  triple: {
+    landscape: { width: 4.6, height: 3.5 },
+    portrait: { width: 4.5, height: 6.0 }
+  },
+  grid: {
+    landscape: { width: 7.2, height: 5.4 },
+    portrait: { width: 6.8, height: 8.5 }
+  }
+};
 
 function createExportError(message, cause) {
   const error = new Error(message);
@@ -246,10 +262,11 @@ async function prepareImageBlob(photo) {
   }
 }
 
-function fitImage(widthPx, heightPx) {
+function fitImage(widthPx, heightPx, layout) {
   const naturalWidthCm = (widthPx / 96) * 2.54;
   const naturalHeightCm = (heightPx / 96) * 2.54;
-  const bounds = heightPx > widthPx ? portraitImageBoundsCm : landscapeImageBoundsCm;
+  const layoutBounds = photoImageBoundsCm[layout] || photoImageBoundsCm.grid;
+  const bounds = heightPx > widthPx ? layoutBounds.portrait : layoutBounds.landscape;
   const scale = Math.min(1, bounds.width / naturalWidthCm, bounds.height / naturalHeightCm);
 
   return {
@@ -289,8 +306,19 @@ function buildPhotoRows(photos) {
   return rows;
 }
 
+function getPhotoSetLayout(photoCount) {
+  return photoCount === 1
+    ? "single"
+    : photoCount === 2
+    ? "double"
+    : photoCount === 3
+    ? "triple"
+    : "grid";
+}
+
 async function preparePhotoSet(photoSet) {
   const sharedCaption = String(photoSet.photos[0]?.caption ?? "").trim();
+  const layout = getPhotoSetLayout(photoSet.photos.length);
   const preparedPhotos = [];
 
   for (const [index, photo] of photoSet.photos.entries()) {
@@ -301,20 +329,11 @@ async function preparePhotoSet(photoSet) {
         extension: prepared.extension,
         widthPx: prepared.widthPx,
         heightPx: prepared.heightPx,
-        ...fitImage(prepared.widthPx, prepared.heightPx)
+        ...fitImage(prepared.widthPx, prepared.heightPx, layout)
       },
       captionDisplay: index === 0 ? sharedCaption : ""
     });
   }
-
-  const photoCount = preparedPhotos.length;
-  const layout = photoCount === 1
-    ? "single"
-    : photoCount === 2
-    ? "double"
-    : photoCount === 3
-    ? "triple"
-    : "grid";
 
   return {
     key: photoSet.key,
@@ -322,6 +341,10 @@ async function preparePhotoSet(photoSet) {
     captionDisplay: sharedCaption,
     photos: preparedPhotos,
     layout,
+    isSingle: layout === "single",
+    isDouble: layout === "double",
+    isTriple: layout === "triple",
+    isGrid: layout === "grid",
     singlePhoto: layout === "single" ? preparedPhotos[0] : null,
     doublePhotos: layout === "double" ? preparedPhotos : [],
     triplePhotos: layout === "triple" ? preparedPhotos : [],
@@ -329,7 +352,6 @@ async function preparePhotoSet(photoSet) {
     compatibilityPhotoRows: buildPhotoRows(preparedPhotos)
   };
 }
-
 async function buildPhotoDays(payload) {
   const relatedPhotos = payload.photoAttachments || [];
   const photoDays = [];
