@@ -614,15 +614,6 @@ h1 {
   max-width: 58ch;
 }
 
-.dashboard-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.dashboard-action-backup[hidden] {
-  display: none !important;
-}
 
 .dashboard-identity-strip {
   margin-bottom: 18px;
@@ -1012,17 +1003,6 @@ h1 {
     margin-bottom: 20px;
   }
 
-  .dashboard-actions {
-    justify-content: flex-end;
-    flex-wrap: nowrap;
-  }
-
-  .dashboard-actions .primary-button,
-  .dashboard-actions .secondary-button {
-    min-height: 42px;
-    white-space: nowrap;
-  }
-
   .dashboard-ojt-progress-card {
     gap: 18px;
     padding: 24px 26px;
@@ -1131,20 +1111,6 @@ h1 {
 
   .dashboard-lead {
     margin-top: 0;
-  }
-
-  .dashboard-actions {
-    flex-direction: column;
-  }
-
-  .dashboard-actions .primary-button,
-  .dashboard-actions .secondary-button {
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .dashboard-action-backup:not([hidden]) {
-    display: inline-flex;
   }
 
   .dashboard-ojt-progress-card {
@@ -2611,11 +2577,6 @@ body.daily-log-editor-open {
     align-items: start;
   }
 
-  .dashboard-actions {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
   .selected-week-navigation {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2716,12 +2677,10 @@ body.daily-log-editor-open {
   }
 }
 
-/* Phase 1 Part 4 UI correction: keep the Dashboard introduction readable and actions discoverable. */
+/* Phase 1 Part 4 UI correction: keep the Dashboard introduction compact. */
 .dashboard-page-header {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
+  display: block;
+  margin-bottom: 18px;
 }
 
 .dashboard-intro {
@@ -2732,12 +2691,6 @@ body.daily-log-editor-open {
   white-space: nowrap;
 }
 
-.dashboard-actions {
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
 /* Settings uses the existing button language as a local tab strip. */
 .settings-jump-nav {
   display: none;
@@ -2746,10 +2699,10 @@ body.daily-log-editor-open {
 .settings-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: 6px;
+  margin-bottom: 14px;
   border-bottom: 1px solid var(--line);
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 
 .settings-tab {
@@ -2760,8 +2713,9 @@ body.daily-log-editor-open {
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  min-height: 42px;
-  padding: 9px 13px;
+  min-height: 40px;
+  padding: 7px 11px;
+  line-height: 1.2;
 }
 
 .settings-tab[aria-selected="true"] {
@@ -2785,21 +2739,20 @@ body.daily-log-editor-open {
     margin-bottom: 20px;
   }
 
-  .dashboard-actions .primary-button,
-  .dashboard-actions .secondary-button {
-    white-space: nowrap;
-  }
 }
 
 @media (max-width: 760px) {
   .settings-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .settings-tab {
     width: 100%;
-    min-height: 48px;
+    min-height: 42px;
+    padding: 7px 9px;
+    line-height: 1.15;
   }
 }
 

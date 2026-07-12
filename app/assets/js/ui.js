@@ -124,18 +124,6 @@
     return `<li class="${filled ? "is-filled" : "is-missing"}">${escapeHtml(label)}: ${statusText}</li>`;
   }
 
-  function setWeeklyPreviewButtonsEnabled(enabled) {
-    document.getElementById("dashboard-action-weekly-preview")?.toggleAttribute("disabled", !enabled);
-    document.getElementById("dashboard-edit-weekly-summary")?.toggleAttribute("disabled", !enabled);
-  }
-
-  function syncDashboardBackupAction(showReminder) {
-    const backupAction = document.getElementById("dashboard-action-backup");
-    if (backupAction) {
-      backupAction.hidden = !showReminder;
-    }
-  }
-
   function normalizeDayStatus(value) {
     return window.OJTCalculations?.normalizeDayStatus(value) || "Worked";
   }
@@ -157,13 +145,11 @@
       setText("dashboard-week-worked-days", "0");
       setText("dashboard-week-open-days", "0");
       daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Journal.</li>';
-      setWeeklyPreviewButtonsEnabled(false);
       summaryElement.innerHTML = `
         <li class="is-missing">Skills Learned: missing</li>
         <li class="is-missing">Problems Encountered: missing</li>
         <li class="is-missing">Reflection: missing</li>
       `;
-      setWeeklyPreviewButtonsEnabled(false);
       return;
     }
 
@@ -226,7 +212,6 @@
       renderSummaryStatusItem("Reflection", week.reflectionOrPointsOfLearning)
     ].join("");
 
-    setWeeklyPreviewButtonsEnabled(true);
   }
 
   async function refreshDashboardWeekProgress() {
@@ -346,7 +331,6 @@
         }
       }
       reminderElement.hidden = !showReminder;
-      syncDashboardBackupAction(showReminder);
     }
 
     updateRenderedProgressSummary();
@@ -430,21 +414,6 @@
   document.addEventListener("DOMContentLoaded", () => {
     refreshDashboardWeekProgress();
     document.getElementById("dashboard-week-days")?.addEventListener("click", openDashboardDay);
-    document.getElementById("dashboard-go-journal")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("journal");
-    });
-    document.getElementById("dashboard-log-today")?.addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("ojt:log-today", { detail: { source: "dashboard" } }));
-    });
-    document.getElementById("dashboard-edit-weekly-summary")?.addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("ojt:focus-weekly-summary", { detail: { source: "dashboard" } }));
-    });
-    document.getElementById("dashboard-action-weekly-preview")?.addEventListener("click", () => {
-      window.OJTApp?.showSection("weekly-preview");
-    });
-    document.getElementById("dashboard-action-backup")?.addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
-    });
     document.getElementById("dashboard-reminder-recovery")?.addEventListener("click", () => {
       document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
     });
