@@ -128,6 +128,138 @@
     });
   }
 
+  async function savePhotoAttachments(photoAttachments) {
+    if (!Array.isArray(photoAttachments) || photoAttachments.length === 0) {
+      throw new Error("At least one photo attachment is required.");
+    }
+
+    const db = await window.OJTDB.openDatabase();
+    const storeName = getStoreName("photoAttachments");
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeName, "readwrite");
+      const store = transaction.objectStore(storeName);
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve(photoAttachments);
+      };
+
+      transaction.onerror = () => {
+        db.close();
+        reject(transaction.error || new Error("The photo batch could not be saved."));
+      };
+
+      transaction.onabort = () => {
+        db.close();
+        reject(transaction.error || new Error("The photo batch could not be saved."));
+      };
+
+      try {
+        photoAttachments.forEach((photoAttachment) => {
+          store.put(photoAttachment);
+        });
+      } catch (error) {
+        try {
+          transaction.abort();
+        } catch {
+          // The transaction may already be inactive.
+        }
+        reject(error);
+      }
+    });
+  }
+  async function updatePhotoSetMetadata(photoSetId, metadata) {
+    const normalizedPhotoSetId = String(photoSetId ?? "").trim();
+
+    if (!normalizedPhotoSetId) {
+      throw new Error("Photo set ID must contain non-whitespace characters.");
+    }
+
+    const update = metadata || {};
+    const hasCaption = Object.prototype.hasOwnProperty.call(update, "caption");
+    const hasPhotoCategory = Object.prototype.hasOwnProperty.call(update, "photoCategory");
+
+    if (!hasCaption && !hasPhotoCategory) {
+      throw new Error("Photo set metadata must include a caption or category.");
+    }
+
+    const normalizedCaption = hasCaption ? String(update.caption ?? "") : null;
+    const normalizedPhotoCategory = hasPhotoCategory
+      ? window.OJTPhotos.normalizePhotoCategory(update.photoCategory)
+      : null;
+    const db = await window.OJTDB.openDatabase();
+    const storeName = getStoreName("photoAttachments");
+
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeName, "readwrite");
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+      let updatedAttachments = [];
+
+      request.onsuccess = () => {
+        updatedAttachments = (request.result || [])
+          .filter((photoAttachment) => photoAttachment.photoSetId === normalizedPhotoSetId)
+          .map((photoAttachment) => {
+            return {
+              ...photoAttachment,
+              ...(hasCaption ? { caption: normalizedCaption } : {}),
+              ...(hasPhotoCategory ? { photoCategory: normalizedPhotoCategory } : {})
+            };
+          });
+
+        if (updatedAttachments.length === 0) {
+          const error = new Error("No photos were found for this photo set.");
+
+          reject(error);
+          try {
+            transaction.abort();
+          } catch {
+            // The transaction may already be inactive.
+          }
+          return;
+        }
+
+        try {
+          updatedAttachments.forEach((photoAttachment) => {
+            store.put(photoAttachment);
+          });
+        } catch (error) {
+          reject(error);
+          try {
+            transaction.abort();
+          } catch {
+            // The transaction may already be inactive.
+          }
+        }
+      };
+
+      request.onerror = () => {
+        reject(request.error || new Error("The photo set could not be loaded."));
+        try {
+          transaction.abort();
+        } catch {
+          // The transaction may already be inactive.
+        }
+      };
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve(updatedAttachments);
+      };
+
+      transaction.onerror = () => {
+        db.close();
+        reject(transaction.error || new Error("The photo set could not be updated."));
+      };
+
+      transaction.onabort = () => {
+        db.close();
+        reject(transaction.error || new Error("The photo set could not be updated."));
+      };
+    });
+  }
+
   async function deleteDailyLogWithRelatedRecords(dailyLogId) {
     const db = await window.OJTDB.openDatabase();
     const dailyLogStore = getStoreName("dailyLogs");
@@ -273,6 +405,8 @@
     deleteDailyTask: (id) => deleteItem("dailyTasks", id),
     getPhotoAttachments: () => getAllRecords("photoAttachments"),
     savePhotoAttachment: (photoAttachment) => saveItem("photoAttachments", photoAttachment),
+    savePhotoAttachments,
+    updatePhotoSetMetadata,
     deletePhotoAttachment: (id) => deleteItem("photoAttachments", id),
     replaceAllData,
     clearAllData
