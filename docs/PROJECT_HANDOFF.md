@@ -183,16 +183,8 @@ The compact two-column appendix layout was manually accepted. Configurable image
 
 ## Next development step
 
-The next development step is **Phase 2 — Batch Photo Documentation**. The accepted lightweight design is:
+The next development step is **Phase 2 — Batch Photo Documentation**. The accepted lightweight design uses one generated `photoSetId` per new upload action, automatic `photoSetIndex` values based on captured file-selection order, shared category/caption copied to each attachment, atomic batch operations, singleton handling for existing photos without set metadata, one Journal caption per set, and one DOCX caption on the first ordered image.
 
-- one or multiple JPEG, PNG, or WebP files per upload action;
-- one optional `photoSetId` and automatic `photoSetIndex` for each new upload action, including a single-image upload;
-- one shared category and caption copied to every attachment in the set;
-- atomic batch creation and shared metadata edits;
-- existing photos without a set ID treated as independent singleton sets;
-- Journal caption/category display once per set;
-- DOCX caption output only on the first ordered image in each set;
-- no new object store, IndexedDB version increase, migration, backupVersion change, template change, regular payload change, or visible Preview photo expansion.
 
 Implementation has not started. Preserve the v1.1 rollback baseline and accepted Phase 1 architecture while validating one/multiple uploads, legacy photos, deletion behavior, backup/restore, and DOCX output.
 ## Deferred work

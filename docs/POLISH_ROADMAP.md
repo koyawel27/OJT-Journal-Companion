@@ -142,7 +142,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Likely files/modules:** `photos.js`, `storage.js`, `daily-logs.js`, `styles.css`, and `docx-export-v2.js`. `db.js`, `backup.js`, `journal-payload.js`, `journal-preview.js`, `app/index.html`, and DOCX templates should remain unchanged unless source evidence reveals a narrow compatibility need.
 
-**Data-model impact:** No IndexedDB schema change is expected. Optional attachment properties are additive; existing records without `photoSetId` remain valid. Backup serialization already preserves additional attachment metadata, so no backupVersion change is expected.
+**Data-model impact:** No IndexedDB database-version increase, new object store, or object-store migration is required. `PhotoAttachment` gains optional additive `photoSetId` and `photoSetIndex` properties for new uploads, while existing records without those properties remain valid. Existing JSON backup and restore behavior remains compatible.
 
 **Migration/backward-compatibility considerations:** No database migration is planned. Existing photos remain unchanged and are treated as independent singleton sets at read time. Existing JSON backups restore through the current path; missing optional batch metadata must remain valid.
 
