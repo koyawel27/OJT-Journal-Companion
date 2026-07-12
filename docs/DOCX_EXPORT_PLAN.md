@@ -2,7 +2,7 @@
 
 ## Status
 
-Official DOCX Export with an automatic Photo Documentation appendix is merged into master and released as v1.1. Final regression and release validation are complete. The v1.1 Git tag is not created yet.
+Official DOCX Export with an automatic Photo Documentation appendix is merged into master and released as v1.1. Final regression and release validation are complete. The v1.1 Git tag has been created and pushed, and v1.1 remains the stable released rollback baseline.
 
 | Item | Status |
 | --- | --- |
@@ -22,7 +22,7 @@ Official DOCX Export with an automatic Photo Documentation appendix is merged in
 | Documentation synchronization | Complete |
 | Final regression | Complete on merged master |
 | PR review and merge | Complete |
-| v1.1 release status | Implementation merged; tag creation and push remain |
+| v1.1 release status | Released and tagged; stable rollback baseline |
 
 ## Final production design
 

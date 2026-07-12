@@ -35,10 +35,11 @@ The repository is a static web app folder even when stored under C:\xampp-projec
 9. weeks.js
 10. daily-logs.js
 11. journal-payload.js
-12. journal-preview.js
-13. backup.js
+12. docx-export-v2.js as a module
+13. journal-preview.js
+14. backup.js
 
-`docx-export-v2.js` is the exporter module used by the Preview & Export workflow and exposes `window.OJTDocxExportV2`; it is not a direct script entry in `app/index.html`.
+`docx-export-v2.js` is loaded directly by `app/index.html` as a module and exposes `window.OJTDocxExportV2`.
 
 Key globals include `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations`, `window.OJTPhotos`, `window.OJTSelectedWeek`, `window.OJTUI`, `window.OJTApp`, `window.OJTJournalPayload`, and `window.OJTDocxExportV2`.
 
