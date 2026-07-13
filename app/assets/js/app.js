@@ -1,9 +1,5 @@
 const navButtons = document.querySelectorAll(".nav-button");
 const sections = document.querySelectorAll(".app-section");
-const menuButton = document.querySelector(".menu-button");
-const drawer = document.querySelector(".mobile-drawer");
-const drawerOverlay = document.querySelector(".drawer-overlay");
-const drawerCloseButton = document.querySelector(".drawer-close");
 const settingsTabs = document.querySelectorAll("[data-settings-tab]");
 const settingsPanels = document.querySelectorAll(".settings-panel");
 
@@ -20,31 +16,6 @@ function activateSettingsTab(target) {
   settingsPanels.forEach((panel) => {
     panel.hidden = panel.id !== controlsId;
   });
-}
-
-function openDrawer() {
-  if (!drawer || !drawerOverlay || !menuButton) {
-    return;
-  }
-
-  drawer.hidden = false;
-  drawerOverlay.hidden = false;
-  drawer.setAttribute("aria-hidden", "false");
-  menuButton.setAttribute("aria-expanded", "true");
-  document.body.classList.add("drawer-open");
-  drawerCloseButton?.focus();
-}
-
-function closeDrawer() {
-  if (!drawer || !drawerOverlay || !menuButton) {
-    return;
-  }
-
-  drawer.hidden = true;
-  drawerOverlay.hidden = true;
-  drawer.setAttribute("aria-hidden", "true");
-  menuButton.setAttribute("aria-expanded", "false");
-  document.body.classList.remove("drawer-open");
 }
 
 function showSection(sectionId) {
@@ -97,18 +68,7 @@ window.OJTApp = {
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
     showSection(button.dataset.section);
-    closeDrawer();
   });
-});
-
-menuButton?.addEventListener("click", openDrawer);
-drawerOverlay?.addEventListener("click", closeDrawer);
-drawerCloseButton?.addEventListener("click", closeDrawer);
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeDrawer();
-  }
 });
 
 document.addEventListener("ojt:focus-settings-section", (event) => {
