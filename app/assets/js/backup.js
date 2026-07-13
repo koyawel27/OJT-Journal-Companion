@@ -107,6 +107,7 @@
 
   const errorCodes = {
     INVALID_BACKUP_OBJECT: "INVALID_BACKUP_OBJECT",
+    INVALID_JSON: "INVALID_JSON",
     MISSING_APP_NAME: "MISSING_APP_NAME",
     WRONG_APP_NAME: "WRONG_APP_NAME",
     MISSING_BACKUP_VERSION: "MISSING_BACKUP_VERSION",
@@ -825,6 +826,461 @@
     return `Backup file is damaged or incomplete: ${firstMessage}`;
   }
 
+  const restoreReviewMessageLimit = 10;
+  let pendingRestore = null;
+  let restoreAnalysisToken = 0;
+  let restoreInProgress = false;
+  let safetyExportInProgress = false;
+
+  function setRestoreBusy(busy) {
+    const panel = getReviewElement("restore-review-panel");
+    const restoreButton = getReviewElement("restore-this-backup-button");
+    const cancelButton = getReviewElement("cancel-restore-review-button");
+    const exportButton = getReviewElement("export-current-data-first-button");
+    const fileInput = getElement("restore-backup-file");
+    const hasValidReview = Boolean(pendingRestore?.validationResult.valid && pendingRestore.restoreCandidate);
+    const operationBusy = busy || safetyExportInProgress;
+
+    if (panel) {
+      if (operationBusy) {
+        panel.setAttribute("aria-busy", "true");
+      } else {
+        panel.removeAttribute("aria-busy");
+      }
+    }
+    if (restoreButton) {
+      restoreButton.disabled = operationBusy || !hasValidReview;
+      restoreButton.textContent = busy ? "Restoring..." : "Restore This Backup";
+      restoreButton.setAttribute("aria-busy", String(busy));
+    }
+    if (cancelButton) {
+      cancelButton.disabled = operationBusy || !pendingRestore;
+    }
+    if (exportButton) {
+      exportButton.disabled = operationBusy || !hasValidReview;
+    }
+    if (fileInput) {
+      fileInput.disabled = operationBusy;
+    }
+  }
+
+  function setSafetyExportBusy(busy) {
+    const panel = getReviewElement("restore-review-panel");
+    const restoreButton = getReviewElement("restore-this-backup-button");
+    const cancelButton = getReviewElement("cancel-restore-review-button");
+    const button = getReviewElement("export-current-data-first-button");
+    const fileInput = getElement("restore-backup-file");
+    const hasValidReview = Boolean(pendingRestore?.validationResult.valid && pendingRestore.restoreCandidate);
+    const operationBusy = busy || restoreInProgress;
+
+    if (panel) {
+      if (operationBusy) {
+        panel.setAttribute("aria-busy", "true");
+      } else {
+        panel.removeAttribute("aria-busy");
+      }
+    }
+    if (restoreButton) {
+      restoreButton.disabled = operationBusy || !hasValidReview;
+    }
+    if (cancelButton) {
+      cancelButton.disabled = operationBusy || !pendingRestore;
+    }
+    if (button) {
+      button.disabled = operationBusy || !hasValidReview;
+      button.textContent = busy ? "Exporting..." : "Export Current Data First";
+      button.setAttribute("aria-busy", String(busy));
+    }
+    if (fileInput) {
+      fileInput.disabled = operationBusy;
+    }
+  }
+
+  function getReviewElement(id) {
+    return getElement(id);
+  }
+
+  function setReviewText(id, value) {
+    const element = getReviewElement(id);
+    if (element) {
+      element.textContent = String(value ?? "");
+    }
+  }
+
+  function clearReviewList(id) {
+    const list = getReviewElement(id);
+    if (!list) {
+      return;
+    }
+
+    while (list.firstChild) {
+      list.removeChild(list.firstChild);
+    }
+  }
+
+  function createReviewResult(code, message) {
+    return {
+      valid: false,
+      errors: [{ code, message }],
+      warnings: [],
+      metadata: null,
+      counts: null,
+      restoreCandidate: null
+    };
+  }
+
+  function formatReviewFileSize(bytes) {
+    if (Number.isFinite(bytes) && window.OJTPhotos?.formatFileSize) {
+      return window.OJTPhotos.formatFileSize(bytes);
+    }
+
+    if (!Number.isFinite(bytes) || bytes < 0) {
+      return "Unknown size";
+    }
+
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+
+    const units = ["KB", "MB", "GB"];
+    let size = bytes;
+    let unitIndex = -1;
+
+    do {
+      size /= 1024;
+      unitIndex += 1;
+    } while (size >= 1024 && unitIndex < units.length - 1);
+
+    return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+  }
+
+  function formatReviewDate(value) {
+    if (!value) {
+      return "Not provided";
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "Not provided" : date.toLocaleString();
+  }
+
+  function formatReviewCount(value) {
+    return Number.isFinite(value) ? String(value) : "Unavailable";
+  }
+
+  function formatReviewPresence(value, counts) {
+    if (!counts) {
+      return "Unavailable";
+    }
+
+    return value ? "Present" : "Not present";
+  }
+
+  function getValidationCategory(code) {
+    if (code === errorCodes.INVALID_JSON) {
+      return "Invalid JSON";
+    }
+
+    if (code === errorCodes.WRONG_APP_NAME || code === errorCodes.MISSING_APP_NAME) {
+      return "Wrong application";
+    }
+
+    if (code === errorCodes.MISSING_BACKUP_VERSION || code === errorCodes.UNSUPPORTED_BACKUP_VERSION) {
+      return "Unsupported backup version";
+    }
+
+    if (code === errorCodes.DUPLICATE_RECORD_ID || code.startsWith("ORPHAN_")) {
+      return "Incompatible relationships or duplicate records";
+    }
+
+    if (code === "FILE_READ_ERROR") {
+      return "File read error";
+    }
+
+    return "Damaged or incomplete backup";
+  }
+
+  function renderReviewMessages(listId, entries) {
+    clearReviewList(listId);
+    const list = getReviewElement(listId);
+
+    if (!list) {
+      return;
+    }
+
+    entries.slice(0, restoreReviewMessageLimit).forEach((entry) => {
+      const item = document.createElement("li");
+      item.textContent = `${getValidationCategory(entry.code)}: ${entry.message}`;
+      list.appendChild(item);
+    });
+
+    const remaining = entries.length - restoreReviewMessageLimit;
+    if (remaining > 0) {
+      const item = document.createElement("li");
+      item.textContent = `And ${remaining} more.`;
+      list.appendChild(item);
+    }
+  }
+
+  function resetRestoreReviewPanel() {
+    const panel = getReviewElement("restore-review-panel");
+    if (panel) {
+      panel.hidden = true;
+    }
+
+    setReviewText("restore-review-status", "Select a JSON backup to begin.");
+    setReviewText("restore-review-file-name", "Not selected");
+    setReviewText("restore-review-file-size", "—");
+    setReviewText("restore-review-app-name", "—");
+    setReviewText("restore-review-version", "—");
+    setReviewText("restore-review-exported-at", "—");
+    setReviewText("restore-review-validation", "—");
+    setReviewText("restore-review-weeks", "—");
+    setReviewText("restore-review-daily-logs", "—");
+    setReviewText("restore-review-daily-tasks", "—");
+    setReviewText("restore-review-photos", "—");
+    setReviewText("restore-review-student-profile", "—");
+    setReviewText("restore-review-company-profile", "—");
+    setReviewText("restore-review-app-settings", "—");
+    setReviewText("restore-review-error-summary", "");
+    setReviewText("restore-review-warning-summary", "");
+    clearReviewList("restore-review-error-list");
+    clearReviewList("restore-review-warning-list");
+
+    [
+      "restore-review-errors",
+      "restore-review-warnings",
+      "restore-review-replacement-warning"
+    ].forEach((id) => {
+      const element = getReviewElement(id);
+      if (element) {
+        element.hidden = true;
+      }
+    });
+
+    [
+      "restore-this-backup-button",
+      "export-current-data-first-button",
+      "cancel-restore-review-button"
+    ].forEach((id) => {
+      const element = getReviewElement(id);
+      if (element) {
+        element.disabled = true;
+      }
+    });
+
+    const fileInput = getElement("restore-backup-file");
+    if (fileInput) {
+      fileInput.disabled = false;
+    }
+    setRestoreBusy(false);
+    setSafetyExportBusy(false);
+  }
+
+  function clearPendingRestore(options) {
+    const settings = options || {};
+    restoreAnalysisToken += 1;
+    pendingRestore = null;
+    resetRestoreReviewPanel();
+
+    const fileInput = getElement("restore-backup-file");
+    if (settings.clearFile !== false && fileInput) {
+      fileInput.value = "";
+    }
+
+    if (settings.focus && fileInput) {
+      fileInput.focus();
+    }
+  }
+
+  function renderRestoreReview(file, validationResult) {
+    const panel = getReviewElement("restore-review-panel");
+    if (!panel) {
+      return;
+    }
+
+    const metadata = validationResult.metadata || {};
+    const counts = validationResult.counts;
+    const valid = validationResult.valid === true;
+    const status = getReviewElement("restore-review-status");
+
+    panel.hidden = false;
+    setReviewText("restore-review-file-name", file.name || "Unnamed file");
+    setReviewText("restore-review-file-size", formatReviewFileSize(file.size));
+    setReviewText("restore-review-app-name", metadata.appName || "Unavailable");
+    setReviewText("restore-review-version", metadata.backupVersion || "Unavailable");
+    setReviewText("restore-review-exported-at", formatReviewDate(metadata.exportedAt));
+    setReviewText("restore-review-validation", valid ? "Valid — ready to restore" : "Invalid — restore blocked");
+    setReviewText("restore-review-weeks", formatReviewCount(counts?.weeks));
+    setReviewText("restore-review-daily-logs", formatReviewCount(counts?.dailyLogs));
+    setReviewText("restore-review-daily-tasks", formatReviewCount(counts?.dailyTasks));
+    setReviewText("restore-review-photos", formatReviewCount(counts?.photoAttachments));
+    setReviewText("restore-review-student-profile", formatReviewPresence(counts?.hasStudentProfile, counts));
+    setReviewText("restore-review-company-profile", formatReviewPresence(counts?.hasCompanyProfile, counts));
+    setReviewText("restore-review-app-settings", formatReviewPresence(counts?.hasAppSettings, counts));
+
+    if (status) {
+      status.dataset.state = valid ? "valid" : "invalid";
+      status.textContent = valid
+        ? "This backup passed validation and is ready for your review."
+        : "This backup cannot be restored until its validation errors are resolved.";
+    }
+
+    const errors = validationResult.errors || [];
+    const warnings = validationResult.warnings || [];
+    const errorPanel = getReviewElement("restore-review-errors");
+    const warningPanel = getReviewElement("restore-review-warnings");
+    const replacementWarning = getReviewElement("restore-review-replacement-warning");
+
+    if (errorPanel) {
+      errorPanel.hidden = errors.length === 0;
+    }
+    if (errors.length > 0) {
+      const categories = [...new Set(errors.map((entry) => getValidationCategory(entry.code)))];
+      setReviewText("restore-review-error-summary", `${errors.length} error${errors.length === 1 ? "" : "s"}: ${categories.join(", ")}.`);
+      renderReviewMessages("restore-review-error-list", errors);
+    }
+
+    if (warningPanel) {
+      warningPanel.hidden = warnings.length === 0;
+    }
+    if (warnings.length > 0) {
+      setReviewText("restore-review-warning-summary", `This backup can still be restored. ${warnings.length} warning${warnings.length === 1 ? "" : "s"} found.`);
+      renderReviewMessages("restore-review-warning-list", warnings);
+    }
+
+    if (replacementWarning) {
+      replacementWarning.hidden = !valid;
+    }
+
+    const restoreButton = getReviewElement("restore-this-backup-button");
+    const exportButton = getReviewElement("export-current-data-first-button");
+    const cancelButton = getReviewElement("cancel-restore-review-button");
+    if (restoreButton) {
+      restoreButton.disabled = !valid;
+    }
+    if (exportButton) {
+      exportButton.disabled = !valid;
+    }
+    if (cancelButton) {
+      cancelButton.disabled = false;
+    }
+    setRestoreBusy(restoreInProgress);
+    setSafetyExportBusy(safetyExportInProgress);
+
+    const heading = getReviewElement("restore-review-title");
+    if (heading) {
+      window.setTimeout(() => heading.focus(), 0);
+    }
+  }
+
+  function createPendingRestore(file, parsedData, validationResult) {
+    pendingRestore = {
+      fileName: file.name || "Unnamed file",
+      fileSize: Number.isFinite(file.size) ? file.size : 0,
+      parsedData,
+      validationResult,
+      restoreCandidate: validationResult.valid ? validationResult.restoreCandidate : null
+    };
+    renderRestoreReview(file, validationResult);
+  }
+
+  async function analyzeRestoreFile(event) {
+    if (restoreInProgress || safetyExportInProgress) {
+      return;
+    }
+
+    const fileInput = event.target;
+    const file = fileInput.files?.[0] || null;
+    const messageElement = getElement("backup-message");
+    window.OJTUI.clearFormMessage(messageElement);
+    clearPendingRestore({ clearFile: false, focus: false });
+
+    if (!file) {
+      return;
+    }
+
+    const analysisToken = ++restoreAnalysisToken;
+
+    try {
+      const parsedData = await readJsonFile(file);
+      if (analysisToken !== restoreAnalysisToken) {
+        return;
+      }
+
+      const validationResult = validateBackupData(parsedData, { purpose: "restore" });
+      createPendingRestore(file, parsedData, validationResult);
+    } catch (error) {
+      if (analysisToken !== restoreAnalysisToken) {
+        return;
+      }
+
+      const isInvalidJson = error.message === "File is not valid JSON.";
+      const result = createReviewResult(
+        isInvalidJson ? errorCodes.INVALID_JSON : "FILE_READ_ERROR",
+        isInvalidJson ? "The selected file is not valid JSON." : "The backup file could not be read."
+      );
+      createPendingRestore(file, null, result);
+    }
+  }
+
+  async function restorePendingBackup() {
+    const messageElement = getElement("backup-message");
+    const review = pendingRestore;
+
+    if (restoreInProgress || safetyExportInProgress || !review || !review.validationResult.valid || !review.restoreCandidate) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Restore this backup?\n\nThis replaces ALL journal data in this browser. It cannot be undone.\n\nExport current data first if you need a recovery copy.\n\nContinue?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    restoreInProgress = true;
+    setRestoreBusy(true);
+
+    try {
+      await window.OJTStorage.replaceAllData(review.restoreCandidate);
+      restoreInProgress = false;
+      clearPendingRestore({ clearFile: true, focus: false });
+      window.OJTUI.showFormMessage(messageElement, "Backup restored. Reloading...", "success");
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } catch (error) {
+      restoreInProgress = false;
+      setRestoreBusy(false);
+      window.OJTUI.showFormMessage(messageElement, error.message || "Could not restore backup. Try again.", "error");
+    }
+  }
+
+  async function exportCurrentDataFirst() {
+    if (restoreInProgress || safetyExportInProgress || !pendingRestore?.validationResult.valid) {
+      return;
+    }
+
+    safetyExportInProgress = true;
+    setSafetyExportBusy(true);
+
+    try {
+      await exportBackup();
+    } finally {
+      safetyExportInProgress = false;
+      setSafetyExportBusy(false);
+    }
+  }
+
+  function cancelRestoreReview() {
+    if (restoreInProgress || safetyExportInProgress) {
+      return;
+    }
+
+    clearPendingRestore({ clearFile: true, focus: true });
+  }
+
   async function preparePhotoForBackup(photo) {
     const fileDataBase64 = await blobToBase64(photo.fileBlob);
     const { fileBlob, ...metadata } = photo;
@@ -942,54 +1398,14 @@
     });
   }
 
-  async function restoreBackup(event) {
-    const messageElement = getElement("backup-message");
-    const fileInput = event.target;
-    const file = fileInput.files?.[0] || null;
-    window.OJTUI.clearFormMessage(messageElement);
-
-    if (!file) {
-      return;
-    }
-
-    try {
-      const parsedData = await readJsonFile(file);
-      const validationResult = validateBackupData(parsedData, { purpose: "restore" });
-
-      if (!validationResult.valid) {
-        window.OJTUI.showFormMessage(messageElement, formatValidationMessage(validationResult, "restore"), "error");
-        fileInput.value = "";
-        return;
-      }
-
-      const confirmed = window.confirm(
-        "Restore this backup?\n\nThis replaces ALL journal data in this browser. It cannot be undone.\n\nExport a backup of your current data first if you need it.\n\nContinue?"
-      );
-
-      if (!confirmed) {
-        fileInput.value = "";
-        return;
-      }
-
-      await window.OJTStorage.replaceAllData(validationResult.restoreCandidate);
-      window.OJTUI.showFormMessage(messageElement, "Backup restored. Reloading...", "success");
-      window.setTimeout(() => {
-        window.location.reload();
-      }, 800);
-    } catch (error) {
-      const message = error.message === "File is not valid JSON."
-        ? "File is not valid JSON."
-        : (error.message || "Could not restore backup. Try again.");
-      window.OJTUI.showFormMessage(messageElement, message, "error");
-      console.error(error);
-    } finally {
-      fileInput.value = "";
-    }
-  }
+  // Restore preparation is intentionally separate from the destructive action.
 
   function bindBackupEvents() {
     getElement("export-backup-button")?.addEventListener("click", exportBackup);
-    getElement("restore-backup-file")?.addEventListener("change", restoreBackup);
+    getElement("restore-backup-file")?.addEventListener("change", analyzeRestoreFile);
+    getElement("restore-this-backup-button")?.addEventListener("click", restorePendingBackup);
+    getElement("export-current-data-first-button")?.addEventListener("click", exportCurrentDataFirst);
+    getElement("cancel-restore-review-button")?.addEventListener("click", cancelRestoreReview);
     getElement("reset-confirm-checkbox")?.addEventListener("change", updateResetButtonState);
     getElement("reset-confirm-text")?.addEventListener("input", updateResetButtonState);
     getElement("reset-local-data-button")?.addEventListener("click", resetLocalData);

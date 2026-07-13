@@ -351,6 +351,52 @@
             </section>
           </div>
 
+          <section class="backup-panel restore-review-panel" id="restore-review-panel" aria-labelledby="restore-review-title" hidden>
+            <span class="card-label">Review</span>
+            <h3 id="restore-review-title" tabindex="-1">Review this backup</h3>
+            <p id="restore-review-status" class="restore-review-status" role="status" aria-live="polite">Select a JSON backup to begin.</p>
+            <h4>File information</h4>
+            <dl class="restore-review-details">
+              <div><dt>Selected file</dt><dd id="restore-review-file-name">Not selected</dd></div>
+              <div><dt>File size</dt><dd id="restore-review-file-size">—</dd></div>
+            </dl>
+            <h4 class="restore-review-subheading">Backup metadata</h4>
+            <dl class="restore-review-details">
+              <div><dt>App identity</dt><dd id="restore-review-app-name">—</dd></div>
+              <div><dt>Backup version</dt><dd id="restore-review-version">—</dd></div>
+              <div><dt>Exported</dt><dd id="restore-review-exported-at">—</dd></div>
+              <div><dt>Validation</dt><dd id="restore-review-validation">—</dd></div>
+            </dl>
+            <div class="restore-review-counts" aria-labelledby="restore-review-contents-title">
+              <h4 id="restore-review-contents-title">Backup contents</h4>
+              <dl class="restore-review-details restore-review-details-compact">
+                <div><dt>OJT weeks</dt><dd id="restore-review-weeks">—</dd></div>
+                <div><dt>Daily Logs</dt><dd id="restore-review-daily-logs">—</dd></div>
+                <div><dt>Daily Tasks</dt><dd id="restore-review-daily-tasks">—</dd></div>
+                <div><dt>Photo Attachments</dt><dd id="restore-review-photos">—</dd></div>
+                <div><dt>Student Profile</dt><dd id="restore-review-student-profile">—</dd></div>
+                <div><dt>Company Profile</dt><dd id="restore-review-company-profile">—</dd></div>
+                <div><dt>App Settings</dt><dd id="restore-review-app-settings">—</dd></div>
+              </dl>
+            </div>
+            <section class="restore-review-result restore-review-errors" id="restore-review-errors" role="alert" aria-labelledby="restore-review-errors-title" hidden>
+              <h4 id="restore-review-errors-title">Why this backup cannot be restored</h4>
+              <p id="restore-review-error-summary"></p>
+              <ul id="restore-review-error-list"></ul>
+            </section>
+            <section class="restore-review-result restore-review-warnings" id="restore-review-warnings" aria-labelledby="restore-review-warnings-title" hidden>
+              <h4 id="restore-review-warnings-title">Warnings</h4>
+              <p id="restore-review-warning-summary" role="status" aria-live="polite" aria-atomic="true"></p>
+              <ul id="restore-review-warning-list"></ul>
+            </section>
+            <p class="restore-review-replacement-warning" id="restore-review-replacement-warning" hidden>Restoring this backup will replace all current app data. It will not merge with the existing journal. Export the current data first when a recovery copy is needed.</p>
+            <div class="restore-review-actions">
+              <button class="primary-button" type="button" id="restore-this-backup-button" disabled>Restore This Backup</button>
+              <button class="secondary-button" type="button" id="export-current-data-first-button" disabled>Export Current Data First</button>
+              <button class="secondary-button" type="button" id="cancel-restore-review-button" disabled>Cancel Restore</button>
+            </div>
+          </section>
+
           <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
             <span class="card-label">Danger zone</span>
             <h3 id="reset-local-data-title">Reset Local App Data</h3>
