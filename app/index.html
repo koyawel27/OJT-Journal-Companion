@@ -83,7 +83,7 @@
 
           <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
             <p class="reminder-text">
-              <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal lives only in this browser — export a copy to keep it safe.
+              <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal is stored only in this browser. Export a JSON backup regularly so your app data can be restored if needed. DOCX exports are editable journal documents and cannot restore the app.
             </p>
             <button class="primary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
           </div>
@@ -329,7 +329,7 @@
             <header class="settings-area-header">
               <span class="card-label">Data &amp; Recovery</span>
               <h3 id="settings-recovery-title">Backup, restore, and reset</h3>
-              <p>Your journal is stored only in this browser. Export a backup before clearing browser data or switching devices.</p>
+              <p>Your journal is stored only in this browser unless you export it. Keep a JSON backup before clearing browser data or switching devices.</p>
             </header>
 
           <div class="backup-grid">
@@ -351,6 +351,93 @@
             </section>
           </div>
 
+          <section class="backup-panel restore-review-panel" id="restore-review-panel" aria-labelledby="restore-review-title" hidden>
+            <span class="card-label">Review</span>
+            <h3 id="restore-review-title" tabindex="-1">Review this backup</h3>
+            <p id="restore-review-status" class="restore-review-status" role="status" aria-live="polite">Select a JSON backup to begin.</p>
+            <h4>File information</h4>
+            <dl class="restore-review-details">
+              <div><dt>Selected file</dt><dd id="restore-review-file-name">Not selected</dd></div>
+              <div><dt>File size</dt><dd id="restore-review-file-size">—</dd></div>
+            </dl>
+            <h4 class="restore-review-subheading">Backup metadata</h4>
+            <dl class="restore-review-details">
+              <div><dt>App identity</dt><dd id="restore-review-app-name">—</dd></div>
+              <div><dt>Backup version</dt><dd id="restore-review-version">—</dd></div>
+              <div><dt>Exported</dt><dd id="restore-review-exported-at">—</dd></div>
+              <div><dt>Validation</dt><dd id="restore-review-validation">—</dd></div>
+            </dl>
+            <div class="restore-review-counts" aria-labelledby="restore-review-contents-title">
+              <h4 id="restore-review-contents-title">Backup contents</h4>
+              <dl class="restore-review-details restore-review-details-compact">
+                <div><dt>OJT weeks</dt><dd id="restore-review-weeks">—</dd></div>
+                <div><dt>Daily Logs</dt><dd id="restore-review-daily-logs">—</dd></div>
+                <div><dt>Daily Tasks</dt><dd id="restore-review-daily-tasks">—</dd></div>
+                <div><dt>Photo Attachments</dt><dd id="restore-review-photos">—</dd></div>
+                <div><dt>Student Profile</dt><dd id="restore-review-student-profile">—</dd></div>
+                <div><dt>Company Profile</dt><dd id="restore-review-company-profile">—</dd></div>
+                <div><dt>App Settings</dt><dd id="restore-review-app-settings">—</dd></div>
+              </dl>
+            </div>
+            <section class="restore-review-result restore-review-errors" id="restore-review-errors" role="alert" aria-labelledby="restore-review-errors-title" hidden>
+              <h4 id="restore-review-errors-title">Why this backup cannot be restored</h4>
+              <p id="restore-review-error-summary"></p>
+              <ul id="restore-review-error-list"></ul>
+            </section>
+            <section class="restore-review-result restore-review-warnings" id="restore-review-warnings" aria-labelledby="restore-review-warnings-title" hidden>
+              <h4 id="restore-review-warnings-title">Warnings</h4>
+              <p id="restore-review-warning-summary" role="status" aria-live="polite" aria-atomic="true"></p>
+              <ul id="restore-review-warning-list"></ul>
+            </section>
+            <p class="restore-review-replacement-warning" id="restore-review-replacement-warning" hidden>Restoring this backup will replace all current app data. It will not merge with the existing journal. Export the current data first when a recovery copy is needed.</p>
+            <div class="restore-review-actions">
+              <button class="primary-button" type="button" id="restore-this-backup-button" disabled>Restore This Backup</button>
+              <button class="secondary-button" type="button" id="export-current-data-first-button" disabled>Export Current Data First</button>
+              <button class="secondary-button" type="button" id="cancel-restore-review-button" disabled>Cancel Restore</button>
+            </div>
+          </section>
+
+          <section class="backup-panel storage-health-panel" aria-labelledby="storage-health-title">
+            <span class="card-label">Browser</span>
+            <h3 id="storage-health-title">Browser Storage Health</h3>
+            <p>Storage information below comes from browser estimates for this site. It helps with awareness, but it is not a guaranteed measurement of only OJT Journal Companion records.</p>
+
+            <div class="storage-health-grid">
+              <section class="storage-health-card" aria-labelledby="storage-health-usage-title">
+                <h4 id="storage-health-usage-title">Storage usage</h4>
+                <p id="storage-health-estimate-status" class="storage-health-status" role="status" aria-live="polite">Checking browser storage estimates...</p>
+                <dl class="storage-health-details">
+                  <div><dt>Approximate site storage used</dt><dd id="storage-health-used">Unavailable</dd></div>
+                  <div><dt>Approximate browser-reported quota</dt><dd id="storage-health-quota">Unavailable</dd></div>
+                  <div><dt>Estimated usage</dt><dd id="storage-health-percentage">Unavailable</dd></div>
+                </dl>
+                <p class="storage-health-note">These values are estimates for this site/origin. Browser-managed quota may change and is not permanent reserved storage.</p>
+              </section>
+
+              <section class="storage-health-card" aria-labelledby="storage-health-persistence-title">
+                <h4 id="storage-health-persistence-title">Persistent storage</h4>
+                <p id="storage-health-persistence-status" class="storage-health-status" role="status" aria-live="polite">Checking persistent-storage status...</p>
+                <p class="storage-health-note">Persistent storage may reduce the chance of automatic browser eviction, but it does not replace JSON backups. Data can still be lost when browser data is cleared, the browser profile is removed, the device fails, or you switch devices.</p>
+                <button class="secondary-button" type="button" id="request-persistent-storage-button" hidden>Request Persistent Storage</button>
+              </section>
+            </div>
+
+            <div class="storage-health-actions">
+              <button class="secondary-button" type="button" id="refresh-storage-status-button">Refresh Storage Status</button>
+              <p class="form-message" id="storage-health-message" role="status" aria-live="polite" hidden></p>
+            </div>
+
+            <div class="storage-health-guidance">
+              <h4>Recovery guidance</h4>
+              <ul>
+                <li>Your journal is stored locally in this browser profile. Clearing browser or site data, browser maintenance, or device failure may remove it.</li>
+                <li>Private or incognito browsing may use temporary storage that is removed when the private session ends; the app does not try to detect private browsing.</li>
+                <li>Switching browsers, browser profiles, or devices does not transfer local data automatically.</li>
+                <li>JSON backup is the app&apos;s portable recovery file. Save regular JSON backups outside the browser or device when possible.</li>
+                <li>DOCX exports are editable journal documents for sharing or printing, not restorable app backups.</li>
+              </ul>
+            </div>
+          </section>
           <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
             <span class="card-label">Danger zone</span>
             <h3 id="reset-local-data-title">Reset Local App Data</h3>

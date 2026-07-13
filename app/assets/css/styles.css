@@ -2683,6 +2683,251 @@ body.daily-log-editor-open {
   margin-top: 0;
 }
 
+.restore-review-panel {
+  margin-top: 18px;
+  border-color: var(--accent-muted);
+  background: var(--surface-raised);
+}
+
+.restore-review-panel h3 {
+  margin: 5px 0 6px;
+}
+
+.restore-review-panel h4 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.restore-review-subheading {
+  margin-top: 18px !important;
+}
+
+.restore-review-status {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.restore-review-status[data-state="valid"] {
+  color: var(--success);
+}
+
+.restore-review-status[data-state="invalid"] {
+  color: var(--danger-text);
+}
+
+.restore-review-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin: 0;
+}
+
+.restore-review-details > div {
+  min-width: 0;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+.restore-review-details dt {
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.restore-review-details dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.restore-review-counts {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.restore-review-details-compact {
+  gap: 0 18px;
+}
+
+.restore-review-details-compact > div {
+  padding: 7px 0;
+}
+
+.restore-review-result {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.restore-review-result p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.restore-review-result ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.restore-review-result li + li {
+  margin-top: 5px;
+}
+
+.restore-review-errors {
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.restore-review-errors h4 {
+  color: var(--danger-text);
+}
+
+.restore-review-warnings {
+  border-color: var(--warning-border);
+  background: var(--warning-soft);
+}
+
+.restore-review-warnings h4 {
+  color: var(--warning-text);
+}
+
+.restore-review-replacement-warning {
+  margin: 18px 0 0;
+  padding: 13px 15px;
+  border-left: 3px solid var(--marker);
+  background: var(--warning-soft);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.restore-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.restore-review-actions .primary-button,
+.restore-review-actions .secondary-button {
+  flex: 1 1 190px;
+}
+
+.storage-health-panel {
+  margin-top: 18px;
+  border-color: var(--accent-muted);
+  background: var(--surface-raised);
+}
+
+.storage-health-panel h3 {
+  margin: 5px 0 6px;
+}
+
+.storage-health-panel > p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.storage-health-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.storage-health-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+
+.storage-health-card h4,
+.storage-health-guidance h4 {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+}
+
+.storage-health-status {
+  min-height: 2.9em;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.storage-health-details {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.storage-health-details > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.storage-health-details dt {
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.storage-health-details dd {
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.storage-health-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.storage-health-card .secondary-button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.storage-health-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.storage-health-actions .form-message {
+  flex: 1 1 260px;
+}
+
+.storage-health-guidance {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.storage-health-guidance ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.storage-health-guidance li + li {
+  margin-top: 6px;
+}
+
 .preview-warning-item {
   display: flex;
   align-items: center;
@@ -2719,6 +2964,42 @@ body.daily-log-editor-open {
 
   .settings-recovery {
     padding: 15px;
+  }
+
+  .restore-review-details {
+    grid-template-columns: 1fr;
+  }
+
+  .storage-health-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .storage-health-details > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .storage-health-details dd {
+    text-align: left;
+  }
+
+  .storage-health-actions {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .storage-health-actions .secondary-button {
+    width: 100%;
+  }
+
+  .restore-review-actions {
+    display: grid;
+  }
+
+  .restore-review-actions .primary-button,
+  .restore-review-actions .secondary-button {
+    width: 100%;
   }
 
   .preview-warning-item {

@@ -2,7 +2,7 @@
 
 A lightweight, offline-first personal browser app for students and interns. Record daily OJT activities, track rendered hours, attach photo documentation, and prepare a weekly journal for copying or official DOCX submission.
 
-**v1.0 is the original baseline release.** **v1.1 is released and tagged** with Official DOCX Export and an automatic Photo Documentation appendix. v1.1 remains the latest tagged stable release. Batch Photo Documentation is completed post-v1.1 roadmap work and is not a new release or tag.
+**v1.0 is the original baseline release.** **v1.1 is released and tagged** with Official DOCX Export and an automatic Photo Documentation appendix. v1.1 remains the latest tagged stable release. Batch Photo Documentation and Phase 3 Data and Recovery Hardening are completed post-v1.1 roadmap work; neither is a new release or tag. Phase 4 Accessible Responsive Visual Redesign is the next approved roadmap phase.
 
 ## What this app is
 
@@ -26,6 +26,12 @@ Export JSON backups regularly. Browser storage can be cleared by you, the browse
   - Editable Word output for any permitted manual photo resizing or document adjustments
 - JSON backup, restore, and guarded local-data reset
 - Dashboard progress and responsive mobile navigation
+
+## Phase 3 Data and Recovery Hardening - complete
+
+JSON backup export and restore now use a supported "1.0" version and exact app-identity gate, structural and relationship checks, duplicate-ID checks, and JPEG/PNG/WebP MIME, Base64, and usable-photo validation. Invalid exports do not download and invalid restores are rejected before IndexedDB writes. Safe compatibility warnings remain nonfatal, including legacy photos without Phase 2 set metadata.
+Restore now provides a review with metadata, counts, errors, warnings, and an explicit replace confirmation. Export Current Data First reuses the existing JSON export flow without automatically continuing to restore. Reset retains its checkbox, exact RESET, final confirmation, all-store clear, selected-week clear, and backup-first guidance.
+Settings also provides approximate browser-reported Storage Health estimates, persistent-storage status, guarded user-requested persistence, refresh/error states, and recovery guidance. Storage Health values are runtime-only. JSON is the portable recovery backup; Official DOCX exports are editable journal documents and cannot restore app data.
 
 ## How to run locally
 
