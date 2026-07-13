@@ -1281,6 +1281,230 @@
     clearPendingRestore({ clearFile: true, focus: true });
   }
 
+  const storageHealthState = {
+    estimate: { status: "checking", usage: null, quota: null, percentage: null },
+    persistence: { status: "checking", canRequest: false }
+  };
+  let storageHealthRefreshInProgress = false;
+  let persistentStorageRequestInProgress = false;
+
+  function getStorageManager() {
+    return window.navigator?.storage || null;
+  }
+
+  function isValidStorageNumber(value) {
+    return typeof value === "number" && Number.isFinite(value) && value >= 0;
+  }
+
+  function formatStorageBytes(value) {
+    if (!isValidStorageNumber(value)) {
+      return "Unavailable";
+    }
+
+    if (value < 1024) {
+      return `${value} B`;
+    }
+
+    const units = ["KB", "MB", "GB", "TB"];
+    let size = value;
+    let unitIndex = -1;
+
+    do {
+      size /= 1024;
+      unitIndex += 1;
+    } while (size >= 1024 && unitIndex < units.length - 1);
+
+    const decimals = size >= 100 || unitIndex === 0 ? 0 : 1;
+    return `${size.toFixed(decimals)} ${units[unitIndex]}`;
+  }
+
+  function formatStoragePercentage(value) {
+    return isValidStorageNumber(value) ? `${value.toFixed(1)}%` : "Unavailable";
+  }
+
+  function setStorageHealthText(id, value) {
+    const element = getElement(id);
+    if (element) {
+      element.textContent = String(value ?? "");
+    }
+  }
+
+  function setStorageHealthMessage(message, type) {
+    const element = getElement("storage-health-message");
+    if (!element) {
+      return;
+    }
+
+    if (!message) {
+      window.OJTUI.clearFormMessage(element);
+      return;
+    }
+
+    window.OJTUI.showFormMessage(element, message, type || "info");
+  }
+
+  function updateStorageHealthControls() {
+    const refreshButton = getElement("refresh-storage-status-button");
+    const requestButton = getElement("request-persistent-storage-button");
+    const requestAvailable = storageHealthState.persistence.canRequest && storageHealthState.persistence.status !== "granted";
+
+    if (refreshButton) {
+      refreshButton.disabled = storageHealthRefreshInProgress || persistentStorageRequestInProgress;
+      refreshButton.textContent = storageHealthRefreshInProgress ? "Refreshing..." : "Refresh Storage Status";
+      refreshButton.setAttribute("aria-busy", String(storageHealthRefreshInProgress));
+    }
+
+    if (requestButton) {
+      requestButton.hidden = !requestAvailable;
+      requestButton.disabled = persistentStorageRequestInProgress || storageHealthRefreshInProgress || !requestAvailable;
+      requestButton.textContent = persistentStorageRequestInProgress ? "Requesting..." : "Request Persistent Storage";
+      requestButton.setAttribute("aria-busy", String(persistentStorageRequestInProgress));
+    }
+  }
+
+  function renderStorageHealth() {
+    const estimate = storageHealthState.estimate;
+    const persistence = storageHealthState.persistence;
+
+    if (estimate.status === "unavailable") {
+      setStorageHealthText("storage-health-estimate-status", "Storage estimates are unavailable in this browser.");
+    } else if (estimate.status === "error") {
+      setStorageHealthText("storage-health-estimate-status", "Storage estimates could not be checked right now.");
+    } else if (estimate.status === "checking") {
+      setStorageHealthText("storage-health-estimate-status", "Checking browser storage estimates...");
+    } else {
+      setStorageHealthText("storage-health-estimate-status", "These are approximate browser estimates for this site/origin.");
+    }
+
+    setStorageHealthText("storage-health-used", formatStorageBytes(estimate.usage));
+    setStorageHealthText("storage-health-quota", formatStorageBytes(estimate.quota));
+    setStorageHealthText("storage-health-percentage", formatStoragePercentage(estimate.percentage));
+
+    const persistenceStatus = {
+      checking: "Checking persistent-storage status...",
+      granted: "Persistent storage is currently granted.",
+      notGranted: "Persistent storage is not currently granted.",
+      unavailable: "Persistent-storage status is unavailable in this browser.",
+      error: "Persistent-storage status could not be checked."
+    }[persistence.status] || "Persistent-storage status is unavailable in this browser.";
+    setStorageHealthText("storage-health-persistence-status", persistenceStatus);
+    updateStorageHealthControls();
+  }
+
+  async function readStorageEstimate() {
+    const storageManager = getStorageManager();
+    if (!storageManager || typeof storageManager.estimate !== "function") {
+      return { status: "unavailable", usage: null, quota: null, percentage: null };
+    }
+
+    try {
+      const estimate = await storageManager.estimate();
+      const usage = isValidStorageNumber(estimate?.usage) ? estimate.usage : null;
+      const quota = isValidStorageNumber(estimate?.quota) ? estimate.quota : null;
+      const percentage = usage !== null && quota !== null && quota > 0
+        ? (usage / quota) * 100
+        : null;
+
+      return {
+        status: "available",
+        usage,
+        quota,
+        percentage: isValidStorageNumber(percentage) ? percentage : null
+      };
+    } catch {
+      return { status: "error", usage: null, quota: null, percentage: null };
+    }
+  }
+
+  async function readPersistentStorageStatus() {
+    const storageManager = getStorageManager();
+    const canRequest = Boolean(storageManager && typeof storageManager.persist === "function");
+
+    if (!storageManager || typeof storageManager.persisted !== "function") {
+      return { status: "unavailable", canRequest };
+    }
+
+    try {
+      const persisted = await storageManager.persisted();
+      return {
+        status: persisted === true ? "granted" : persisted === false ? "notGranted" : "error",
+        canRequest
+      };
+    } catch {
+      return { status: "error", canRequest };
+    }
+  }
+
+  async function loadStorageHealthStatus(interactive) {
+    if (storageHealthRefreshInProgress || persistentStorageRequestInProgress) {
+      return;
+    }
+
+    storageHealthRefreshInProgress = true;
+    if (interactive) {
+      setStorageHealthMessage("");
+    }
+    updateStorageHealthControls();
+
+    try {
+      const [estimate, persistence] = await Promise.all([
+        readStorageEstimate(),
+        readPersistentStorageStatus()
+      ]);
+      storageHealthState.estimate = estimate;
+      storageHealthState.persistence = persistence;
+      renderStorageHealth();
+      if (interactive) {
+        setStorageHealthMessage("Storage status refreshed.", "info");
+      }
+    } finally {
+      storageHealthRefreshInProgress = false;
+      updateStorageHealthControls();
+    }
+  }
+
+  async function refreshStorageStatus() {
+    await loadStorageHealthStatus(true);
+  }
+
+  async function requestPersistentStorage() {
+    const storageManager = getStorageManager();
+    if (storageHealthRefreshInProgress || persistentStorageRequestInProgress || !storageManager || typeof storageManager.persist !== "function" || !storageHealthState.persistence.canRequest || storageHealthState.persistence.status === "granted") {
+      return;
+    }
+
+    persistentStorageRequestInProgress = true;
+    setStorageHealthMessage("");
+    updateStorageHealthControls();
+
+    try {
+      const granted = await storageManager.persist();
+      storageHealthState.persistence = {
+        status: granted === true ? "granted" : "notGranted",
+        canRequest: true
+      };
+      renderStorageHealth();
+      setStorageHealthMessage(
+        granted === true
+          ? "Persistent storage is now granted. JSON backups remain important."
+          : "Persistent storage was not granted. Keep using JSON backups for recovery.",
+        granted === true ? "success" : "info"
+      );
+    } catch {
+      storageHealthState.persistence = { status: "error", canRequest: true };
+      renderStorageHealth();
+      setStorageHealthMessage("Persistent storage could not be requested. You can keep using the app and JSON backups.", "info");
+    } finally {
+      persistentStorageRequestInProgress = false;
+      updateStorageHealthControls();
+    }
+  }
+
+  function initializeStorageHealth() {
+    renderStorageHealth();
+    void loadStorageHealthStatus(false);
+  }
+
   async function preparePhotoForBackup(photo) {
     const fileDataBase64 = await blobToBase64(photo.fileBlob);
     const { fileBlob, ...metadata } = photo;
@@ -1406,9 +1630,12 @@
     getElement("restore-this-backup-button")?.addEventListener("click", restorePendingBackup);
     getElement("export-current-data-first-button")?.addEventListener("click", exportCurrentDataFirst);
     getElement("cancel-restore-review-button")?.addEventListener("click", cancelRestoreReview);
+    getElement("refresh-storage-status-button")?.addEventListener("click", refreshStorageStatus);
+    getElement("request-persistent-storage-button")?.addEventListener("click", requestPersistentStorage);
     getElement("reset-confirm-checkbox")?.addEventListener("change", updateResetButtonState);
     getElement("reset-confirm-text")?.addEventListener("input", updateResetButtonState);
     getElement("reset-local-data-button")?.addEventListener("click", resetLocalData);
+    initializeStorageHealth();
   }
 
   function isResetReady() {

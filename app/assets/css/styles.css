@@ -2817,6 +2817,117 @@ body.daily-log-editor-open {
   flex: 1 1 190px;
 }
 
+.storage-health-panel {
+  margin-top: 18px;
+  border-color: var(--accent-muted);
+  background: var(--surface-raised);
+}
+
+.storage-health-panel h3 {
+  margin: 5px 0 6px;
+}
+
+.storage-health-panel > p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.storage-health-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.storage-health-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+
+.storage-health-card h4,
+.storage-health-guidance h4 {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+}
+
+.storage-health-status {
+  min-height: 2.9em;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.storage-health-details {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.storage-health-details > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.storage-health-details dt {
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.storage-health-details dd {
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.storage-health-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.storage-health-card .secondary-button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.storage-health-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.storage-health-actions .form-message {
+  flex: 1 1 260px;
+}
+
+.storage-health-guidance {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.storage-health-guidance ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.storage-health-guidance li + li {
+  margin-top: 6px;
+}
+
 .preview-warning-item {
   display: flex;
   align-items: center;
@@ -2857,6 +2968,29 @@ body.daily-log-editor-open {
 
   .restore-review-details {
     grid-template-columns: 1fr;
+  }
+
+  .storage-health-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .storage-health-details > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .storage-health-details dd {
+    text-align: left;
+  }
+
+  .storage-health-actions {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .storage-health-actions .secondary-button {
+    width: 100%;
   }
 
   .restore-review-actions {
