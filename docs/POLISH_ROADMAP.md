@@ -18,7 +18,7 @@ Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboar
 | Capabilities | Profiles/settings, week management, daily records, tasks, photos, weekly summaries, preview/copy, JSON backup/restore/reset, and Official DOCX Export. |
 | DOCX | Client-side `docx-templates` v2 export with a private-first official template and tracked sanitized fallback. |
 | Strengths | Mature single-user feature set, offline-first data ownership, official rendered-hours rules, editable output, responsive foundations, and no server dependency. |
-| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow. Phase 2 batch photo documentation is complete; Data and Recovery Hardening is the next active concern. |
+| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow. Phase 2 batch photo documentation and Phase 3 Data and Recovery Hardening are complete; Phase 4 Accessible Responsive Visual Redesign is the next active concern. |
 
 ## 3. Product Principles
 
@@ -57,8 +57,8 @@ These decisions are approved and must not be reopened unless the current code re
 | 0 | Baseline and Roadmap Alignment | Establish one accurate post-v1.1 plan and regression baseline. | None | Released/tagged v1.1 | Roadmap approval | Complete |
 | 1 | Journal UX Architecture | Unify the weekly workflow and selected-week state. | None expected | Phase 0 | Journal workflow acceptance | Complete |
 | 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | Additive optional metadata fields on existing PhotoAttachment records; no new object store, IndexedDB version increase, migration, or backup-version increase | Phase 1 | Batch upload/export acceptance | Complete |
-| 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Next |
-| 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1–3 | Accessibility/responsive acceptance | Planned |
+| 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Complete |
+| 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1-3 | Accessibility/responsive acceptance | Next |
 | 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Planned |
 | 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3–5 | Hosted/PWA readiness | Planned |
 | 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
@@ -178,6 +178,14 @@ These decisions are approved and must not be reopened unless the current code re
 **Exit criteria:** Unsupported/invalid data cannot replace current data; valid supported backups restore with a clear report; storage risk is visible; recovery drill passes.
 
 **Dependencies on earlier phases:** Phase 2 batch-photo compatibility behavior and regression evidence.
+
+### Phase 3 completion status
+
+Phase 3 is complete and accepted as post-v1.1 roadmap work; it is not a release or tag. The implementation adds a supported "1.0" backup-version gate, exact app identity and structural checks, duplicate and parent-reference validation, JPEG/PNG/WebP photo MIME/Base64/usable-Blob checks, nonfatal compatibility warnings, and export-integrity blocking. Legacy singleton photos and Phase 2 set metadata remain compatible. Restore now uses a review with metadata, counts, categorized errors and warnings, optional safety export, explicit replace confirmation, guarded mutual exclusion, and the existing atomic replacement path.
+
+Settings now reports approximate site/origin usage, quota, and valid percentage values, distinguishes persistent-storage states, and offers explicit guarded persistence requests and refresh. Recovery guidance explains local browser storage, clearing/device/private-session loss, non-transfer between profiles/devices, JSON recovery backups, non-restorable DOCX output, and that persistent storage may reduce eviction risk but cannot prevent all data loss. Persistence is not guaranteed, and there is no cloud sync. Storage Health values are runtime-only.
+
+No new object store, IndexedDB version increase, migration, backup-format change, or backup-version increase was added. DB_VERSION remains 4; backupVersion remains "1.0". Focused automated assertions, syntax/repository checks, and primary-browser manual verification passed with no observed blocking defect; broader browser/device testing remains future testing.
 
 ### Phase 4 — Accessible Responsive Visual Redesign
 
@@ -383,7 +391,7 @@ Only these remain unresolved:
 ## 11. Roadmap Change Control
 
 - v1.1 remains the stable rollback/regression baseline.
-- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation is complete. **Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.**
+- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation and Phase 3 Data and Recovery Hardening are complete. **Phase 4 - Accessible Responsive Visual Redesign is the next approved roadmap phase.**
 - Review phase scope, current code, likely files, risks, and tests before coding.
 - Data-model phases require explicit IndexedDB migration, backup-version, restore-compatibility, and rollback/recovery review.
 - Keep changes phase-scoped; do not combine opportunistic framework/platform work.

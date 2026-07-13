@@ -8,7 +8,7 @@ OJT Journal Companion is a personal offline-first journal companion for one stud
 
 **v1.1 status:** Released, merged, and tagged after final regression. Official DOCX Export with an automatic photo appendix is included. v1.1 remains the stable released rollback baseline.
 
-**Post-v1.1 Phase 2 — Batch Photo Documentation:** Complete. This is completed roadmap work, not a new release or tag.
+**Post-v1.1 Phase 2 — Batch Photo Documentation:** Complete. This is completed roadmap work, not a new release or tag. **Post-v1.1 Phase 3 - Data and Recovery Hardening:** Complete. Phase 3 is completed roadmap work, not a new release or tag. Phase 4 Accessible Responsive Visual Redesign is the next approved roadmap phase. v1.1 remains the latest tagged stable release.
 
 The app is not an internship management system. It has no accounts, approval workflow, online submission, or automatic cross-device sync.
 
@@ -23,6 +23,18 @@ The app is not an internship management system. It has no accounts, approval wor
 - Weekly Preview and Copy Weekly Journal
 - Dashboard OJT progress and backup reminder
 - JSON backup/export, replace-style restore, and guarded reset
+
+## Data and Recovery Hardening - Phase 3 complete
+
+Phase 3 hardens the existing JSON recovery path without changing the backup shape, DB_VERSION = 4, backupVersion = "1.0", or the seven existing stores.
+
+- **Backup/export integrity:** exact app identity and supported version gate, required structure, duplicate IDs, parent references, and JPEG/PNG/WebP MIME, Base64, and usable non-empty Blob validation. Invalid export data blocks download.
+- **Restore validation:** invalid data is rejected before IndexedDB writes; safe unknown fields and legacy singleton photos remain compatible; normalized restore candidates do not mutate parsed backups and remove transport-only photo fields before persistence.
+- **Restore review:** metadata, counts, profile/settings presence, categorized fatal errors, and nonfatal warnings appear before replacement. Warning-only backups may restore; invalid backups cannot.
+- **Safety and replacement:** Export Current Data First reuses the existing export workflow. Restore requires explicit guarded confirmation, remains replace-style, and preserves the review after cancellation or failure.
+- **Storage Health:** approximate site/origin usage, quota, and valid percentage; graceful API failures; persistent-storage status and explicit guarded request/refresh actions. Values remain runtime-only.
+- **Recovery guidance:** data is local to the current browser profile; JSON is the portable recovery backup; DOCX is editable output and cannot restore app data; persistent storage may reduce eviction risk but cannot prevent all data loss, is not guaranteed protection, and cloud sync does not exist.
+- **Reset preservation:** checkbox, exact RESET, final native confirmation, all-seven-store clearing, selected-week clearing, and backup-first guidance remain unchanged.
 
 ## Batch Photo Documentation — Phase 2 complete
 

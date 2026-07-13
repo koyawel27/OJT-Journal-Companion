@@ -189,7 +189,7 @@ JSON export should include all data needed to restore the local app state.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `appName` | string | Should identify the app, such as `OJT Journal Companion`. |
-| `backupVersion` | string | Version of the backup format. |
+| `backupVersion` | string | Supported backup format version is exactly "1.0"; Phase 3 did not increase it. |
 | `exportedAt` | string | Date and time the backup was exported. |
 | `studentProfile` | object or null | The saved `StudentProfile` record. |
 | `companyProfile` | object or null | The saved `CompanyProfile` record. |
@@ -206,6 +206,14 @@ JSON backup should include photo metadata. If photo data is included in the JSON
 A future ZIP backup may be better for photo-heavy data because photos can remain as separate files, but ZIP export is not required for v1.0.
 
 For v1.0, importing a JSON backup should replace the current local app data after user confirmation. The app should not try to merge two backups or resolve import conflicts in v1.0.
+
+### Phase 3 backup and restore implementation notes
+
+Phase 3 did not add a stored validation-report entity or any new data entity. DB_VERSION remains 4; the seven existing object stores remain unchanged; no migration or backup-format change was added. The backup version remains exactly "1.0".
+
+The current validation result is an in-memory structured result containing validity, errors, warnings, metadata, counts, and (for valid restore use) a normalized restore candidate. Validation covers exact app identity/version, required structure, duplicate IDs, parent references, and supported JPEG/PNG/WebP photo MIME, Base64, and usable non-empty Blob data. Safe unknown fields are preserved with nonfatal warnings, and Phase 2 photo-set metadata remains compatible with legacy singleton photos.
+
+The normalized restore candidate is built without mutating parsed backup data. Photo transport fields fileDataBase64 and fileDataType are removed before persistence; the restored fileType matches the reconstructed fileBlob.type. Current app normalization is applied to dayStatus and photoCategory. Storage Health estimates, persistence status, and request/refresh results are runtime-only and are not stored in IndexedDB, localStorage, or JSON backup data.
 
 ## 12. Relationships Between Data
 

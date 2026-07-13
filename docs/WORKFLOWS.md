@@ -151,53 +151,50 @@ The app should support copy-ready weekly journal content. It should not submit t
 
 ## 9. Backup Export Workflow
 
-The backup export workflow helps protect local offline data.
+The backup export workflow protects local offline data and preserves the existing JSON shape.
 
-1. User chooses export backup.
-2. App gathers student profile data.
-3. App gathers company profile data.
-4. App gathers weeks.
-5. App gathers daily logs.
-6. App gathers daily task items.
-7. App gathers photo attachments.
-8. App gathers app settings.
-9. App creates a JSON backup.
-10. User saves the backup file manually.
+1. User chooses Export Backup in Settings - Data & Recovery.
+2. App gathers the seven existing data stores and photo payloads.
+3. App validates exact app identity, supported "1.0" version, structure, IDs, relationships, and photo MIME/Base64/usable Blob integrity.
+4. Invalid export data blocks the download and shows an integrity error.
+5. Large photo-heavy exports keep the existing confirmation; cancellation performs no download.
+6. A valid export downloads JSON, updates lastBackupDate, refreshes the Dashboard reminder, and dispatches ojt:backup-exported.
 
-The JSON backup should include photo metadata. If photo data is included, it may need to be converted to Base64, which can make the backup file large.
+JSON includes photo metadata and serialized photo data, so photo-heavy files can be large. A future ZIP backup remains outside the current workflow.
 
-A future ZIP backup may be better for photo-heavy data, but ZIP export is not required for v1.0.
+## 10. Backup Restore Review and Replacement Workflow
 
-## 10. Backup Restore Workflow
+Restore is replace-style and does not merge. The current workflow is:
 
-The backup restore workflow replaces the current local app data with a selected backup.
+1. User selects a JSON backup file.
+2. App parses and validates it without writing data.
+3. App shows file information, backup metadata, record counts, profile/settings presence, fatal errors, and nonfatal warnings.
+4. Invalid backups cannot restore. Warning-only backups may restore.
+5. User may choose Export Current Data First, which reuses the existing JSON export workflow, preserves the pending review, and does not continue automatically into restore.
+6. User chooses Restore This Backup and accepts the final replacement confirmation.
+7. The existing atomic replace transaction runs, then the app reloads.
 
-1. User chooses import or restore.
-2. User selects a JSON backup file.
-3. App checks that the file looks like an OJT Journal Companion backup.
-4. App warns the user that restore will replace current local data.
-5. User confirms the restore.
-6. App replaces current local data with the backup contents.
-7. App reloads or refreshes the restored local data view.
-
-Merge behavior and import conflict handling are out of scope for v1.0.
+One in-memory pending review is reused for the final operation. A new file replaces the prior review. Cancel Restore clears the review and file selection. Confirmation cancellation performs no write and keeps the review. Repeated restore/export activation is guarded, restore and safety export cannot overlap, and failures restore controls while keeping the review. No second JSON parse, validation, or photo decode occurs after review.
 
 ## 11. Reset Local App Data Workflow
 
 The reset workflow lets the student permanently clear all local journal data from the current browser.
 
-1. User opens the Backup section.
-2. User reads the Reset Local App Data danger-zone panel.
-3. User checks the confirmation checkbox.
-4. User types `RESET` in the confirmation field.
-5. The reset button becomes enabled only after both guardrails are satisfied.
-6. User clicks Reset Local App Data.
-7. App shows a final confirmation dialog explaining that profile, weeks, daily logs, tasks, photos, and settings will be permanently removed.
-8. If the user cancels, nothing is deleted.
-9. If the user confirms, app clears all IndexedDB object stores through `clearAllData()`.
-10. App reloads the page so the UI returns to a fresh empty state.
+1. User opens Settings - Data & Recovery and reads the danger-zone panel.
+2. User checks the confirmation checkbox and types exact RESET.
+3. The reset button enables only after both guards are satisfied.
+4. User clicks Reset Local App Data and accepts the final native confirmation.
+5. If cancelled, nothing is deleted.
+6. If confirmed, all seven IndexedDB stores are cleared and selected-week state is cleared.
+7. The app reloads to a fresh empty state.
 
 Reset is irreversible without a JSON backup. Export a backup first if the student may need the data later.
+
+### Storage Health and Recovery Guidance
+
+Settings reports approximate browser-reported site/origin usage, quota, and usage percentage only when valid. Unsupported or failed APIs show graceful states without NaN, Infinity, or fabricated values. Persistent-storage status distinguishes granted, not granted, unavailable, and check failure. Request Persistent Storage is explicit and guarded; Refresh Storage Status is guarded, does not reload, and does not modify app data. Storage Health values remain in memory only and are not stored in IndexedDB, localStorage, or JSON backup data.
+
+The guidance explains current-browser-profile storage, clearing and maintenance/device loss, temporary private/incognito storage, non-transfer between browsers/profiles/devices, portable JSON recovery backups stored outside the browser/device when practical, editable non-restorable DOCX output, and that persistent storage may reduce eviction risk but cannot prevent all data loss. Persistence is not guaranteed, and cloud sync does not exist.
 
 ## 12. Dashboard Workflow
 

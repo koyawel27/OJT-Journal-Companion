@@ -2,7 +2,7 @@
 
 Use this document to continue development or onboard a developer.
 
-**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released and tagged as v1.1. Final regression passed, and v1.1 is the stable rollback baseline and latest tagged stable release. Phase 1 Journal UX Architecture and Phase 2 Batch Photo Documentation are complete on the post-v1.1 roadmap; neither is a new tagged release. **Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.**
+**Release context:** v1.0 is the original baseline release. Official DOCX Export with an automatic photo appendix is merged into master and released and tagged as v1.1. Final regression passed, and v1.1 is the stable rollback baseline and latest tagged stable release. Phase 1 Journal UX Architecture, Phase 2 Batch Photo Documentation, and Phase 3 Data and Recovery Hardening are complete post-v1.1 roadmap work; none is a new tagged release. **Phase 4 - Accessible Responsive Visual Redesign is the next approved roadmap phase.**
 
 ## Project summary
 
@@ -58,12 +58,12 @@ Key globals include `window.OJTDB`, `window.OJTStorage`, `window.OJTCalculations
 | Journal workspace | Complete; Weeks, Daily Logs, tasks, batch photo sets, summaries, and Log Today are consolidated |
 | Preview & Export | Complete; review, copy, Official DOCX, and return-to-Journal handoffs remain available |
 | Settings | Complete; Student, Company, Preferences, and Data & Recovery handoffs are available |
-| Phase 3 Data and Recovery Hardening | Next approved roadmap phase |
+| Phase 3 Data and Recovery Hardening | Complete; validation, restore review, and Storage Health accepted |
 | PDF export and cloud workflows | Deferred; PWA is scheduled in roadmap Phase 6 |
 
 ## Post-v1.1 roadmap
 
-`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 — Journal UX Architecture and Phase 2 — Batch Photo Documentation are complete. **Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.**
+`docs/POLISH_ROADMAP.md` is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadmap. Phase 1 - Journal UX Architecture, Phase 2 - Batch Photo Documentation, and Phase 3 - Data and Recovery Hardening are complete. **Phase 4 - Accessible Responsive Visual Redesign is the next approved roadmap phase.**
 
 ## Current UI architecture
 
@@ -86,6 +86,44 @@ Weeks, Daily Logs, Profile, and Backup are not separate top-level destinations. 
 - Deleting a daily log cascades to its tasks and photos.
 - JSON restore replaces all local data; reset clears all stores.
 - Batch photos use optional `photoSetId` and `photoSetIndex` on existing `PhotoAttachment` records only; there is no separate group store, no migration, `DB_VERSION` remains `4`, and backup version remains `1.0`.
+
+## Phase 3 Data and Recovery Hardening
+
+Phase 3 is completed post-v1.1 roadmap work. It did not change DB_VERSION = 4, backupVersion = "1.0", the seven existing IndexedDB stores, the backup JSON structure, or replace-style restore. No migration or new object store was added.
+
+### Validation and export integrity
+
+The supported backup gate requires exact app identity and backup version "1.0", required structure, duplicate IDs, and parent references from Daily Logs to OJT Weeks, Daily Tasks to Daily Logs, and Photo Attachments to Daily Logs. Export and restore photo checks cover JPEG, PNG, and WebP MIME types, Base64, and a usable non-empty Blob. Invalid export data blocks download; invalid restore data is rejected before any IndexedDB write.
+
+Safe unknown fields and legacy photos without Phase 2 set metadata remain compatible with nonfatal warnings. Restore creates a normalized in-memory candidate without mutating parsed backup data. fileDataBase64 and fileDataType are transport-only and are removed before persistence; restored fileType matches the reconstructed Blob type. Current app normalization is applied to dayStatus and photoCategory. This validation is focused on the implemented backup, relationship, and photo integrity rules; it does not claim broad strict validation for every optional date or time field.
+
+### Restore review and safety export
+
+The current workflow is:
+
+Select JSON backup
+-> parse and validate
+-> show restore review
+-> show metadata, counts, errors, and warnings
+-> optionally export current data first
+-> explicitly choose Restore This Backup
+-> final replace confirmation
+-> existing atomic replace transaction
+-> reload
+
+One in-memory pending review holds the parsed data, validation result, and normalized candidate. The review shows file information, metadata, counts, profile/settings presence, categorized fatal errors, and nonfatal warnings. Details are limited to a readable count while total counts remain visible. Invalid backups cannot restore; warning-only backups may restore. A new file replaces the previous pending review, and Cancel Restore clears the pending state and file selection. Analysis does not perform a second parse, validation, or photo decode.
+
+Export Current Data First reuses the existing JSON export workflow, including export validation, large-export confirmation, lastBackupDate, Dashboard reminder refresh, and ojt:backup-exported. It does not duplicate backup logic or automatically continue with restore. Restore and safety export are mutually exclusive and repeated activation is guarded. Final confirmation cancellation performs no write and keeps the review available. Failed replacement restores controls and keeps the review; successful replacement uses the existing one-transaction path and reloads.
+
+### Storage Health and recovery guidance
+
+Settings reports approximate browser-reported site/origin usage, quota, and a percentage only when valid. Unsupported or failed APIs show graceful unavailable/error states without NaN, Infinity, or fabricated values. Persistent-storage status distinguishes granted, not granted, unavailable, and check failure. Request Persistent Storage is explicit and guarded; no automatic persistence request occurs. Refresh Storage Status is guarded, does not reload, and does not modify app data. Storage Health values remain in memory only and are not stored in IndexedDB, localStorage, or JSON backup data.
+
+Guidance explains browser-profile-local data, clearing and maintenance/device loss, temporary private browsing storage, non-transfer between browsers/profiles/devices, portable JSON recovery backups, outside-browser backup storage, editable non-restorable DOCX output, and that persistent storage may reduce eviction risk but cannot prevent all data loss. Persistence is not guaranteed, and cloud sync does not exist.
+
+### Phase 3 closeout
+
+Focused automated assertions, JavaScript syntax checks, and repository checks passed. Primary-browser manual verification passed with no observed blocking defect. Valid export/restore, invalid-version blocking, warning-only review, safety export, restore cancellation, successful restore, Storage Health, responsive behavior, and cross-phase regression paths were reviewed. Broader cross-browser/device testing remains future testing.
 
 ## Official DOCX Export
 
@@ -196,7 +234,7 @@ Configurable image sizing is a possible future polish item, not a v1.1 requireme
 
 ## Next development step
 
-**Phase 3 — Data and Recovery Hardening is the next approved roadmap phase.** Preserve the v1.1 rollback baseline, accepted Phase 1 architecture, and completed Phase 2 batch photo behavior while improving restore validation, recovery visibility, and storage-risk guidance.
+**Phase 4 - Accessible Responsive Visual Redesign is the next approved roadmap phase. Preserve the v1.1 rollback baseline, accepted Phase 1 architecture, completed Phase 2 batch photo behavior, and completed Phase 3 recovery hardening while improving the accessible responsive shell.**
 
 ## Deferred work
 
