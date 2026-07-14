@@ -8,8 +8,10 @@
     photoAttachments: [],
     selectedWeekId: "",
     expandedDate: null,
-    activeDailyLogId: null
+    activeDailyLogId: null,
+    returnFocusElement: null
   };
+  let dailyLogKeydownHandler = null;
 
   function getElement(id) {
     return document.getElementById(id);
@@ -35,6 +37,170 @@
 
   function nowIso() {
     return new Date().toISOString();
+  }
+  function getEditorRoot() {
+    return getElement("daily-log-editor-root");
+  }
+
+  function getEditorPanel() {
+    return getEditorRoot()?.querySelector("[role=\"dialog\"]") || null;
+  }
+
+  function isVisibleFocusable(element) {
+    if (!element || !element.isConnected || element.disabled || element.hidden || element.closest("[inert]") || element.closest("[aria-hidden=\"true\"]")) {
+      return false;
+    }
+
+    const styles = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return styles.display !== "none" && styles.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+  }
+
+  function getEditorFocusableElements() {
+    const panel = getEditorPanel();
+    if (!panel) {
+      return [];
+    }
+
+    return Array.from(panel.querySelectorAll("a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex=\"-1\"])")).filter(isVisibleFocusable);
+  }
+
+  function getEditorFocusKey(element) {
+    const panel = getEditorPanel();
+    if (!panel || !element || !panel.contains(element)) {
+      return "";
+    }
+
+    if (element.dataset.taskAction && element.dataset.taskId) {
+      return `task:${element.dataset.taskId}:${element.dataset.taskAction}`;
+    }
+
+    if (element.dataset.photoAction && element.dataset.photoId) {
+      return `photo:${element.dataset.photoId}:${element.dataset.photoAction}`;
+    }
+
+    if (element.dataset.photoSetAction && element.dataset.photoSetId) {
+      return `photo-set:${element.dataset.photoSetId}:${element.dataset.photoSetAction}`;
+    }
+
+    if (element.dataset.photoUploadAction) {
+      return `photo-upload:${element.dataset.photoUploadAction}`;
+    }
+
+    const photoSetForm = element.closest("[data-photo-set-form]");
+    if (photoSetForm?.dataset.photoSetId && element.name) {
+      return `photo-set:${photoSetForm.dataset.photoSetId}:${element.name}`;
+    }
+
+    return element.id ? `id:${element.id}` : "";
+  }
+
+  function captureEditorFocusKey() {
+    return getEditorFocusKey(document.activeElement);
+  }
+
+  function findEditorFocusTarget(focusKey) {
+    const panel = getEditorPanel();
+    if (!panel || !focusKey) {
+      return null;
+    }
+
+    const parts = focusKey.split(":");
+    if (parts[0] === "task" && parts[1] && parts[2]) {
+      return panel.querySelector(`[data-task-action="${CSS.escape(parts[2])}"][data-task-id="${CSS.escape(parts[1])}"]`);
+    }
+
+    if (parts[0] === "photo" && parts[1] && parts[2]) {
+      const target = panel.querySelector(`[data-photo-action="${CSS.escape(parts[2])}"][data-photo-id="${CSS.escape(parts[1])}"]`);
+      const details = target?.closest("details");
+      if (details) {
+        details.open = true;
+      }
+      return target;
+    }
+
+    if (parts[0] === "photo-set" && parts[1] && parts[2]) {
+      const target = parts[2] === "save"
+        ? panel.querySelector(`[data-photo-set-action="save"][data-photo-set-id="${CSS.escape(parts[1])}"]`)
+        : panel.querySelector(`[data-photo-set-form][data-photo-set-id="${CSS.escape(parts[1])}"] [name="${CSS.escape(parts[2])}"]`);
+      const details = target?.closest("details");
+      if (details) {
+        details.open = true;
+      }
+      return target;
+    }
+
+    if (parts[0] === "photo-upload" && parts[1]) {
+      return panel.querySelector(`[data-photo-upload-action="${CSS.escape(parts[1])}"]`);
+    }
+
+    if (parts[0] === "id" && parts[1]) {
+      return panel.querySelector(`#${CSS.escape(parts.slice(1).join(":"))}`);
+    }
+
+    return null;
+  }
+
+  function getEditorFallbackTarget(focusKey) {
+    const panel = getEditorPanel();
+    if (!panel) {
+      return null;
+    }
+
+    let selectors = ["#daily-log-day-status", "#daily-log-editor-close"];
+    if (focusKey?.startsWith("task:")) {
+      selectors = ["[data-task-action=\"edit\"]", "[data-task-action=\"delete\"]", "#daily-task-description", ...selectors];
+    } else if (focusKey?.startsWith("photo:") || focusKey?.startsWith("photo-set:") || focusKey?.startsWith("photo-upload:")) {
+      selectors = ["[data-photo-action=\"download\"]", "[data-photo-action=\"delete\"]", "[data-photo-set-action=\"save\"]", "[data-photo-upload-action=\"attach\"]", "#photo-upload-file", ...selectors];
+    }
+
+    return selectors.map((selector) => panel.querySelector(selector)).find(isVisibleFocusable) || null;
+  }
+
+  function restoreEditorFocus(focusKey, fallbackKey = "") {
+    if (!focusKey) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      const target = findEditorFocusTarget(focusKey) || findEditorFocusTarget(fallbackKey) || getEditorFallbackTarget(focusKey);
+      if (isVisibleFocusable(target)) {
+        target.focus();
+      }
+    });
+  }
+
+  function focusEditorInitialControl() {
+    window.requestAnimationFrame(() => {
+      const panel = getEditorPanel();
+      const target = panel?.querySelector("[data-editor-initial-focus]") || panel?.querySelector("#daily-log-editor-close");
+      if (isVisibleFocusable(target)) {
+        target.focus();
+      }
+    });
+  }
+
+
+
+  function showValidationError(form, message, fieldIds) {
+    window.OJTUI.clearFieldValidation(form);
+    const messageElement = form?.querySelector(".form-message");
+    const validFields = (fieldIds || []).map((id) => getElement(id)).filter(Boolean);
+    validFields.forEach((field) => {
+      field.setAttribute("aria-invalid", "true");
+      const describedBy = new Set((field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+      if (messageElement?.id) {
+        describedBy.add(messageElement.id);
+      }
+      if (describedBy.size > 0) {
+        field.setAttribute("aria-describedby", [...describedBy].join(" "));
+      }
+    });
+    window.OJTUI.showFormMessage(messageElement, message, "error");
+    window.requestAnimationFrame(() => {
+      const firstField = validFields.find(isVisibleFocusable);
+      firstField?.focus();
+    });
   }
 
   function createId(prefix) {
@@ -431,7 +597,7 @@
             <textarea name="caption" rows="2">${escapeHtml(caption)}</textarea>
           </label>
           <div class="form-actions">
-            <button class="secondary-button" type="submit">Save shared details</button>
+            <button class="secondary-button" type="submit" data-photo-set-action="save" data-photo-set-id="${escapeHtml(photoSet.photoSetId)}">Save shared details</button>
             <p class="form-message" hidden></p>
           </div>
         </form>
@@ -447,7 +613,7 @@
             <textarea name="caption" rows="2">${escapeHtml(caption)}</textarea>
           </label>
           <div class="form-actions">
-            <button class="secondary-button" type="submit">Save details</button>
+            <button class="secondary-button" type="submit" data-photo-action="save-details" data-photo-id="${escapeHtml(firstPhoto.id)}">Save details</button>
             <p class="form-message" hidden></p>
           </div>
         </form>
@@ -540,7 +706,7 @@
           </div>
 
           <div class="form-actions">
-            <button class="primary-button" type="submit">Attach photos</button>
+            <button class="primary-button" type="submit" data-photo-upload-action="attach">Attach photos</button>
             <p class="form-message" id="photo-upload-message" hidden></p>
           </div>
         </form>
@@ -557,7 +723,10 @@
     const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
     const tasksEnabled = Boolean(dailyLog);
     const deleteButton = dailyLog
-      ? `<button class="danger-button" type="button" data-log-action="delete" data-log-id="${dailyLog.id}">Delete day record</button>`
+      ? `<div class="destructive-actions">
+          <span class="destructive-label">Delete day record</span>
+          <button class="danger-button" type="button" data-log-action="delete" data-log-id="${dailyLog.id}">Delete day record</button>
+        </div>`
       : "";
 
     return `
@@ -573,23 +742,26 @@
 
             <label class="field">
               <span>Day status</span>
-              <select id="daily-log-day-status">
+              <select id="daily-log-day-status" data-editor-initial-focus="true">
                 ${renderOptions(dayStatuses, dayStatus)}
               </select>
             </label>
 
-            <label class="field time-field${timePanelClass}">
-              <span>Time in</span>
-              <input type="time" id="daily-log-time-in" value="${escapeHtml(dailyLog?.timeIn || "")}" ${timeFieldState}>
-            </label>
-            <label class="field time-field${timePanelClass}">
-              <span>Time out</span>
-              <input type="time" id="daily-log-time-out" value="${escapeHtml(dailyLog?.timeOut || "")}" ${timeFieldState}>
-            </label>
-            <label class="field time-field${timePanelClass}">
-              <span>Break minutes</span>
-              <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}" ${timeFieldState}>
-            </label>
+            <fieldset class="journal-fieldset time-entry-fieldset">
+              <legend>Worked-day timing</legend>
+              <label class="field time-field${timePanelClass}">
+                <span>Time in</span>
+                <input type="time" id="daily-log-time-in" value="${escapeHtml(dailyLog?.timeIn || "")}" ${timeFieldState}>
+              </label>
+              <label class="field time-field${timePanelClass}">
+                <span>Time out</span>
+                <input type="time" id="daily-log-time-out" value="${escapeHtml(dailyLog?.timeOut || "")}" ${timeFieldState}>
+              </label>
+              <label class="field time-field${timePanelClass}">
+                <span>Break minutes</span>
+                <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}" ${timeFieldState}>
+              </label>
+            </fieldset>
             <label class="field field-wide">
               <span>Day remarks</span>
               <textarea id="daily-log-day-remarks" rows="2" placeholder="Optional reason or notes">${escapeHtml(dailyLog?.dayRemarks || "")}</textarea>
@@ -597,19 +769,19 @@
 
             ${renderRenderedTimePanel(dailyLog, tasks)}
 
-            <div class="form-actions">
-              <button class="primary-button" type="submit" id="save-daily-log-button">${dailyLog ? "Save day record" : "Save day record"}</button>
-              ${deleteButton}
+            <div class="form-actions day-record-actions">
+              <button class="primary-button" type="submit" id="save-daily-log-button">Save day record</button>
               <p class="form-message" id="daily-log-form-message" hidden></p>
             </div>
           </form>
+          ${deleteButton}
         </div>
 
         <div class="journal-col journal-col-tasks">
           <div class="journal-col-header">
             <span class="card-label">Task/work items</span>
             <h4>Accomplishments</h4>
-            <p class="phase-note">${tasksEnabled ? "Add what you accomplished today — these become journal bullets." : "Save the day record first, then add task items here."}</p>
+            <p class="phase-note">${tasksEnabled ? "Add what you accomplished today - these become journal bullets." : "Save the day record first, then add task items here."}</p>
           </div>
 
           <div class="task-list-display" id="daily-task-list">
@@ -641,7 +813,7 @@
               </label>
             </div>
 
-            <p class="phase-note">Task time is for your notes only — rendered hours come from time in, time out, and break.</p>
+            <p class="phase-note">Task time is for your notes only - rendered hours come from time in, time out, and break.</p>
 
             <div class="form-actions">
               <button class="primary-button" type="submit" id="save-daily-task-button" ${tasksEnabled ? "" : "disabled"}>Save task item</button>
@@ -655,7 +827,6 @@
       ${renderPhotoSection(dailyLog)}
     `;
   }
-
   function renderDayCard(week, dateText, dayNumber, dailyLog) {
     const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
     const photos = dailyLog ? getPhotosForDailyLog(dailyLog.id) : [];
@@ -693,17 +864,19 @@
 
     const dayLabel = getDayLabel(week, dateText);
     const titleId = `daily-log-editor-title-${dateText}`;
+    const descriptionId = `daily-log-editor-description-${dateText}`;
     const statusMarkup = dailyLog
       ? renderDayStatusBadge(dailyLog.dayStatus)
       : '<span class="day-status-badge is-empty">Not logged yet</span>';
 
     return `
       <div class="daily-log-editor-overlay" data-editor-close="true">
-        <section class="daily-log-editor-panel" role="dialog" aria-modal="true" aria-labelledby="${escapeHtml(titleId)}">
+        <section class="daily-log-editor-panel" role="dialog" aria-modal="true" aria-labelledby="${escapeHtml(titleId)}" aria-describedby="${escapeHtml(descriptionId)}">
           <div class="daily-log-editor-header">
             <div>
               <span class="card-label">Daily Log Editor</span>
               <h3 id="${escapeHtml(titleId)}">${escapeHtml(dayLabel)} - ${escapeHtml(formatDisplayDate(dateText))}</h3>
+              <p class="sr-only" id="${escapeHtml(descriptionId)}">Edit the selected day’s status, time, tasks, and photo documentation.</p>
               ${statusMarkup}
             </div>
             <button class="secondary-button editor-close-button" type="button" id="daily-log-editor-close" data-editor-close="true">Close</button>
@@ -715,25 +888,121 @@
       </div>
     `;
   }
-
   function closeDailyLogEditor() {
     const closingDate = state.expandedDate;
+    const returnFocusElement = state.returnFocusElement;
+    let closeError = null;
     state.expandedDate = null;
     state.activeDailyLogId = null;
-    renderJournalWeek();
+    state.returnFocusElement = null;
+
+    try {
+      renderJournalWeek();
+    } catch (error) {
+      closeError = error;
+      console.error(error);
+    } finally {
+      const root = getEditorRoot();
+      if (root) {
+        root.innerHTML = "";
+      }
+      syncDailyLogEditorState();
+    }
+
     window.requestAnimationFrame(() => {
+      if (returnFocusElement?.isConnected && isVisibleFocusable(returnFocusElement)) {
+        returnFocusElement.focus();
+        return;
+      }
       const dayButton = Array.from(document.querySelectorAll("button[data-day-action='open']"))
         .find((button) => button.dataset.date === closingDate);
-      dayButton?.focus();
+      (dayButton || getElement("journal-log-today") || getElement("journal-week-select"))?.focus();
     });
+
+    if (closeError) {
+      throw closeError;
+    }
+  }
+
+  function attachDailyLogKeydownListener() {
+    if (dailyLogKeydownHandler) {
+      return;
+    }
+    dailyLogKeydownHandler = handleDailyLogKeydown;
+    document.addEventListener("keydown", dailyLogKeydownHandler);
+  }
+
+  function detachDailyLogKeydownListener() {
+    if (!dailyLogKeydownHandler) {
+      return;
+    }
+    document.removeEventListener("keydown", dailyLogKeydownHandler);
+    dailyLogKeydownHandler = null;
+  }
+
+  function handleDailyLogKeydown(event) {
+    if (!state.expandedDate) {
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeDailyLogEditor();
+      return;
+    }
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = getEditorFocusableElements();
+    if (focusable.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const panel = getEditorPanel();
+    if (!panel?.contains(document.activeElement)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+      return;
+    }
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function syncDailyLogEditorState() {
-    document.body.classList.toggle("daily-log-editor-open", Boolean(state.expandedDate));
+    const isOpen = Boolean(state.expandedDate);
+    const root = getEditorRoot();
+    const appShell = document.querySelector(".app-shell");
+    if (isOpen) {
+      attachDailyLogKeydownListener();
+    } else {
+      detachDailyLogKeydownListener();
+    }
+    document.body.classList.toggle("daily-log-editor-open", isOpen);
+    if (appShell) {
+      appShell.inert = isOpen;
+      appShell.toggleAttribute("inert", isOpen);
+      appShell.setAttribute("aria-hidden", isOpen ? "true" : "false");
+    }
+    if (root) {
+      root.hidden = !isOpen;
+      root.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    }
   }
-  function renderJournalWeek() {
+
+  function renderJournalWeek(options = {}) {
     const container = getElement("journal-week-accordions");
+    const root = getEditorRoot();
     const week = getSelectedWeek();
+    const focusKey = state.expandedDate ? captureEditorFocusKey() : "";
+    const fallbackKey = options.focusFallbackKey || "";
 
     if (!container) {
       syncDailyLogEditorState();
@@ -741,6 +1010,9 @@
     }
 
     container.innerHTML = "";
+    if (root) {
+      root.innerHTML = "";
+    }
 
     if (!week) {
       state.expandedDate = null;
@@ -754,26 +1026,28 @@
     let currentDate = parseDate(week.inclusiveStartDate);
     const endDate = parseDate(week.inclusiveEndDate);
     let dayNumber = 1;
-
     while (currentDate <= endDate) {
       const dateText = formatDate(currentDate);
       const dailyLog = getDailyLogForDate(dateText);
       dayCards.push(renderDayCard(week, dateText, dayNumber, dailyLog));
-
       currentDate.setDate(currentDate.getDate() + 1);
       dayNumber += 1;
     }
 
     const activeDailyLog = state.expandedDate ? getDailyLogForDate(state.expandedDate) : null;
     state.activeDailyLogId = activeDailyLog?.id || null;
-
     container.innerHTML = `
       <div class="daily-log-day-list" aria-label="Daily log days">
         ${dayCards.join("")}
       </div>
-      ${state.expandedDate ? renderDayEditorModal(week, state.expandedDate, activeDailyLog) : ""}
     `;
+    if (root && state.expandedDate) {
+      root.innerHTML = renderDayEditorModal(week, state.expandedDate, activeDailyLog);
+    }
     syncDailyLogEditorState();
+    if (state.expandedDate && focusKey) {
+      restoreEditorFocus(focusKey, fallbackKey);
+    }
   }
 
   function expandDay(dateText) {
@@ -784,15 +1058,17 @@
     if (!dateText) {
       return;
     }
-
+    const activeElement = document.activeElement;
+    if (activeElement?.isConnected && activeElement.matches("button, a, input, select, textarea")) {
+      state.returnFocusElement = activeElement;
+    }
     window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
     state.expandedDate = dateText;
     const dailyLog = getDailyLogForDate(dateText);
     state.activeDailyLogId = dailyLog?.id || null;
     renderJournalWeek();
-    getElement("daily-log-editor-close")?.focus();
+    focusEditorInitialControl();
   }
-
   function buildDailyLogRecord() {
     const existingLog = getActiveDailyLog() || getDailyLogForDate(getValue("daily-log-entry-date"));
     const timestamp = nowIso();
@@ -992,16 +1268,32 @@
     window.OJTUI.clearFormMessage(getElement("daily-task-form-message"));
   }
 
+  function getDailyLogInvalidFieldIds(message) {
+    if (/Day status|week|entry date|already exists/i.test(message)) {
+      return ["daily-log-day-status"];
+    }
+    if (/Break minutes/i.test(message)) {
+      return ["daily-log-break-minutes"];
+    }
+    if (/Rendered minutes/i.test(message)) {
+      return ["daily-log-time-in", "daily-log-time-out"];
+    }
+    if (/Time in|time out|HH:mm|calculation|negative/i.test(message)) {
+      return ["daily-log-time-in", "daily-log-time-out"];
+    }
+    return ["daily-log-day-status"];
+  }
   async function saveDailyLog(event) {
     event.preventDefault();
+    const form = event.target;
     const messageElement = getElement("daily-log-form-message");
+    window.OJTUI.clearFieldValidation(form);
     window.OJTUI.clearFormMessage(messageElement);
 
     const dailyLog = buildDailyLogRecord();
     const validationMessage = validateDailyLog(dailyLog);
-
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      showValidationError(form, validationMessage, getDailyLogInvalidFieldIds(validationMessage));
       return;
     }
 
@@ -1016,7 +1308,7 @@
       const saveMessage = savedLog.renderedMinutes !== null &&
         savedLog.renderedMinutes !== undefined &&
         Number.isFinite(Number(savedLog.renderedMinutes))
-        ? `Day saved — ${formatRenderedTime(savedLog.renderedMinutes)} rendered.`
+        ? `Day saved - ${formatRenderedTime(savedLog.renderedMinutes)} rendered.`
         : "Day saved. Add time in and time out to calculate rendered hours.";
       window.OJTUI.showFormMessage(getElement("daily-log-form-message"), saveMessage, "success");
     } catch (error) {
@@ -1024,7 +1316,6 @@
       console.error(error);
     }
   }
-
   async function deleteDailyLog(dailyLog) {
     const confirmed = window.confirm(`Delete the log for ${dailyLog.entryDate}? Tasks and photos for this day will also be removed.`);
 
@@ -1037,29 +1328,42 @@
       state.dailyLogs = state.dailyLogs.filter((log) => log.id !== dailyLog.id);
       state.dailyTasks = state.dailyTasks.filter((task) => task.dailyLogId !== dailyLog.id);
       state.photoAttachments = state.photoAttachments.filter((photo) => photo.dailyLogId !== dailyLog.id);
+      const returnFocusElement = state.returnFocusElement;
+      const closingDate = state.expandedDate;
       state.expandedDate = null;
       state.activeDailyLogId = null;
+      state.returnFocusElement = null;
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
       notifyJournalDataChange();
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Day log deleted.", "success");
+      window.OJTUI.showFormMessage(getElement("journal-message"), "Day log deleted.", "success");
+      window.requestAnimationFrame(() => {
+        if (returnFocusElement?.isConnected && isVisibleFocusable(returnFocusElement)) {
+          returnFocusElement.focus();
+          return;
+        }
+        const dayButton = Array.from(document.querySelectorAll("button[data-day-action='open']"))
+          .find((button) => button.dataset.date === closingDate);
+        (dayButton || getElement("journal-log-today") || getElement("journal-week-select"))?.focus();
+      });
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), "Could not delete daily log. Try again.", "error");
+      window.OJTUI.showFormMessage(getElement("journal-message"), "Could not delete daily log. Try again.", "error");
       console.error(error);
     }
   }
 
   async function saveTask(event) {
     event.preventDefault();
+    const form = event.target;
     const messageElement = getElement("daily-task-form-message");
+    window.OJTUI.clearFieldValidation(form);
     window.OJTUI.clearFormMessage(messageElement);
 
     const task = buildTaskRecord();
     const validationMessage = validateTask(task);
-
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      showValidationError(form, validationMessage, ["daily-task-description"]);
       return;
     }
 
@@ -1076,7 +1380,6 @@
       console.error(error);
     }
   }
-
   function startEditTask(task) {
     setValue("daily-task-id", task.id);
     setValue("daily-task-description", task.description);
@@ -1128,22 +1431,24 @@
     const caption = getValue("photo-upload-caption");
     const photoCategory = normalizePhotoCategory(getValue("photo-upload-category"));
 
+
+    window.OJTUI.clearFieldValidation(form);
     window.OJTUI.clearFormMessage(messageElement);
 
     if (!selectedLog) {
-      window.OJTUI.showFormMessage(messageElement, "Save the day record before attaching photos.", "error");
+      showValidationError(form, "Save the day record before attaching photos.", ["photo-upload-file"]);
       return;
     }
 
     if (files.length === 0) {
-      window.OJTUI.showFormMessage(messageElement, "Choose at least one photo.", "error");
+      showValidationError(form, "Choose at least one photo.", ["photo-upload-file"]);
       return;
     }
 
     for (const file of files) {
       const validationMessage = window.OJTPhotos.validatePhotoFile(file);
       if (validationMessage) {
-        window.OJTUI.showFormMessage(messageElement, `${file.name}: ${validationMessage}`, "error");
+        showValidationError(form, `${file.name}: ${validationMessage}`, ["photo-upload-file"]);
         return;
       }
     }
@@ -1228,6 +1533,24 @@
     }
   }
 
+  function getPhotoDeleteFallbackKey(photo) {
+    const photoSet = getPhotoSetsForDailyLog(photo.dailyLogId).find((set) => set.photos.some((item) => item.id === photo.id));
+    if (photoSet) {
+      const index = photoSet.photos.findIndex((item) => item.id === photo.id);
+      const nextPhoto = photoSet.photos[index + 1];
+      const previousPhoto = photoSet.photos[index - 1];
+      if (nextPhoto) {
+        return `photo:${nextPhoto.id}:delete`;
+      }
+      if (previousPhoto) {
+        return `photo:${previousPhoto.id}:delete`;
+      }
+      if (photoSet.photoSetId) {
+        return `photo-set:${photoSet.photoSetId}:save`;
+      }
+    }
+    return "photo-upload:attach";
+  }
   async function deletePhoto(photo) {
     const confirmed = window.confirm(`Delete ${photo.fileName || "this photo"}? The day log will stay saved.`);
 
@@ -1237,8 +1560,9 @@
 
     try {
       await window.OJTStorage.deletePhotoAttachment(photo.id);
+      const focusFallbackKey = getPhotoDeleteFallbackKey(photo);
       state.photoAttachments = state.photoAttachments.filter((attachment) => attachment.id !== photo.id);
-      renderJournalWeek();
+      renderJournalWeek({ focusFallbackKey });
       updateWeekSummary();
       notifyJournalDataChange();
       window.OJTUI.showFormMessage(getElement("photo-upload-message"), "Photo attachment deleted.", "success");
@@ -1341,46 +1665,51 @@
   }
 
   function bindDailyLogEvents() {
-    getElement("journal-week-accordions")?.addEventListener("click", handleJournalClick);
-    getElement("journal-week-accordions")?.addEventListener("input", (event) => {
-      if (["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].includes(event.target.id)) {
-        updateRenderedPreview();
-      }
-    });
-    getElement("journal-week-accordions")?.addEventListener("change", (event) => {
-      if (event.target.id === "daily-log-day-status") {
-        updateDayStatusControls();
-      }
-
-      if (event.target.id === "photo-upload-file") {
-        updatePhotoSelectionCount();
-      }
-    });
-    getElement("journal-week-accordions")?.addEventListener("submit", (event) => {
-      if (event.target.id === "daily-log-form") {
-        saveDailyLog(event);
-      }
-
-      if (event.target.id === "daily-task-form") {
-        saveTask(event);
-      }
-
-      if (event.target.id === "photo-upload-form") {
-        savePhotoAttachment(event);
-      }
-
-      if (event.target.matches("[data-photo-set-form]")) {
-        event.preventDefault();
-        savePhotoSetMetadata(event.target);
-      }
-
-      if (event.target.matches("[data-photo-caption-form]")) {
-        event.preventDefault();
-        savePhotoCaption(event.target);
-      }
+    const roots = [getElement("journal-week-accordions"), getEditorRoot()].filter(Boolean);
+    roots.forEach((root) => {
+      root.addEventListener("click", handleJournalClick);
+      root.addEventListener("input", (event) => {
+        const form = event.target.closest("form");
+        if (form) {
+          window.OJTUI.clearFieldValidation(form);
+        }
+        if (["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].includes(event.target.id)) {
+          updateRenderedPreview();
+        }
+      });
+      root.addEventListener("change", (event) => {
+        const form = event.target.closest("form");
+        if (form) {
+          window.OJTUI.clearFieldValidation(form);
+        }
+        if (event.target.id === "daily-log-day-status") {
+          updateDayStatusControls();
+        }
+        if (event.target.id === "photo-upload-file") {
+          updatePhotoSelectionCount();
+        }
+      });
+      root.addEventListener("submit", (event) => {
+        if (event.target.id === "daily-log-form") {
+          saveDailyLog(event);
+        }
+        if (event.target.id === "daily-task-form") {
+          saveTask(event);
+        }
+        if (event.target.id === "photo-upload-form") {
+          savePhotoAttachment(event);
+        }
+        if (event.target.matches("[data-photo-set-form]")) {
+          event.preventDefault();
+          savePhotoSetMetadata(event.target);
+        }
+        if (event.target.matches("[data-photo-caption-form]")) {
+          event.preventDefault();
+          savePhotoCaption(event.target);
+        }
+      });
     });
   }
-
   document.addEventListener("DOMContentLoaded", () => {
     bindDailyLogEvents();
     loadDailyLogData();
@@ -1399,11 +1728,7 @@
     updateWeekSummary();
   });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && state.expandedDate) {
-      closeDailyLogEditor();
-    }
-  });
+
   document.addEventListener("ojt:weeks-data-change", loadDailyLogData);
 
   document.addEventListener("ojt:section-change", (event) => {
@@ -1414,6 +1739,9 @@
 
     state.expandedDate = null;
     state.activeDailyLogId = null;
+    if (getEditorRoot()) {
+      getEditorRoot().innerHTML = "";
+    }
     syncDailyLogEditorState();
   });
 

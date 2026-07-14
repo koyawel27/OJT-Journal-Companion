@@ -3420,3 +3420,205 @@ body,
     padding-bottom: var(--mobile-navigation-clearance);
   }
 }
+
+/* Phase 4C Journal workspace: ledger hierarchy, readable density, and editor affordances. */
+.journal-page-header {
+  max-width: 68ch;
+  margin-bottom: 4px;
+}
+
+.journal-page-header > p:last-child {
+  max-width: 62ch;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.journal-toolbar,
+.journal-overview,
+.journal-history-panel,
+.journal-summary-panel {
+  border-top: 3px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.journal-toolbar-header,
+.journal-overview-header,
+.journal-col-header {
+  min-width: 0;
+}
+
+.journal-toolbar-actions,
+.journal-overview-actions,
+.week-actions,
+.task-bullet-actions,
+.photo-item-actions {
+  min-width: 0;
+}
+
+.journal-log-today-button {
+  min-height: 48px;
+}
+
+.journal-overview-header h3,
+.journal-history-item h4,
+.journal-col-header h4,
+.journal-day-heading {
+  overflow-wrap: anywhere;
+}
+
+.journal-overview-grid dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.journal-history-item,
+.week-item-main,
+.week-item-main strong,
+.week-item-main p {
+  min-width: 0;
+}
+
+.journal-history-item,
+.week-item-main p,
+.task-bullet-content,
+.photo-attachment-main {
+  overflow-wrap: anywhere;
+}
+
+.daily-log-day-card {
+  border-radius: var(--radius-control);
+  border-left: 3px solid var(--accent-soft);
+  box-shadow: none;
+  transition: transform 160ms ease, opacity 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.daily-log-day-card:hover {
+  transform: translateY(-1px);
+  border-left-color: var(--accent);
+}
+
+.day-card-main,
+.day-card-summary,
+.day-card-action,
+.day-status-badge {
+  min-width: 0;
+}
+
+.day-card-summary,
+.day-card-meta {
+  overflow-wrap: anywhere;
+}
+
+.journal-fieldset {
+  min-width: 0;
+  margin: 0 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.journal-fieldset legend {
+  padding: 0 6px;
+  color: var(--label);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.time-entry-fieldset .field:last-child {
+  margin-bottom: 0;
+}
+
+.day-record-actions {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.destructive-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  border-top: 1px solid var(--danger-border);
+  padding-top: 14px;
+}
+
+.destructive-label {
+  color: var(--danger-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.photo-attachment-main,
+.task-bullet-content,
+.task-title-row strong {
+  min-width: 0;
+}
+
+.photo-item-actions {
+  flex-wrap: wrap;
+}
+
+#daily-log-editor-root[hidden] {
+  display: none;
+}
+
+.daily-log-editor-body {
+  overscroll-behavior: contain;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+.daily-log-editor-panel [aria-invalid="true"] {
+  border-color: var(--danger-border);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .journal-page-header {
+    margin-bottom: 0;
+  }
+
+  .journal-toolbar,
+  .journal-overview,
+  .journal-history-panel,
+  .journal-summary-panel {
+    border-top-width: 2px;
+  }
+
+  .journal-overview-actions,
+  .destructive-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .journal-overview-actions > button,
+  .destructive-actions > button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .daily-log-day-card:hover {
+    transform: none;
+  }
+
+  .daily-log-editor-body {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .journal-fieldset {
+    padding: 10px;
+  }
+}

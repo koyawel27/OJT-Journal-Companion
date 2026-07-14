@@ -454,9 +454,11 @@
         </section></section>
 
         <section class="app-section" id="journal" aria-labelledby="journal-title" hidden>
-          <p class="section-kicker">Selected-week workspace</p>
-          <h2 id="journal-title">Journal</h2>
-          <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
+          <header class="journal-page-header">
+            <p class="section-kicker">Selected-week workspace</p>
+            <h2 id="journal-title">Journal</h2>
+            <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
+          </header>
 
           <div class="journal-layout">
             <section class="week-panel journal-toolbar" aria-labelledby="journal-toolbar-title">
@@ -474,9 +476,9 @@
                   <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">Next</button>
                 </div>
                 <div class="journal-toolbar-actions">
-                  <button class="primary-button" type="button" id="journal-new-week">New Week</button>
+                  <button class="secondary-button" type="button" id="journal-new-week">New Week</button>
                   <button class="secondary-button" type="button" id="journal-all-weeks" aria-controls="all-weeks-panel" aria-expanded="false">All Weeks</button>
-                  <button class="secondary-button" type="button" id="journal-log-today">Log Today</button>
+                  <button class="primary-button journal-log-today-button" type="button" id="journal-log-today">Log Today</button>
                 </div>
               </div>
               <p class="form-message" id="journal-message" aria-live="polite" hidden></p>
@@ -572,7 +574,7 @@
                   </div>
                   <p id="journal-daily-summary" aria-live="polite"></p>
                 </div>
-                <div class="journal-week-accordions" id="journal-week-accordions" aria-live="polite"></div>
+                <div class="journal-week-accordions" id="journal-week-accordions"></div>
               </section>
 
               <section class="week-panel journal-summary-panel" aria-labelledby="journal-weekly-summary-title">
@@ -631,6 +633,7 @@
     </div>
   </div>
 
+  <div id="daily-log-editor-root"></div>
 
   <script src="assets/js/db.js"></script>
   <script src="assets/js/storage.js"></script>
