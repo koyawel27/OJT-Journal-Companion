@@ -1,3 +1,150 @@
+const appearanceController = (() => {
+  const cacheKey = "ojt-journal-companion:appearance-mode";
+  const allowedModes = new Set(["system", "dark", "light"]);
+  const root = document.documentElement;
+  let authoritativeMode = "system";
+  let currentMode = normalizeAppearanceMode(root.dataset.appearance);
+  let previewActive = false;
+  let mediaQuery = null;
+  let mediaListenerBound = false;
+
+  function normalizeAppearanceMode(value) {
+    return typeof value === "string" && allowedModes.has(value) ? value : "system";
+  }
+
+  function getSystemMediaQuery() {
+    if (mediaQuery || typeof window.matchMedia !== "function") {
+      return mediaQuery;
+    }
+
+    try {
+      mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    } catch {
+      mediaQuery = null;
+    }
+    return mediaQuery;
+  }
+
+  function resolveEffectiveTheme(mode) {
+    const normalizedMode = normalizeAppearanceMode(mode);
+    if (normalizedMode !== "system") {
+      return normalizedMode;
+    }
+
+    const query = getSystemMediaQuery();
+    return query ? (query.matches ? "dark" : "light") : "dark";
+  }
+
+  function applyRootMode(mode) {
+    currentMode = normalizeAppearanceMode(mode);
+    root.dataset.appearance = currentMode;
+    root.dataset.theme = resolveEffectiveTheme(currentMode);
+    return currentMode;
+  }
+
+  function reconcileCache(mode) {
+    const normalizedMode = normalizeAppearanceMode(mode);
+    try {
+      if (normalizedMode === "system") {
+        window.localStorage.removeItem(cacheKey);
+      } else {
+        window.localStorage.setItem(cacheKey, normalizedMode);
+      }
+    } catch {
+      // The cache is optional; IndexedDB remains authoritative.
+    }
+  }
+
+  function applyPreviewMode(mode) {
+    previewActive = true;
+    return applyRootMode(mode);
+  }
+
+  function applyAuthoritativeMode(mode) {
+    authoritativeMode = normalizeAppearanceMode(mode);
+    reconcileCache(authoritativeMode);
+    if (!previewActive) {
+      applyRootMode(authoritativeMode);
+    }
+    return authoritativeMode;
+  }
+
+  function commitMode(mode) {
+    authoritativeMode = normalizeAppearanceMode(mode);
+    previewActive = false;
+    applyRootMode(authoritativeMode);
+    reconcileCache(authoritativeMode);
+    return authoritativeMode;
+  }
+
+  function restorePersistedMode() {
+    previewActive = false;
+    applyRootMode(authoritativeMode);
+    reconcileCache(authoritativeMode);
+    return authoritativeMode;
+  }
+
+  function resetToSystem() {
+    authoritativeMode = "system";
+    previewActive = false;
+    applyRootMode("system");
+    reconcileCache("system");
+  }
+
+  function handleSystemAppearanceChange() {
+    if (currentMode === "system") {
+      applyRootMode("system");
+    }
+  }
+
+  function bindSystemListener() {
+    const query = getSystemMediaQuery();
+    if (!query || mediaListenerBound) {
+      return;
+    }
+
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", handleSystemAppearanceChange);
+    } else if (typeof query.addListener === "function") {
+      query.addListener(handleSystemAppearanceChange);
+    } else {
+      return;
+    }
+    mediaListenerBound = true;
+  }
+
+  function unbindSystemListener() {
+    if (!mediaQuery || !mediaListenerBound) {
+      return;
+    }
+
+    if (typeof mediaQuery.removeEventListener === "function") {
+      mediaQuery.removeEventListener("change", handleSystemAppearanceChange);
+    } else if (typeof mediaQuery.removeListener === "function") {
+      mediaQuery.removeListener(handleSystemAppearanceChange);
+    }
+    mediaListenerBound = false;
+  }
+
+  bindSystemListener();
+  applyRootMode(currentMode);
+  window.addEventListener("pagehide", unbindSystemListener, { once: true });
+
+  return {
+    cacheKey,
+    normalizeAppearanceMode,
+    applyPreviewMode,
+    applyAuthoritativeMode,
+    commitMode,
+    restorePersistedMode,
+    resetToSystem,
+    getCurrentMode: () => currentMode,
+    getAuthoritativeMode: () => authoritativeMode,
+    hasActivePreview: () => previewActive
+  };
+})();
+
+window.OJTAppearance = appearanceController;
 const navButtons = document.querySelectorAll(".nav-button");
 const sections = document.querySelectorAll(".app-section");
 const settingsTabs = document.querySelectorAll("[data-settings-tab]");

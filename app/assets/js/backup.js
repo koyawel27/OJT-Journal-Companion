@@ -99,6 +99,7 @@
       "id",
       "preferredWeekStartDay",
       "timeFormat",
+      "appearanceMode",
       "lastBackupDate",
       "createdAt",
       "updatedAt"
@@ -141,6 +142,7 @@
     LEGACY_SINGLETON_PHOTO: "LEGACY_SINGLETON_PHOTO",
     NORMALIZED_DAY_STATUS: "NORMALIZED_DAY_STATUS",
     NORMALIZED_PHOTO_CATEGORY: "NORMALIZED_PHOTO_CATEGORY",
+    NORMALIZED_APPEARANCE_MODE: "NORMALIZED_APPEARANCE_MODE",
     NULL_PROFILE_RECORD: "NULL_PROFILE_RECORD"
   };
 
@@ -553,7 +555,10 @@
     return {
       studentProfile: data.studentProfile === null ? null : { ...data.studentProfile },
       companyProfile: data.companyProfile === null ? null : { ...data.companyProfile },
-      appSettings: data.appSettings === null ? null : { ...data.appSettings },
+      appSettings: data.appSettings === null ? null : {
+        ...data.appSettings,
+        appearanceMode: window.OJTAppearance.normalizeAppearanceMode(data.appSettings.appearanceMode)
+      },
       weeks: data.weeks.map((week) => ({ ...week })),
       dailyLogs: data.dailyLogs.map((log) => ({
         ...log,
@@ -637,6 +642,14 @@
       pushWarning(warnings, warningCodes.NULL_PROFILE_RECORD, "App settings is null.");
     } else {
       collectUnknownSingletonFields(data.appSettings, "appSettings", warnings);
+      if (Object.prototype.hasOwnProperty.call(data.appSettings, "appearanceMode") &&
+        window.OJTAppearance.normalizeAppearanceMode(data.appSettings.appearanceMode) !== data.appSettings.appearanceMode) {
+        pushWarning(warnings, warningCodes.NORMALIZED_APPEARANCE_MODE, "App settings appearance mode will be normalized to System on restore.", {
+          store: "appSettings",
+          recordId: data.appSettings.id || null,
+          field: "appearanceMode"
+        });
+      }
     }
 
     if (errors.length > 0) {
@@ -1244,6 +1257,7 @@
 
     try {
       await window.OJTStorage.replaceAllData(review.restoreCandidate);
+      window.OJTAppearance.commitMode(review.restoreCandidate.appSettings?.appearanceMode);
       restoreInProgress = false;
       clearPendingRestore({ clearFile: true, focus: false });
       window.OJTUI.showFormMessage(messageElement, "Backup restored. Reloading...", "success");
@@ -1682,6 +1696,7 @@
 
     try {
       await window.OJTStorage.clearAllData();
+      window.OJTAppearance.resetToSystem();
       window.OJTSelectedWeek?.clearSelection({ source: "reset" });
       window.OJTUI.showFormMessage(messageElement, "Local data reset. Reloading...", "success");
       window.setTimeout(() => {

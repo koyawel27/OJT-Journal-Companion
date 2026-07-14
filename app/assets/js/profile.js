@@ -1,7 +1,8 @@
 (function () {
   const defaultSettings = {
     preferredWeekStartDay: "Monday",
-    timeFormat: "24-hour"
+    timeFormat: "24-hour",
+    appearanceMode: "system"
   };
 
   const state = {
@@ -19,6 +20,18 @@
     if (element) {
       element.value = value ?? "";
     }
+  }
+
+  function getSelectedAppearanceMode() {
+    const selected = document.querySelector('input[name="appearance-mode"]:checked');
+    return window.OJTAppearance.normalizeAppearanceMode(selected?.value);
+  }
+
+  function setSelectedAppearanceMode(value) {
+    const normalizedMode = window.OJTAppearance.normalizeAppearanceMode(value);
+    document.querySelectorAll('input[name="appearance-mode"]').forEach((radio) => {
+      radio.checked = radio.value === normalizedMode;
+    });
   }
 
   function nowIso() {
@@ -62,6 +75,7 @@
     const record = {
       preferredWeekStartDay: getValue("preferred-week-start-day") || defaultSettings.preferredWeekStartDay,
       timeFormat: getValue("time-format") || defaultSettings.timeFormat,
+      appearanceMode: getSelectedAppearanceMode(),
       ...buildTimestampFields(state.appSettings)
     };
     if (state.appSettings && state.appSettings.lastBackupDate) {
@@ -138,6 +152,9 @@
     };
     setValue("preferred-week-start-day", activeSettings.preferredWeekStartDay);
     setValue("time-format", activeSettings.timeFormat);
+    if (!window.OJTAppearance.hasActivePreview()) {
+      setSelectedAppearanceMode(activeSettings.appearanceMode);
+    }
   }
 
   async function loadProfileData() {
@@ -152,9 +169,10 @@
       state.companyProfile = companyProfile;
       state.appSettings = appSettings;
 
+      const appearanceMode = window.OJTAppearance.applyAuthoritativeMode(appSettings?.appearanceMode);
       populateStudentForm(studentProfile);
       populateCompanyForm(companyProfile);
-      populateSettingsForm(appSettings);
+      populateSettingsForm({ ...appSettings, appearanceMode });
       window.OJTUI.updateDashboardSummary(studentProfile, companyProfile, appSettings);
     } catch (error) {
       const message = "Could not load Settings data. Refresh and try again.";
@@ -221,10 +239,14 @@
 
     try {
       state.appSettings = await window.OJTStorage.saveAppSettings(buildAppSettings());
+      window.OJTAppearance.commitMode(state.appSettings.appearanceMode);
       window.OJTUI.updateDashboardSummary(state.studentProfile, state.companyProfile, state.appSettings);
       window.OJTUI.showFormMessage(messageElement, "Settings saved.", "success");
     } catch (error) {
+      const persistedMode = window.OJTAppearance.restorePersistedMode();
+      setSelectedAppearanceMode(persistedMode);
       window.OJTUI.showFormMessage(messageElement, "Could not save settings. Try again.", "error");
+      document.querySelector('input[name="appearance-mode"]:checked')?.focus();
       console.error(error);
     }
   }
@@ -232,7 +254,13 @@
   function bindProfileForms() {
     document.getElementById("student-profile-form")?.addEventListener("submit", saveStudentProfile);
     document.getElementById("company-profile-form")?.addEventListener("submit", saveCompanyProfile);
-    document.getElementById("app-settings-form")?.addEventListener("submit", saveAppSettings);
+    const settingsForm = document.getElementById("app-settings-form");
+    settingsForm?.addEventListener("submit", saveAppSettings);
+    settingsForm?.addEventListener("change", (event) => {
+      if (event.target.matches('input[name="appearance-mode"]')) {
+        window.OJTAppearance.applyPreviewMode(event.target.value);
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
