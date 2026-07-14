@@ -90,6 +90,23 @@
     return "";
   }
 
+  function showValidationError(fieldId, messageElement, message) {
+    const field = document.getElementById(fieldId);
+    window.OJTUI.showFormMessage(messageElement, message, "error");
+
+    if (!field) {
+      return;
+    }
+
+    const describedBy = new Set((field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+    if (messageElement?.id) {
+      describedBy.add(messageElement.id);
+    }
+    field.setAttribute("aria-invalid", "true");
+    field.setAttribute("aria-describedby", [...describedBy].join(" "));
+    field.focus();
+  }
+
   function populateStudentForm(profile) {
     if (!profile) {
       return;
@@ -150,12 +167,16 @@
     event.preventDefault();
     const messageElement = document.getElementById("student-profile-message");
     window.OJTUI.clearFormMessage(messageElement);
+    window.OJTUI.clearFieldValidation(event.currentTarget);
 
     const profile = buildStudentProfile();
     const validationMessage = validateStudentProfile(profile);
 
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      const fieldId = !profile.studentName
+        ? "student-name"
+        : "required-ojt-hours";
+      showValidationError(fieldId, messageElement, validationMessage);
       return;
     }
 
@@ -173,12 +194,13 @@
     event.preventDefault();
     const messageElement = document.getElementById("company-profile-message");
     window.OJTUI.clearFormMessage(messageElement);
+    window.OJTUI.clearFieldValidation(event.currentTarget);
 
     const profile = buildCompanyProfile();
     const validationMessage = validateCompanyProfile(profile);
 
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      showValidationError("company-name", messageElement, validationMessage);
       return;
     }
 

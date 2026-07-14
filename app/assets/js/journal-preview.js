@@ -138,7 +138,7 @@
     return window.confirm(`${warnings.join("\n\n")}\n\nContinue exporting DOCX?`);
   }
 
-  function renderProfileWarnings() {
+  function renderProfileWarnings(payload) {
     const warnings = [];
 
     if (!state.studentProfile?.studentName) {
@@ -157,19 +157,26 @@
       });
     }
 
+    buildExportWarnings(payload)
+      .filter((message) => !message.startsWith("Missing "))
+      .forEach((message) => warnings.push({ message }));
+
     if (warnings.length === 0) {
       return "";
     }
 
     return `
-      <div class="preview-warnings">
-        ${warnings.map((warning) => `
-          <div class="preview-warning-item">
-            <p>${escapeHtml(warning.message)}</p>
-            <button class="secondary-button" type="button" data-settings-focus="${escapeHtml(warning.target)}">${escapeHtml(warning.action)}</button>
-          </div>
-        `).join("")}
-      </div>
+      <section class="preview-warnings" aria-labelledby="preview-readiness-title">
+        <h3 id="preview-readiness-title">Before final submission</h3>
+        <ul class="preview-warning-list">
+          ${warnings.map((warning) => `
+            <li class="preview-warning-item">
+              <p>${escapeHtml(warning.message)}</p>
+              ${warning.target ? `<button class="secondary-button" type="button" data-settings-focus="${escapeHtml(warning.target)}">${escapeHtml(warning.action)}</button>` : ""}
+            </li>
+          `).join("")}
+        </ul>
+      </section>
     `;
   }
 
@@ -212,23 +219,36 @@
   function renderDailyRows(payload) {
     if (payload.days.length === 0) {
       return `
-        <div class="preview-table-row">
-          <div class="preview-day-cell">No dates</div>
-          <div class="preview-work-cell"><p class="empty-state">No inclusive date range saved for this week.</p></div>
-        </div>
+        <li class="preview-day-entry">
+          <section class="preview-day-section" aria-labelledby="preview-no-dates-title">
+            <h5 id="preview-no-dates-title">No dates saved</h5>
+            <p class="empty-state">No inclusive date range is saved for this week.</p>
+          </section>
+        </li>
       `;
     }
 
-    return payload.days.map((day) => {
+    return payload.days.map((day, index) => {
+      const headingId = `preview-day-${index + 1}-title`;
       return `
-        <div class="preview-table-row">
-          <div class="preview-day-cell">
-            <strong>${escapeHtml(day.dayLabel)}</strong>
-            <span>${escapeHtml(day.date)}</span>
-            ${day.dayStatus ? `<span>${escapeHtml(day.dayStatus)}</span>` : ""}
-          </div>
-          <div class="preview-work-cell">${renderDailyAccomplishment(day)}</div>
-        </div>
+        <li class="preview-day-entry">
+          <section class="preview-day-section" aria-labelledby="${headingId}">
+            <header class="preview-day-header">
+              <div>
+                <h5 id="${headingId}">${escapeHtml(day.dayLabel)}</h5>
+                <p>${escapeHtml(day.date)}</p>
+              </div>
+              <dl class="preview-day-meta">
+                <div><dt>Status</dt><dd>${escapeHtml(day.dayStatus || "Not logged")}</dd></div>
+                <div><dt>Rendered time</dt><dd>${escapeHtml(day.renderedDisplay)}</dd></div>
+              </dl>
+            </header>
+            <div class="preview-day-work">
+              <h6 class="sr-only">Daily accomplishments</h6>
+              ${renderDailyAccomplishment(day)}
+            </div>
+          </section>
+        </li>
       `;
     }).join("");
   }
@@ -312,6 +332,7 @@
 
     if (!week) {
       output.innerHTML = '<p class="empty-state">Choose a saved week to preview and export your journal.</p>';
+      window.OJTUI.showFormMessage(getElement("weekly-preview-message"), "No saved week is selected.", "info");
       copyButton.disabled = true;
       if (exportButton) {
         exportButton.disabled = true;
@@ -325,52 +346,49 @@
     copyButton.disabled = false;
     if (exportButton) {
       exportButton.disabled = false;
+      exportButton.setAttribute("aria-busy", "false");
     }
 
     output.innerHTML = `
-      ${renderProfileWarnings()}
+      ${renderProfileWarnings(payload)}
       <article class="journal-preview-card">
-        <div class="preview-info-grid">
+        <dl class="preview-info-grid">
           <div>
-            <span>Student Name</span>
-            <strong>${escapeHtml(payload.studentName || "Not set")}</strong>
+            <dt>Student Name</dt>
+            <dd>${escapeHtml(payload.studentName || "Not set")}</dd>
           </div>
           <div>
-            <span>Company</span>
-            <strong>${escapeHtml(payload.companyName || "Not set")}</strong>
+            <dt>Company</dt>
+            <dd>${escapeHtml(payload.companyName || "Not set")}</dd>
           </div>
           <div>
-            <span>Week Number</span>
-            <strong>${escapeHtml(payload.weekNumber || "Not set")}</strong>
+            <dt>Week Number</dt>
+            <dd>${escapeHtml(payload.weekNumber || "Not set")}</dd>
           </div>
           <div>
-            <span>Inclusive Dates</span>
-            <strong>${escapeHtml(payload.inclusiveStartDate || "Not set")} to ${escapeHtml(payload.inclusiveEndDate || "Not set")}</strong>
+            <dt>Inclusive Dates</dt>
+            <dd>${escapeHtml(payload.inclusiveStartDate || "Not set")} to ${escapeHtml(payload.inclusiveEndDate || "Not set")}</dd>
           </div>
-        </div>
+        </dl>
 
         <section class="preview-section-block preview-accomplishments-section">
           <h4>Daily Accomplishments</h4>
           ${renderDailyLogEmptyNote(payload)}
-          <div class="preview-table">
-            <div class="preview-table-header">
-              <div>Day</div>
-              <div>Daily Accomplishments</div>
-            </div>
+          <ol class="preview-day-list">
             ${renderDailyRows(payload)}
-          </div>
+          </ol>
         </section>
 
-        <section class="preview-total-row">
-          <span>Total weekly Hours Rendered</span>
-          <strong>${escapeHtml(payload.totalRenderedDisplay)}</strong>
-        </section>
+        <dl class="preview-total-row">
+          <div><dt>Total weekly Hours Rendered</dt><dd>${escapeHtml(payload.totalRenderedDisplay)}</dd></div>
+        </dl>
 
         ${renderSummarySection("Skills Learned", week.weeklySkillsLearned)}
         ${renderSummarySection("Problems Encountered", week.problemsEncountered)}
         ${renderSummarySection("Reflection (Points of Learning)", week.reflectionOrPointsOfLearning)}
       </article>
     `;
+    window.OJTUI.showFormMessage(getElement("weekly-preview-message"), `Preview updated for Week ${payload.weekNumber || "not set"}.`, "info");
   }
 
   function updateJournalHandoff(hasWeek) {
@@ -480,6 +498,7 @@
       if (exportButton) {
         exportButton.disabled = true;
         exportButton.textContent = "Exporting DOCX...";
+        exportButton.setAttribute("aria-busy", "true");
       }
 
       await window.OJTDocxExportV2.exportWeekById(window.OJTSelectedWeek?.getSelectedWeekId() || state.selectedWeekId);
@@ -491,12 +510,14 @@
       if (exportButton) {
         exportButton.textContent = originalButtonText;
         exportButton.disabled = !state.currentPayload;
+        exportButton.setAttribute("aria-busy", "false");
       }
     }
   }
 
   async function loadPreviewData() {
     try {
+      window.OJTUI.showFormMessage(getElement("weekly-preview-message"), "Loading weekly preview...", "info");
       const [studentProfile, companyProfile, weeks, dailyLogs, dailyTasks] = await Promise.all([
         window.OJTStorage.getStudentProfile(),
         window.OJTStorage.getCompanyProfile(),
@@ -519,16 +540,29 @@
       if (output) {
         output.innerHTML = '<p class="empty-state">Could not load preview. Refresh and try again.</p>';
       }
+      window.OJTUI.showFormMessage(getElement("weekly-preview-message"), "Could not load preview. Refresh and try again.", "error");
       console.error(error);
     }
   }
 
+
+  function openSelectedWeekInJournal() {
+    window.OJTApp?.showSection("journal");
+    window.requestAnimationFrame(() => {
+      const heading = getElement("journal-overview-title") || getElement("journal-title");
+      if (!heading) {
+        return;
+      }
+      heading.tabIndex = -1;
+      heading.focus();
+    });
+  }
   function bindPreviewEvents() {
     getElement("weekly-preview-week-select")?.addEventListener("change", (event) => {
       window.OJTSelectedWeek?.selectWeek(event.target.value, { weeks: state.weeks, source: "weekly-preview" });
     });
 
-    getElement("preview-edit-selected-week")?.addEventListener("click", () => window.OJTApp?.showSection("journal"));
+    getElement("preview-edit-selected-week")?.addEventListener("click", openSelectedWeekInJournal);
     getElement("weekly-preview-output")?.addEventListener("click", (event) => {
       const button = event.target.closest?.("button[data-settings-focus]");
       if (button) {

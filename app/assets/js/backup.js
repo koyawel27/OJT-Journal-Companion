@@ -1454,9 +1454,15 @@
       storageHealthState.estimate = estimate;
       storageHealthState.persistence = persistence;
       renderStorageHealth();
-      if (interactive) {
-        setStorageHealthMessage("Storage status refreshed.", "info");
-      }
+      const states = [estimate.status, persistence.status];
+      const statusMessage = states.includes("error")
+        ? "Storage status checked, but some information could not be read."
+        : states.includes("unavailable")
+          ? "Storage status checked. Some information is unavailable in this browser."
+          : interactive
+            ? "Storage status refreshed."
+            : "Storage status checked.";
+      setStorageHealthMessage(statusMessage, "info");
     } finally {
       storageHealthRefreshInProgress = false;
       updateStorageHealthControls();
@@ -1501,6 +1507,7 @@
   }
 
   function initializeStorageHealth() {
+    setStorageHealthMessage("Checking browser storage status...", "info");
     renderStorageHealth();
     void loadStorageHealthStatus(false);
   }

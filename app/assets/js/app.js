@@ -3,7 +3,8 @@ const sections = document.querySelectorAll(".app-section");
 const settingsTabs = document.querySelectorAll("[data-settings-tab]");
 const settingsPanels = document.querySelectorAll(".settings-panel");
 
-function activateSettingsTab(target) {
+function activateSettingsTab(target, options) {
+  const settings = options || {};
   const tab = Array.from(settingsTabs).find((candidate) => candidate.dataset.settingsTab === target) || document.querySelector("[data-settings-tab=\"student\"]");
   const controlsId = tab?.getAttribute("aria-controls");
 
@@ -16,6 +17,9 @@ function activateSettingsTab(target) {
   settingsPanels.forEach((panel) => {
     panel.hidden = panel.id !== controlsId;
   });
+  if (settings.focusTab) {
+    tab?.focus();
+  }
 }
 
 function showSection(sectionId) {
@@ -84,9 +88,23 @@ document.getElementById("settings")?.addEventListener("click", (event) => {
 
 settingsTabs.forEach((tab) => {
   tab.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
+    const tabs = Array.from(settingsTabs);
+    const currentIndex = tabs.indexOf(tab);
+    let nextIndex = null;
+
+    if (event.key === "ArrowLeft") {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = tabs.length - 1;
+    }
+
+    if (nextIndex !== null) {
       event.preventDefault();
-      activateSettingsTab(tab.dataset.settingsTab);
+      activateSettingsTab(tabs[nextIndex].dataset.settingsTab, { focusTab: true });
     }
   });
 });
