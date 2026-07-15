@@ -724,7 +724,7 @@
     const tasksEnabled = Boolean(dailyLog);
     const deleteButton = dailyLog
       ? `<div class="destructive-actions">
-          <span class="destructive-label">Delete day record</span>
+          <span class="destructive-label">Danger zone</span>
           <button class="danger-button" type="button" data-log-action="delete" data-log-id="${dailyLog.id}">Delete day record</button>
         </div>`
       : "";

@@ -42,6 +42,17 @@ const appearanceController = (() => {
     return currentMode;
   }
 
+  function notifyAppearanceChange(eventName) {
+    document.dispatchEvent(new CustomEvent(eventName, {
+      detail: {
+        mode: currentMode,
+        authoritativeMode,
+        previewActive,
+        effectiveTheme: root.dataset.theme
+      }
+    }));
+  }
+
   function reconcileCache(mode) {
     const normalizedMode = normalizeAppearanceMode(mode);
     try {
@@ -57,7 +68,9 @@ const appearanceController = (() => {
 
   function applyPreviewMode(mode) {
     previewActive = true;
-    return applyRootMode(mode);
+    const appliedMode = applyRootMode(mode);
+    notifyAppearanceChange("ojt:appearance-preview");
+    return appliedMode;
   }
 
   function applyAuthoritativeMode(mode) {
@@ -66,6 +79,7 @@ const appearanceController = (() => {
     if (!previewActive) {
       applyRootMode(authoritativeMode);
     }
+    notifyAppearanceChange("ojt:appearance-authoritative");
     return authoritativeMode;
   }
 
@@ -74,6 +88,7 @@ const appearanceController = (() => {
     previewActive = false;
     applyRootMode(authoritativeMode);
     reconcileCache(authoritativeMode);
+    notifyAppearanceChange("ojt:appearance-committed");
     return authoritativeMode;
   }
 
@@ -81,6 +96,7 @@ const appearanceController = (() => {
     previewActive = false;
     applyRootMode(authoritativeMode);
     reconcileCache(authoritativeMode);
+    notifyAppearanceChange("ojt:appearance-committed");
     return authoritativeMode;
   }
 
@@ -89,11 +105,14 @@ const appearanceController = (() => {
     previewActive = false;
     applyRootMode("system");
     reconcileCache("system");
+    notifyAppearanceChange("ojt:appearance-committed");
+    return authoritativeMode;
   }
 
   function handleSystemAppearanceChange() {
     if (currentMode === "system") {
       applyRootMode("system");
+      notifyAppearanceChange("ojt:appearance-system-change");
     }
   }
 
@@ -145,6 +164,126 @@ const appearanceController = (() => {
 })();
 
 window.OJTAppearance = appearanceController;
+const quickAppearanceController = (() => {
+  const controller = window.OJTAppearance;
+  const switchControl = document.getElementById("appearance-switch");
+  const status = document.getElementById("appearance-switch-status");
+  let saveInProgress = false;
+
+  if (!controller || !switchControl) {
+    return null;
+  }
+
+  function modeLabel(mode) {
+    return mode.charAt(0).toUpperCase() + mode.slice(1);
+  }
+
+  function effectiveTheme() {
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  }
+
+  function syncSettingsMode(mode) {
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    document.querySelectorAll('input[name="appearance-mode"]').forEach((radio) => {
+      radio.checked = radio.value === normalizedMode;
+    });
+  }
+
+  function updateSwitch(mode, reportedTheme) {
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    const theme = reportedTheme === "dark" || reportedTheme === "light" ? reportedTheme : effectiveTheme();
+    const isDark = theme === "dark";
+    const nextMode = isDark ? "light" : "dark";
+    const context = normalizedMode === "system"
+      ? "Following System appearance, currently " + modeLabel(theme) + "."
+      : "Current appearance: " + modeLabel(theme) + ".";
+
+    switchControl.setAttribute("aria-checked", String(isDark));
+    switchControl.setAttribute("aria-label", context + " Switch to " + modeLabel(nextMode) + " mode.");
+    switchControl.title = "Switch to " + modeLabel(nextMode) + " mode";
+
+    if (!controller.hasActivePreview()) {
+      syncSettingsMode(normalizedMode);
+    }
+  }
+
+  function setStatus(message, type) {
+    if (!status) {
+      return;
+    }
+    status.textContent = message;
+    status.setAttribute("role", type === "error" ? "alert" : "status");
+    status.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
+  }
+
+  function setBusy(isBusy) {
+    saveInProgress = isBusy;
+    switchControl.disabled = isBusy;
+    switchControl.setAttribute("aria-busy", String(isBusy));
+  }
+
+  async function saveMode(mode) {
+    if (saveInProgress) {
+      return;
+    }
+
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    const previousMode = controller.getAuthoritativeMode();
+    setBusy(true);
+    controller.applyPreviewMode(normalizedMode);
+
+    try {
+      const existingSettings = await window.OJTStorage.getAppSettings();
+      const timestamp = new Date().toISOString();
+      const record = existingSettings
+        ? {
+            ...existingSettings,
+            appearanceMode: normalizedMode,
+            updatedAt: timestamp
+          }
+        : {
+            preferredWeekStartDay: "Monday",
+            timeFormat: "24-hour",
+            appearanceMode: normalizedMode,
+            createdAt: timestamp,
+            updatedAt: timestamp
+          };
+      const savedSettings = await window.OJTStorage.saveAppSettings(record);
+      controller.commitMode(savedSettings?.appearanceMode ?? normalizedMode);
+      setStatus("Appearance changed to " + modeLabel(normalizedMode) + ".", "success");
+      setBusy(false);
+    } catch (error) {
+      controller.restorePersistedMode();
+      updateSwitch(previousMode, document.documentElement.dataset.theme);
+      setStatus("Could not change appearance. Try again.", "error");
+      console.error(error);
+      setBusy(false);
+    }
+  }
+
+  updateSwitch(controller.getCurrentMode(), document.documentElement.dataset.theme);
+  document.addEventListener("ojt:appearance-preview", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  document.addEventListener("ojt:appearance-authoritative", (event) => {
+    if (!event.detail?.previewActive) {
+      updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+    }
+  });
+  document.addEventListener("ojt:appearance-committed", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  document.addEventListener("ojt:appearance-system-change", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  switchControl.addEventListener("click", () => {
+    saveMode(effectiveTheme() === "dark" ? "light" : "dark");
+  });
+
+  return { saveMode };
+})();
+
+window.OJTQuickAppearance = quickAppearanceController;
 const navButtons = document.querySelectorAll(".nav-button");
 const sections = document.querySelectorAll(".app-section");
 const settingsTabs = document.querySelectorAll("[data-settings-tab]");

@@ -92,6 +92,51 @@
       </nav>
 
       <main class="content" id="main-content">
+        <div class="content-utility">
+          <button
+            class="appearance-switch"
+            id="appearance-switch"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-busy="false"
+            aria-label="Appearance switch"
+            title="Switch appearance"
+          >
+            <span class="appearance-switch-track" aria-hidden="true">
+              <svg class="appearance-switch-icon appearance-switch-icon-sun" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
+              </svg>
+              <span class="appearance-switch-thumb"></span>
+              <svg class="appearance-switch-icon appearance-switch-icon-moon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                <path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.8 7.8 0 1 0 9.5 9.5Z"></path>
+              </svg>
+            </span>
+          </button>
+          <script>
+            (() => {
+              const root = document.documentElement;
+              const switchControl = document.getElementById("appearance-switch");
+              if (!switchControl) {
+                return;
+              }
+
+              const selectedMode = root.dataset.appearance === "system" ? "system" : root.dataset.appearance;
+              const theme = root.dataset.theme === "light" ? "light" : "dark";
+              const currentLabel = theme === "dark" ? "Dark" : "Light";
+              const nextLabel = theme === "dark" ? "Light" : "Dark";
+              const context = selectedMode === "system"
+                ? "Following System appearance, currently " + currentLabel + "."
+                : "Current appearance: " + currentLabel + ".";
+
+              switchControl.setAttribute("aria-checked", String(theme === "dark"));
+              switchControl.setAttribute("aria-label", context + " Switch to " + nextLabel + " mode.");
+              switchControl.title = "Switch to " + nextLabel + " mode";
+            })();
+          </script>
+          <p class="sr-only" id="appearance-switch-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
         <section class="app-section is-visible" id="dashboard" aria-labelledby="dashboard-title">
           <header class="dashboard-page-header">
             <div class="dashboard-intro">
@@ -649,6 +694,7 @@
             <p class="section-kicker">Prepared journal content</p>
             <h2 id="weekly-preview-title">Preview &amp; Export</h2>
             <p>Pick a saved week to review, correct, copy, or export. Save summary changes in Journal first.</p>
+            <p class="phase-note preview-purpose-note">This screen preview is optimized for reading. The exported DOCX keeps the official journal layout.</p>
           </header>
 
           <div class="weekly-preview-layout">
