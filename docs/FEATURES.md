@@ -1,83 +1,76 @@
-# OJT Journal Companion Features
+﻿# OJT Journal Companion Features
 
-## Feature overview
+## Current status
 
-OJT Journal Companion is a personal offline-first journal companion for one student using browser-local data. It records daily OJT work, rendered hours, task details, photo documentation, and weekly journal content.
+The latest tagged stable release is **v1.1**. Phase 4 — Accessible Responsive Visual Redesign is complete post-v1.1 roadmap work on feature/accessible-responsive-redesign; it is not a new release or tag. No v1.2 release is implied.
 
-**v1.0 status:** released baseline.
+The app is a local, offline-first companion for one student on one browser/device. It has no account/login, backend, cloud sync, online submission, coordinator/admin dashboard, or formal accessibility certification.
 
-**v1.1 status:** Released, merged, and tagged after final regression. Official DOCX Export with an automatic photo appendix is included. v1.1 remains the stable released rollback baseline.
+## Implemented feature inventory
 
-**Post-v1.1 Phase 2 — Batch Photo Documentation:** Complete. This is completed roadmap work, not a new release or tag. **Post-v1.1 Phase 3 - Data and Recovery Hardening:** Complete. Phase 3 is completed roadmap work, not a new release or tag. Phase 4 Accessible Responsive Visual Redesign is the next approved roadmap phase. v1.1 remains the latest tagged stable release.
+### Responsive app shell
 
-The app is not an internship management system. It has no accounts, approval workflow, online submission, or automatic cross-device sync.
+- Desktop sidebar navigation with app identity and four destinations.
+- Mobile fixed bottom navigation with exactly Dashboard, Journal, Preview & Export, and Settings.
+- Safe-area support and responsive desktop, tablet, and mobile layouts.
+- The mobile drawer navigation is not part of the current interface.
 
-## Implemented features
+### Journal and dashboard
 
-- Student profile, company profile, and personal settings
-- OJT week creation and weekly summaries
-- Daily Logs with worked, absent, and rest-day handling
-- Rendered-hours calculation from DailyLog time records
-- Structured tasks with description, optional duration, and personal status
-- JPEG, PNG, and WebP photo attachments: one or multiple images per upload, shared category and caption per set, once-per-set Journal display, individual download and removal
-- Weekly Preview and Copy Weekly Journal
-- Dashboard OJT progress and backup reminder
-- JSON backup/export, replace-style restore, and guarded reset
+- Student and company details with personal app settings.
+- Dashboard OJT progress, current-week status, day handoffs, and backup reminder.
+- OJT week creation, editing, deletion safeguards, and selected-week synchronization.
+- Daily Logs with Worked, Absent, and No OJT / Rest Day statuses.
+- Rendered-hour calculations from DailyLog time fields and stored renderedMinutes.
+- Daily Tasks with description, optional time, notes, personal status, and ordering.
+- Weekly Summary fields for skills learned, problems encountered, reflection, and additional notes.
 
-## Data and Recovery Hardening - Phase 3 complete
+### Accessible interaction improvements
 
-Phase 3 hardens the existing JSON recovery path without changing the backup shape, DB_VERSION = 4, backupVersion = "1.0", or the seven existing stores.
+The current interface includes visible focus treatment, Daily Log dialog/sheet focus containment, Escape close, opener-focus restoration, background inertness, Settings keyboard tabs, first-invalid focus, field-level validation semantics, and controlled status announcements. These are implementation features, not a formal WCAG conformance claim.
 
-- **Backup/export integrity:** exact app identity and supported version gate, required structure, duplicate IDs, parent references, and JPEG/PNG/WebP MIME, Base64, and usable non-empty Blob validation. Invalid export data blocks download.
-- **Restore validation:** invalid data is rejected before IndexedDB writes; safe unknown fields and legacy singleton photos remain compatible; normalized restore candidates do not mutate parsed backups and remove transport-only photo fields before persistence.
-- **Restore review:** metadata, counts, profile/settings presence, categorized fatal errors, and nonfatal warnings appear before replacement. Warning-only backups may restore; invalid backups cannot.
-- **Safety and replacement:** Export Current Data First reuses the existing export workflow. Restore requires explicit guarded confirmation, remains replace-style, and preserves the review after cancellation or failure.
-- **Storage Health:** approximate site/origin usage, quota, and valid percentage; graceful API failures; persistent-storage status and explicit guarded request/refresh actions. Values remain runtime-only.
-- **Recovery guidance:** data is local to the current browser profile; JSON is the portable recovery backup; DOCX is editable output and cannot restore app data; persistent storage may reduce eviction risk but cannot prevent all data loss, is not guaranteed protection, and cloud sync does not exist.
-- **Reset preservation:** checkbox, exact RESET, final native confirmation, all-seven-store clearing, selected-week clearing, and backup-first guidance remain unchanged.
+### Appearance
 
-## Batch Photo Documentation — Phase 2 complete
+- System, Dark, and Light appearance modes.
+- Persisted appearanceMode in AppSettings.
+- Settings preview changes immediately and Save settings persists the selected mode.
+- System follows the browser/device appearance.
+- The top Light/Dark quick switch toggles the effective theme and saves only the appearance preference immediately.
+- System remains available in Settings.
 
-One upload action may select one or multiple JPEG, PNG, or WebP files. The app creates one generated `photoSetId` per upload action and assigns `photoSetIndex` in native file-selection order. Every image remains a normal `PhotoAttachment`; shared category and caption are duplicated across set records. Journal displays shared metadata once per set, and shared metadata edits are atomic. Each image remains individually downloadable and deletable. Deleting the first image preserves shared metadata; stored indices are not renumbered; deleting the final image removes the set naturally. Legacy records without set metadata behave as runtime singleton sets. There is no separate group entity or store, no migration, `DB_VERSION` remains `4`, backup version remains `1.0`, and older supported backups remain compatible.
+### Batch Photo Documentation
 
-## Official DOCX Export — v1.1 released, Phase 2 appendix updated
+- Select one or multiple JPEG, PNG, or WebP files in one upload action.
+- Apply shared category and caption metadata to the group.
+- Store each image as an independent PhotoAttachment.
+- Download or delete individual files.
+- Display grouped photos once per set in Journal.
+- Preserve legacy photos without set metadata as singleton groups.
+- Use set-aware Official DOCX layouts without a new store, migration, or DB-version increase.
 
-The Official DOCX button in Preview & Export creates one editable Word document for the selected week.
+### Preview and export
 
-The export includes:
+- Responsive, reading-oriented browser Preview with semantic daily structure.
+- Copy Weekly Journal for convenient text transfer.
+- Official DOCX Export retains the official journal layout, remains editable, and is independent of the browser Preview layout.
+- DOCX output is not a restorable backup.
 
-- Student name, company, week number, and inclusive dates
-- Dynamic Day 1 through Day N rows, each with its actual date
-- Task description, optional duration, and task status
-- Total weekly rendered hours
-- Skills Learned, Problems Encountered, and Reflection / Points of Learning
-- Blank student and supervisor signature areas
-- Optional Photo Documentation appendix after the journal section when photos exist
+### Recovery
 
-Photo documentation is grouped by day and date, then by photo set within each day:
+- JSON backup containing the local app data and photo payloads.
+- Restore Review with metadata, counts, fatal errors, and nonfatal warnings.
+- Fatal errors block restore; warning-only backups may remain restorable.
+- Export Current Data First safety export.
+- Replace-style restore with final confirmation and atomic replacement.
+- Storage Health estimates, persistence status, explicit persistence request, refresh, and recovery guidance.
+- Reset safeguards requiring the confirmation checkbox, exact RESET, and final confirmation.
 
-- One image: larger centered layout
-- Two images: two columns
-- Three images: three columns
-- Four or more images: two-column rows within the set
-- One shared caption below the complete set; category is not exported
-- Images from separate sets never share one row
+### Safe rendering boundary
 
-JPEG and PNG images are used directly. WebP images are converted temporarily to PNG for the export; the original saved photo is not changed. Aspect ratio is preserved; images are not cropped, stretched, or upscaled. Captions are optional, long captions wrap naturally, and the resulting DOCX stays editable. No-photo exports contain no photo appendix structure or generated image media.
+Restored and user-controlled values are safely rendered at HTML serialization boundaries. Restored IDs remain compatible with storage and lookup without unsafe HTML interpolation; selector contexts use selector-safe handling.
 
-The exporter tries a locally ignored private approved v2 template first, then uses the tracked sanitized v2 fallback. It requires local HTTP serving for reliable template loading. Microsoft Word and LibreOffice regression passed.
+## Data and scope boundaries
 
-## Boundaries
+The app uses IndexedDB for application records and may use localStorage only for small non-authoritative selected-week and appearance startup state. Journal content, tasks, photos, and JSON backup payloads are not stored in localStorage. JSON backup is the recovery path; browser storage can still be lost.
 
-- JSON backup/restore is separate from DOCX export: JSON protects app data; DOCX is a submission document.
-- Daily rendered hours come from DailyLog renderedMinutes. Task duration is documentation only.
-- DOCX export is client-side only. There is no backend, cloud storage, runtime npm install, or CDN.
-- PDF export, online submission, account/login, cloud sync, and supervisor approval remain out of scope.
-
-## Future candidates
-
-- PWA installability
-- PDF export
-- Better photo compression and photo-heavy backup handling
-- Search and printable weekly views
-- Configurable DOCX image sizing, if needed after real-world use
+The app does not provide PDF export, login, accounts, cloud sync, GPS/QR attendance, online submission, supervisor approval, or multi-user management.

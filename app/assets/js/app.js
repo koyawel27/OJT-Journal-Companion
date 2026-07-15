@@ -1,13 +1,296 @@
+const appearanceController = (() => {
+  const cacheKey = "ojt-journal-companion:appearance-mode";
+  const allowedModes = new Set(["system", "dark", "light"]);
+  const root = document.documentElement;
+  let authoritativeMode = "system";
+  let currentMode = normalizeAppearanceMode(root.dataset.appearance);
+  let previewActive = false;
+  let mediaQuery = null;
+  let mediaListenerBound = false;
+
+  function normalizeAppearanceMode(value) {
+    return typeof value === "string" && allowedModes.has(value) ? value : "system";
+  }
+
+  function getSystemMediaQuery() {
+    if (mediaQuery || typeof window.matchMedia !== "function") {
+      return mediaQuery;
+    }
+
+    try {
+      mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    } catch {
+      mediaQuery = null;
+    }
+    return mediaQuery;
+  }
+
+  function resolveEffectiveTheme(mode) {
+    const normalizedMode = normalizeAppearanceMode(mode);
+    if (normalizedMode !== "system") {
+      return normalizedMode;
+    }
+
+    const query = getSystemMediaQuery();
+    return query ? (query.matches ? "dark" : "light") : "dark";
+  }
+
+  function applyRootMode(mode) {
+    currentMode = normalizeAppearanceMode(mode);
+    root.dataset.appearance = currentMode;
+    root.dataset.theme = resolveEffectiveTheme(currentMode);
+    return currentMode;
+  }
+
+  function notifyAppearanceChange(eventName) {
+    document.dispatchEvent(new CustomEvent(eventName, {
+      detail: {
+        mode: currentMode,
+        authoritativeMode,
+        previewActive,
+        effectiveTheme: root.dataset.theme
+      }
+    }));
+  }
+
+  function reconcileCache(mode) {
+    const normalizedMode = normalizeAppearanceMode(mode);
+    try {
+      if (normalizedMode === "system") {
+        window.localStorage.removeItem(cacheKey);
+      } else {
+        window.localStorage.setItem(cacheKey, normalizedMode);
+      }
+    } catch {
+      // The cache is optional; IndexedDB remains authoritative.
+    }
+  }
+
+  function applyPreviewMode(mode) {
+    previewActive = true;
+    const appliedMode = applyRootMode(mode);
+    notifyAppearanceChange("ojt:appearance-preview");
+    return appliedMode;
+  }
+
+  function applyAuthoritativeMode(mode) {
+    authoritativeMode = normalizeAppearanceMode(mode);
+    reconcileCache(authoritativeMode);
+    if (!previewActive) {
+      applyRootMode(authoritativeMode);
+    }
+    notifyAppearanceChange("ojt:appearance-authoritative");
+    return authoritativeMode;
+  }
+
+  function commitMode(mode) {
+    authoritativeMode = normalizeAppearanceMode(mode);
+    previewActive = false;
+    applyRootMode(authoritativeMode);
+    reconcileCache(authoritativeMode);
+    notifyAppearanceChange("ojt:appearance-committed");
+    return authoritativeMode;
+  }
+
+  function restorePersistedMode() {
+    previewActive = false;
+    applyRootMode(authoritativeMode);
+    reconcileCache(authoritativeMode);
+    notifyAppearanceChange("ojt:appearance-committed");
+    return authoritativeMode;
+  }
+
+  function resetToSystem() {
+    authoritativeMode = "system";
+    previewActive = false;
+    applyRootMode("system");
+    reconcileCache("system");
+    notifyAppearanceChange("ojt:appearance-committed");
+    return authoritativeMode;
+  }
+
+  function handleSystemAppearanceChange() {
+    if (currentMode === "system") {
+      applyRootMode("system");
+      notifyAppearanceChange("ojt:appearance-system-change");
+    }
+  }
+
+  function bindSystemListener() {
+    const query = getSystemMediaQuery();
+    if (!query || mediaListenerBound) {
+      return;
+    }
+
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", handleSystemAppearanceChange);
+    } else if (typeof query.addListener === "function") {
+      query.addListener(handleSystemAppearanceChange);
+    } else {
+      return;
+    }
+    mediaListenerBound = true;
+  }
+
+  function unbindSystemListener() {
+    if (!mediaQuery || !mediaListenerBound) {
+      return;
+    }
+
+    if (typeof mediaQuery.removeEventListener === "function") {
+      mediaQuery.removeEventListener("change", handleSystemAppearanceChange);
+    } else if (typeof mediaQuery.removeListener === "function") {
+      mediaQuery.removeListener(handleSystemAppearanceChange);
+    }
+    mediaListenerBound = false;
+  }
+
+  bindSystemListener();
+  applyRootMode(currentMode);
+  window.addEventListener("pagehide", unbindSystemListener, { once: true });
+
+  return {
+    cacheKey,
+    normalizeAppearanceMode,
+    applyPreviewMode,
+    applyAuthoritativeMode,
+    commitMode,
+    restorePersistedMode,
+    resetToSystem,
+    getCurrentMode: () => currentMode,
+    getAuthoritativeMode: () => authoritativeMode,
+    hasActivePreview: () => previewActive
+  };
+})();
+
+window.OJTAppearance = appearanceController;
+const quickAppearanceController = (() => {
+  const controller = window.OJTAppearance;
+  const switchControl = document.getElementById("appearance-switch");
+  const status = document.getElementById("appearance-switch-status");
+  let saveInProgress = false;
+
+  if (!controller || !switchControl) {
+    return null;
+  }
+
+  function modeLabel(mode) {
+    return mode.charAt(0).toUpperCase() + mode.slice(1);
+  }
+
+  function effectiveTheme() {
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  }
+
+  function syncSettingsMode(mode) {
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    document.querySelectorAll('input[name="appearance-mode"]').forEach((radio) => {
+      radio.checked = radio.value === normalizedMode;
+    });
+  }
+
+  function updateSwitch(mode, reportedTheme) {
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    const theme = reportedTheme === "dark" || reportedTheme === "light" ? reportedTheme : effectiveTheme();
+    const isDark = theme === "dark";
+    const nextMode = isDark ? "light" : "dark";
+    const context = normalizedMode === "system"
+      ? "Following System appearance, currently " + modeLabel(theme) + "."
+      : "Current appearance: " + modeLabel(theme) + ".";
+
+    switchControl.setAttribute("aria-checked", String(isDark));
+    switchControl.setAttribute("aria-label", context + " Switch to " + modeLabel(nextMode) + " mode.");
+    switchControl.title = "Switch to " + modeLabel(nextMode) + " mode";
+
+    if (!controller.hasActivePreview()) {
+      syncSettingsMode(normalizedMode);
+    }
+  }
+
+  function setStatus(message, type) {
+    if (!status) {
+      return;
+    }
+    status.textContent = message;
+    status.setAttribute("role", type === "error" ? "alert" : "status");
+    status.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
+  }
+
+  function setBusy(isBusy) {
+    saveInProgress = isBusy;
+    switchControl.disabled = isBusy;
+    switchControl.setAttribute("aria-busy", String(isBusy));
+  }
+
+  async function saveMode(mode) {
+    if (saveInProgress) {
+      return;
+    }
+
+    const normalizedMode = controller.normalizeAppearanceMode(mode);
+    const previousMode = controller.getAuthoritativeMode();
+    setBusy(true);
+    controller.applyPreviewMode(normalizedMode);
+
+    try {
+      const existingSettings = await window.OJTStorage.getAppSettings();
+      const timestamp = new Date().toISOString();
+      const record = existingSettings
+        ? {
+            ...existingSettings,
+            appearanceMode: normalizedMode,
+            updatedAt: timestamp
+          }
+        : {
+            preferredWeekStartDay: "Monday",
+            timeFormat: "24-hour",
+            appearanceMode: normalizedMode,
+            createdAt: timestamp,
+            updatedAt: timestamp
+          };
+      const savedSettings = await window.OJTStorage.saveAppSettings(record);
+      controller.commitMode(savedSettings?.appearanceMode ?? normalizedMode);
+      setStatus("Appearance changed to " + modeLabel(normalizedMode) + ".", "success");
+      setBusy(false);
+    } catch (error) {
+      controller.restorePersistedMode();
+      updateSwitch(previousMode, document.documentElement.dataset.theme);
+      setStatus("Could not change appearance. Try again.", "error");
+      console.error(error);
+      setBusy(false);
+    }
+  }
+
+  updateSwitch(controller.getCurrentMode(), document.documentElement.dataset.theme);
+  document.addEventListener("ojt:appearance-preview", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  document.addEventListener("ojt:appearance-authoritative", (event) => {
+    if (!event.detail?.previewActive) {
+      updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+    }
+  });
+  document.addEventListener("ojt:appearance-committed", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  document.addEventListener("ojt:appearance-system-change", (event) => {
+    updateSwitch(event.detail?.mode, event.detail?.effectiveTheme);
+  });
+  switchControl.addEventListener("click", () => {
+    saveMode(effectiveTheme() === "dark" ? "light" : "dark");
+  });
+
+  return { saveMode };
+})();
+
+window.OJTQuickAppearance = quickAppearanceController;
 const navButtons = document.querySelectorAll(".nav-button");
 const sections = document.querySelectorAll(".app-section");
-const menuButton = document.querySelector(".menu-button");
-const drawer = document.querySelector(".mobile-drawer");
-const drawerOverlay = document.querySelector(".drawer-overlay");
-const drawerCloseButton = document.querySelector(".drawer-close");
 const settingsTabs = document.querySelectorAll("[data-settings-tab]");
 const settingsPanels = document.querySelectorAll(".settings-panel");
 
-function activateSettingsTab(target) {
+function activateSettingsTab(target, options) {
+  const settings = options || {};
   const tab = Array.from(settingsTabs).find((candidate) => candidate.dataset.settingsTab === target) || document.querySelector("[data-settings-tab=\"student\"]");
   const controlsId = tab?.getAttribute("aria-controls");
 
@@ -20,31 +303,9 @@ function activateSettingsTab(target) {
   settingsPanels.forEach((panel) => {
     panel.hidden = panel.id !== controlsId;
   });
-}
-
-function openDrawer() {
-  if (!drawer || !drawerOverlay || !menuButton) {
-    return;
+  if (settings.focusTab) {
+    tab?.focus();
   }
-
-  drawer.hidden = false;
-  drawerOverlay.hidden = false;
-  drawer.setAttribute("aria-hidden", "false");
-  menuButton.setAttribute("aria-expanded", "true");
-  document.body.classList.add("drawer-open");
-  drawerCloseButton?.focus();
-}
-
-function closeDrawer() {
-  if (!drawer || !drawerOverlay || !menuButton) {
-    return;
-  }
-
-  drawer.hidden = true;
-  drawerOverlay.hidden = true;
-  drawer.setAttribute("aria-hidden", "true");
-  menuButton.setAttribute("aria-expanded", "false");
-  document.body.classList.remove("drawer-open");
 }
 
 function showSection(sectionId) {
@@ -97,18 +358,7 @@ window.OJTApp = {
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
     showSection(button.dataset.section);
-    closeDrawer();
   });
-});
-
-menuButton?.addEventListener("click", openDrawer);
-drawerOverlay?.addEventListener("click", closeDrawer);
-drawerCloseButton?.addEventListener("click", closeDrawer);
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeDrawer();
-  }
 });
 
 document.addEventListener("ojt:focus-settings-section", (event) => {
@@ -124,9 +374,23 @@ document.getElementById("settings")?.addEventListener("click", (event) => {
 
 settingsTabs.forEach((tab) => {
   tab.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
+    const tabs = Array.from(settingsTabs);
+    const currentIndex = tabs.indexOf(tab);
+    let nextIndex = null;
+
+    if (event.key === "ArrowLeft") {
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    } else if (event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % tabs.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = tabs.length - 1;
+    }
+
+    if (nextIndex !== null) {
       event.preventDefault();
-      activateSettingsTab(tab.dataset.settingsTab);
+      activateSettingsTab(tabs[nextIndex].dataset.settingsTab, { focusTab: true });
     }
   });
 });

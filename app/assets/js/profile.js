@@ -1,7 +1,8 @@
 (function () {
   const defaultSettings = {
     preferredWeekStartDay: "Monday",
-    timeFormat: "24-hour"
+    timeFormat: "24-hour",
+    appearanceMode: "system"
   };
 
   const state = {
@@ -19,6 +20,18 @@
     if (element) {
       element.value = value ?? "";
     }
+  }
+
+  function getSelectedAppearanceMode() {
+    const selected = document.querySelector('input[name="appearance-mode"]:checked');
+    return window.OJTAppearance.normalizeAppearanceMode(selected?.value);
+  }
+
+  function setSelectedAppearanceMode(value) {
+    const normalizedMode = window.OJTAppearance.normalizeAppearanceMode(value);
+    document.querySelectorAll('input[name="appearance-mode"]').forEach((radio) => {
+      radio.checked = radio.value === normalizedMode;
+    });
   }
 
   function nowIso() {
@@ -62,6 +75,7 @@
     const record = {
       preferredWeekStartDay: getValue("preferred-week-start-day") || defaultSettings.preferredWeekStartDay,
       timeFormat: getValue("time-format") || defaultSettings.timeFormat,
+      appearanceMode: getSelectedAppearanceMode(),
       ...buildTimestampFields(state.appSettings)
     };
     if (state.appSettings && state.appSettings.lastBackupDate) {
@@ -88,6 +102,23 @@
     }
 
     return "";
+  }
+
+  function showValidationError(fieldId, messageElement, message) {
+    const field = document.getElementById(fieldId);
+    window.OJTUI.showFormMessage(messageElement, message, "error");
+
+    if (!field) {
+      return;
+    }
+
+    const describedBy = new Set((field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+    if (messageElement?.id) {
+      describedBy.add(messageElement.id);
+    }
+    field.setAttribute("aria-invalid", "true");
+    field.setAttribute("aria-describedby", [...describedBy].join(" "));
+    field.focus();
   }
 
   function populateStudentForm(profile) {
@@ -121,6 +152,9 @@
     };
     setValue("preferred-week-start-day", activeSettings.preferredWeekStartDay);
     setValue("time-format", activeSettings.timeFormat);
+    if (!window.OJTAppearance.hasActivePreview()) {
+      setSelectedAppearanceMode(activeSettings.appearanceMode);
+    }
   }
 
   async function loadProfileData() {
@@ -135,9 +169,10 @@
       state.companyProfile = companyProfile;
       state.appSettings = appSettings;
 
+      const appearanceMode = window.OJTAppearance.applyAuthoritativeMode(appSettings?.appearanceMode);
       populateStudentForm(studentProfile);
       populateCompanyForm(companyProfile);
-      populateSettingsForm(appSettings);
+      populateSettingsForm({ ...appSettings, appearanceMode });
       window.OJTUI.updateDashboardSummary(studentProfile, companyProfile, appSettings);
     } catch (error) {
       const message = "Could not load Settings data. Refresh and try again.";
@@ -150,12 +185,16 @@
     event.preventDefault();
     const messageElement = document.getElementById("student-profile-message");
     window.OJTUI.clearFormMessage(messageElement);
+    window.OJTUI.clearFieldValidation(event.currentTarget);
 
     const profile = buildStudentProfile();
     const validationMessage = validateStudentProfile(profile);
 
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      const fieldId = !profile.studentName
+        ? "student-name"
+        : "required-ojt-hours";
+      showValidationError(fieldId, messageElement, validationMessage);
       return;
     }
 
@@ -173,12 +212,13 @@
     event.preventDefault();
     const messageElement = document.getElementById("company-profile-message");
     window.OJTUI.clearFormMessage(messageElement);
+    window.OJTUI.clearFieldValidation(event.currentTarget);
 
     const profile = buildCompanyProfile();
     const validationMessage = validateCompanyProfile(profile);
 
     if (validationMessage) {
-      window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      showValidationError("company-name", messageElement, validationMessage);
       return;
     }
 
@@ -199,10 +239,14 @@
 
     try {
       state.appSettings = await window.OJTStorage.saveAppSettings(buildAppSettings());
+      window.OJTAppearance.commitMode(state.appSettings.appearanceMode);
       window.OJTUI.updateDashboardSummary(state.studentProfile, state.companyProfile, state.appSettings);
       window.OJTUI.showFormMessage(messageElement, "Settings saved.", "success");
     } catch (error) {
+      const persistedMode = window.OJTAppearance.restorePersistedMode();
+      setSelectedAppearanceMode(persistedMode);
       window.OJTUI.showFormMessage(messageElement, "Could not save settings. Try again.", "error");
+      document.querySelector('input[name="appearance-mode"]:checked')?.focus();
       console.error(error);
     }
   }
@@ -210,7 +254,13 @@
   function bindProfileForms() {
     document.getElementById("student-profile-form")?.addEventListener("submit", saveStudentProfile);
     document.getElementById("company-profile-form")?.addEventListener("submit", saveCompanyProfile);
-    document.getElementById("app-settings-form")?.addEventListener("submit", saveAppSettings);
+    const settingsForm = document.getElementById("app-settings-form");
+    settingsForm?.addEventListener("submit", saveAppSettings);
+    settingsForm?.addEventListener("change", (event) => {
+      if (event.target.matches('input[name="appearance-mode"]')) {
+        window.OJTAppearance.applyPreviewMode(event.target.value);
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {

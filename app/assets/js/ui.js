@@ -16,6 +16,9 @@
     clearTimeout(Number(element.dataset.messageTimer || 0));
     element.textContent = message;
     element.className = `form-message ${type}`;
+    element.setAttribute("role", type === "error" ? "alert" : "status");
+    element.setAttribute("aria-live", type === "error" ? "assertive" : "polite");
+    element.setAttribute("aria-atomic", "true");
     element.hidden = false;
 
     if (type === "success") {
@@ -37,12 +40,34 @@
     delete element.dataset.messageTimer;
     element.textContent = "";
     element.className = "form-message";
+    element.removeAttribute("role");
+    element.removeAttribute("aria-live");
+    element.removeAttribute("aria-atomic");
     element.hidden = true;
   }
 
   function clearFormMessages(container) {
     const root = container || document;
     root.querySelectorAll(".form-message").forEach(clearFormMessage);
+  }
+
+  function clearFieldValidation(form) {
+    if (!form) {
+      return;
+    }
+
+    const messageId = form.querySelector(".form-message")?.id || "";
+    form.querySelectorAll("[aria-invalid=\"true\"]").forEach((field) => {
+      field.removeAttribute("aria-invalid");
+      const describedBy = (field.getAttribute("aria-describedby") || "")
+        .split(/\s+/)
+        .filter((id) => id && id !== messageId);
+      if (describedBy.length > 0) {
+        field.setAttribute("aria-describedby", [...new Set(describedBy)].join(" "));
+      } else {
+        field.removeAttribute("aria-describedby");
+      }
+    });
   }
 
   function setText(id, text) {
@@ -368,6 +393,7 @@
 
     if (form) {
       clearFormMessages(form);
+      clearFieldValidation(form);
     }
   });
 
@@ -376,6 +402,7 @@
 
     if (form) {
       clearFormMessages(form);
+      clearFieldValidation(form);
     }
   });
 
@@ -423,6 +450,7 @@
     showFormMessage,
     clearFormMessage,
     clearFormMessages,
+    clearFieldValidation,
     refreshDashboardWeekProgress,
     updateDashboardSummary,
     updateWeeksSummary,

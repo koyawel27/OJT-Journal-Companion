@@ -1,36 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-appearance="system" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OJT Journal Companion</title>
+  <script>
+    (() => {
+      const cacheKey = "ojt-journal-companion:appearance-mode";
+      const allowedModes = ["system", "dark", "light"];
+      let mode = "system";
+
+      try {
+        const cachedMode = window.localStorage.getItem(cacheKey);
+        if (allowedModes.includes(cachedMode)) {
+          mode = cachedMode;
+        }
+      } catch {
+        // Appearance caching is optional; startup must continue without it.
+      }
+
+      let effectiveTheme = mode;
+      if (mode === "system") {
+        try {
+          effectiveTheme = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+        } catch {
+          effectiveTheme = "dark";
+        }
+        if (!window.matchMedia) {
+          effectiveTheme = "dark";
+        }
+      }
+
+      document.documentElement.dataset.appearance = mode;
+      document.documentElement.dataset.theme = effectiveTheme;
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-header">
-      <button class="menu-button" type="button" aria-label="Open navigation menu" aria-controls="mobile-nav-drawer" aria-expanded="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M4 7h16M4 12h16M4 17h16"></path>
-        </svg>
-      </button>
-      <div class="header-title">
-        <p class="eyebrow">Your OJT journal</p>
-        <h1>OJT Journal Companion</h1>
-      </div>
-      <div class="header-actions">
-        <p class="header-note">Saved only in this browser</p>
-      </div>
-    </header>
+
     <nav class="mobile-section-tabs" aria-label="Primary mobile navigation">
-      <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page">Dashboard</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="journal">Journal</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview">Preview &amp; Export</button>
-      <button class="nav-button mobile-tab-button" type="button" data-section="settings">Settings</button>
+      <button class="nav-button mobile-tab-button is-active" type="button" data-section="dashboard" aria-current="page"><span class="mobile-tab-icon" aria-hidden="true">⌂</span><span>Dashboard</span></button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="journal"><span class="mobile-tab-icon" aria-hidden="true">✎</span><span>Journal</span></button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="weekly-preview"><span class="mobile-tab-icon" aria-hidden="true">▤</span><span>Preview &amp; Export</span></button>
+      <button class="nav-button mobile-tab-button" type="button" data-section="settings"><span class="mobile-tab-icon" aria-hidden="true">⚙</span><span>Settings</span></button>
     </nav>
 
     <div class="app-layout">
       <nav class="sidebar" aria-label="Main navigation">
+        <div class="sidebar-identity">
+          <h1>OJT Journal Companion</h1>
+          <p class="header-note">Saved only in this browser</p>
+        </div>
         <button class="nav-button is-active" type="button" data-section="dashboard" aria-current="page">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
@@ -70,6 +92,51 @@
       </nav>
 
       <main class="content" id="main-content">
+        <div class="content-utility">
+          <button
+            class="appearance-switch"
+            id="appearance-switch"
+            type="button"
+            role="switch"
+            aria-checked="false"
+            aria-busy="false"
+            aria-label="Appearance switch"
+            title="Switch appearance"
+          >
+            <span class="appearance-switch-track" aria-hidden="true">
+              <svg class="appearance-switch-icon appearance-switch-icon-sun" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
+              </svg>
+              <span class="appearance-switch-thumb"></span>
+              <svg class="appearance-switch-icon appearance-switch-icon-moon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                <path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.8 7.8 0 1 0 9.5 9.5Z"></path>
+              </svg>
+            </span>
+          </button>
+          <script>
+            (() => {
+              const root = document.documentElement;
+              const switchControl = document.getElementById("appearance-switch");
+              if (!switchControl) {
+                return;
+              }
+
+              const selectedMode = root.dataset.appearance === "system" ? "system" : root.dataset.appearance;
+              const theme = root.dataset.theme === "light" ? "light" : "dark";
+              const currentLabel = theme === "dark" ? "Dark" : "Light";
+              const nextLabel = theme === "dark" ? "Light" : "Dark";
+              const context = selectedMode === "system"
+                ? "Following System appearance, currently " + currentLabel + "."
+                : "Current appearance: " + currentLabel + ".";
+
+              switchControl.setAttribute("aria-checked", String(theme === "dark"));
+              switchControl.setAttribute("aria-label", context + " Switch to " + nextLabel + " mode.");
+              switchControl.title = "Switch to " + nextLabel + " mode";
+            })();
+          </script>
+          <p class="sr-only" id="appearance-switch-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
         <section class="app-section is-visible" id="dashboard" aria-labelledby="dashboard-title">
           <header class="dashboard-page-header">
             <div class="dashboard-intro">
@@ -85,10 +152,10 @@
             <p class="reminder-text">
               <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal is stored only in this browser. Export a JSON backup regularly so your app data can be restored if needed. DOCX exports are editable journal documents and cannot restore the app.
             </p>
-            <button class="primary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
+            <button class="secondary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
           </div>
 
-          <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title" aria-live="polite">
+          <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title">
             <div class="dashboard-ojt-progress-header">
               <div>
                 <span class="card-label">OJT Progress</span>
@@ -129,7 +196,7 @@
 
           <section class="dashboard-identity-strip" aria-labelledby="dashboard-identity-heading">
             <h3 class="dashboard-identity-heading" id="dashboard-identity-heading">Journal identity</h3>
-            <div class="dashboard-identity-grid" aria-live="polite">
+            <div class="dashboard-identity-grid">
               <article class="summary-card summary-card--identity">
                 <span class="card-label">Student</span>
                 <strong id="summary-student-name">Not set yet</strong>
@@ -203,7 +270,7 @@
             Manage the details used in your journal, app preferences, and local backup and recovery tools.
           </p>
 
-          <nav class="settings-tabs" aria-label="Settings areas" role="tablist">
+          <nav class="settings-tabs" aria-label="Settings areas" role="tablist" aria-orientation="horizontal">
             <button class="settings-tab" type="button" role="tab" id="settings-tab-student" data-settings-tab="student" aria-controls="settings-panel-student" aria-selected="true">Student details</button>
             <button class="settings-tab" type="button" role="tab" id="settings-tab-company" data-settings-tab="company" aria-controls="settings-panel-company" aria-selected="false" tabindex="-1">Company / OJT placement</button>
             <button class="settings-tab" type="button" role="tab" id="settings-tab-preferences" data-settings-tab="preferences" aria-controls="settings-panel-preferences" aria-selected="false" tabindex="-1">App preferences</button>
@@ -222,8 +289,9 @@
 
               <div class="form-grid">
                 <label class="field">
-                  <span>Student name</span>
-                  <input type="text" id="student-name" autocomplete="name" required>
+                  <span>Student name <span class="required-marker">(required)</span></span>
+                  <input type="text" id="student-name" autocomplete="name" aria-describedby="student-name-help" required>
+                  <small class="field-help" id="student-name-help">Used as the student name in journal previews and exports.</small>
                 </label>
                 <label class="field">
                   <span>Course or program</span>
@@ -239,7 +307,8 @@
                 </label>
                 <label class="field">
                   <span>Required OJT hours</span>
-                  <input type="number" id="required-ojt-hours" min="0" step="1" inputmode="decimal" placeholder="0">
+                  <input type="number" id="required-ojt-hours" min="0" step="1" inputmode="decimal" placeholder="0" aria-describedby="required-ojt-hours-help">
+                  <small class="field-help" id="required-ojt-hours-help">Enter zero or a positive whole number.</small>
                 </label>
               </div>
 
@@ -260,8 +329,9 @@
 
               <div class="form-grid">
                 <label class="field field-wide">
-                  <span>Company name</span>
-                  <input type="text" id="company-name" required>
+                  <span>Company name <span class="required-marker">(required)</span></span>
+                  <input type="text" id="company-name" aria-describedby="company-name-help" required>
+                  <small class="field-help" id="company-name-help">Used as the placement name in journal previews and exports.</small>
                 </label>
                 <label class="field field-wide">
                   <span>Company address</span>
@@ -316,6 +386,24 @@
                     <option value="12-hour">12-hour</option>
                   </select>
                 </label>
+                <fieldset class="appearance-fieldset field-wide" aria-describedby="appearance-mode-helper">
+                  <legend>Appearance</legend>
+                  <div class="appearance-options">
+                    <label class="appearance-option">
+                      <input id="appearance-mode-system" type="radio" name="appearance-mode" value="system" checked>
+                      <span>System</span>
+                    </label>
+                    <label class="appearance-option">
+                      <input id="appearance-mode-dark" type="radio" name="appearance-mode" value="dark">
+                      <span>Dark</span>
+                    </label>
+                    <label class="appearance-option">
+                      <input id="appearance-mode-light" type="radio" name="appearance-mode" value="light">
+                      <span>Light</span>
+                    </label>
+                  </div>
+                  <p class="appearance-helper" id="appearance-mode-helper">System follows your browser or device appearance. Dark and Light override it. Changes preview immediately; choose Save settings to keep them.</p>
+                </fieldset>
               </div>
 
               <div class="form-actions">
@@ -328,21 +416,21 @@
           <section class="settings-panel" id="settings-panel-recovery" role="tabpanel" aria-labelledby="settings-tab-recovery" hidden><section class="settings-area settings-recovery" id="settings-recovery" aria-labelledby="settings-recovery-title">
             <header class="settings-area-header">
               <span class="card-label">Data &amp; Recovery</span>
-              <h3 id="settings-recovery-title">Backup, restore, and reset</h3>
+              <h3 id="settings-recovery-title">Protect and recover your journal</h3>
               <p>Your journal is stored only in this browser unless you export it. Keep a JSON backup before clearing browser data or switching devices.</p>
             </header>
 
           <div class="backup-grid">
             <section class="backup-panel" aria-labelledby="export-backup-title">
-              <span class="card-label">Export</span>
-              <h3 id="export-backup-title">Save a JSON backup</h3>
-              <p>Download a JSON file with all your journal data, including photos.</p>
-              <button class="primary-button" type="button" id="export-backup-button">Export Backup</button>
+              <span class="card-label">JSON Backup</span>
+              <h3 id="export-backup-title">Save restorable recovery data</h3>
+              <p>Download a JSON file with all journal data, including photos. This is the portable backup that can restore the app.</p>
+              <button class="primary-button" type="button" id="export-backup-button">Export JSON Backup</button>
             </section>
 
             <section class="backup-panel" aria-labelledby="restore-backup-title">
-              <span class="card-label">Restore</span>
-              <h3 id="restore-backup-title">Restore from JSON</h3>
+              <span class="card-label">Restore Backup</span>
+              <h3 id="restore-backup-title">Select a JSON backup</h3>
               <p>Replace everything in this browser with a backup file. Restore does not merge — it overwrites your current data.</p>
               <label class="field">
                 <span>Backup file</span>
@@ -354,7 +442,7 @@
           <section class="backup-panel restore-review-panel" id="restore-review-panel" aria-labelledby="restore-review-title" hidden>
             <span class="card-label">Review</span>
             <h3 id="restore-review-title" tabindex="-1">Review this backup</h3>
-            <p id="restore-review-status" class="restore-review-status" role="status" aria-live="polite">Select a JSON backup to begin.</p>
+            <p id="restore-review-status" class="restore-review-status">Select a JSON backup to begin.</p>
             <h4>File information</h4>
             <dl class="restore-review-details">
               <div><dt>Selected file</dt><dd id="restore-review-file-name">Not selected</dd></div>
@@ -391,8 +479,8 @@
             </section>
             <p class="restore-review-replacement-warning" id="restore-review-replacement-warning" hidden>Restoring this backup will replace all current app data. It will not merge with the existing journal. Export the current data first when a recovery copy is needed.</p>
             <div class="restore-review-actions">
-              <button class="primary-button" type="button" id="restore-this-backup-button" disabled>Restore This Backup</button>
-              <button class="secondary-button" type="button" id="export-current-data-first-button" disabled>Export Current Data First</button>
+              <button class="primary-button" type="button" id="export-current-data-first-button" disabled>Export Current Data First</button>
+              <button class="danger-button" type="button" id="restore-this-backup-button" disabled>Restore This Backup</button>
               <button class="secondary-button" type="button" id="cancel-restore-review-button" disabled>Cancel Restore</button>
             </div>
           </section>
@@ -405,7 +493,7 @@
             <div class="storage-health-grid">
               <section class="storage-health-card" aria-labelledby="storage-health-usage-title">
                 <h4 id="storage-health-usage-title">Storage usage</h4>
-                <p id="storage-health-estimate-status" class="storage-health-status" role="status" aria-live="polite">Checking browser storage estimates...</p>
+                <p id="storage-health-estimate-status" class="storage-health-status">Checking browser storage estimates...</p>
                 <dl class="storage-health-details">
                   <div><dt>Approximate site storage used</dt><dd id="storage-health-used">Unavailable</dd></div>
                   <div><dt>Approximate browser-reported quota</dt><dd id="storage-health-quota">Unavailable</dd></div>
@@ -416,7 +504,7 @@
 
               <section class="storage-health-card" aria-labelledby="storage-health-persistence-title">
                 <h4 id="storage-health-persistence-title">Persistent storage</h4>
-                <p id="storage-health-persistence-status" class="storage-health-status" role="status" aria-live="polite">Checking persistent-storage status...</p>
+                <p id="storage-health-persistence-status" class="storage-health-status">Checking persistent-storage status...</p>
                 <p class="storage-health-note">Persistent storage may reduce the chance of automatic browser eviction, but it does not replace JSON backups. Data can still be lost when browser data is cleared, the browser profile is removed, the device fails, or you switch devices.</p>
                 <button class="secondary-button" type="button" id="request-persistent-storage-button" hidden>Request Persistent Storage</button>
               </section>
@@ -424,23 +512,24 @@
 
             <div class="storage-health-actions">
               <button class="secondary-button" type="button" id="refresh-storage-status-button">Refresh Storage Status</button>
-              <p class="form-message" id="storage-health-message" role="status" aria-live="polite" hidden></p>
+              <p class="form-message" id="storage-health-message" hidden></p>
             </div>
 
             <div class="storage-health-guidance">
               <h4>Recovery guidance</h4>
               <ul>
-                <li>Your journal is stored locally in this browser profile. Clearing browser or site data, browser maintenance, or device failure may remove it.</li>
+                <li>Your journal is stored locally in this browser profile. Clearing browser or site data, browser or device maintenance, or device failure may remove it.</li>
                 <li>Private or incognito browsing may use temporary storage that is removed when the private session ends; the app does not try to detect private browsing.</li>
-                <li>Switching browsers, browser profiles, or devices does not transfer local data automatically.</li>
-                <li>JSON backup is the app&apos;s portable recovery file. Save regular JSON backups outside the browser or device when possible.</li>
-                <li>DOCX exports are editable journal documents for sharing or printing, not restorable app backups.</li>
+                <li>Switching browsers, browser profiles, or devices does not transfer local data. Cloud sync does not exist.</li>
+                <li>JSON is the app&apos;s portable recovery backup. Store regular backups outside the browser or device when practical.</li>
+                <li>DOCX exports are editable journal documents for review, sharing, or printing. They cannot restore app data.</li>
+                <li>Persistent storage may reduce browser eviction risk, but it cannot prevent all data loss and does not replace JSON backups.</li>
               </ul>
             </div>
           </section>
           <section class="backup-panel backup-reset-panel" aria-labelledby="reset-local-data-title">
             <span class="card-label">Danger zone</span>
-            <h3 id="reset-local-data-title">Reset Local App Data</h3>
+            <h3 id="reset-local-data-title">Reset App Data</h3>
             <p>
               Your journal lives only in this browser. Reset permanently removes all local OJT data — profile, weeks, daily logs, tasks, photos, and settings. Export a backup first if you may need it later.
             </p>
@@ -455,7 +544,7 @@
               <input type="text" id="reset-confirm-text" autocomplete="off" spellcheck="false" inputmode="text" placeholder="RESET">
             </label>
 
-            <button class="danger-button" type="button" id="reset-local-data-button" disabled>Reset Local App Data</button>
+            <button class="danger-button" type="button" id="reset-local-data-button" disabled>Reset App Data</button>
           </section>
 
           <p class="form-message" id="backup-message" hidden></p>
@@ -463,9 +552,11 @@
         </section></section>
 
         <section class="app-section" id="journal" aria-labelledby="journal-title" hidden>
-          <p class="section-kicker">Selected-week workspace</p>
-          <h2 id="journal-title">Journal</h2>
-          <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
+          <header class="journal-page-header">
+            <p class="section-kicker">Selected-week workspace</p>
+            <h2 id="journal-title">Journal</h2>
+            <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
+          </header>
 
           <div class="journal-layout">
             <section class="week-panel journal-toolbar" aria-labelledby="journal-toolbar-title">
@@ -483,9 +574,9 @@
                   <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">Next</button>
                 </div>
                 <div class="journal-toolbar-actions">
-                  <button class="primary-button" type="button" id="journal-new-week">New Week</button>
+                  <button class="secondary-button" type="button" id="journal-new-week">New Week</button>
                   <button class="secondary-button" type="button" id="journal-all-weeks" aria-controls="all-weeks-panel" aria-expanded="false">All Weeks</button>
-                  <button class="secondary-button" type="button" id="journal-log-today">Log Today</button>
+                  <button class="primary-button journal-log-today-button" type="button" id="journal-log-today">Log Today</button>
                 </div>
               </div>
               <p class="form-message" id="journal-message" aria-live="polite" hidden></p>
@@ -581,7 +672,7 @@
                   </div>
                   <p id="journal-daily-summary" aria-live="polite"></p>
                 </div>
-                <div class="journal-week-accordions" id="journal-week-accordions" aria-live="polite"></div>
+                <div class="journal-week-accordions" id="journal-week-accordions"></div>
               </section>
 
               <section class="week-panel journal-summary-panel" aria-labelledby="journal-weekly-summary-title">
@@ -599,39 +690,52 @@
         </section>
 
         <section class="app-section" id="weekly-preview" aria-labelledby="weekly-preview-title" hidden>
-          <p class="section-kicker">Prepared journal content</p>
-          <h2 id="weekly-preview-title">Preview &amp; Export</h2>
-          <p>
-            Pick a saved week to review, copy, or export your journal. Save summary changes in Journal first.
-          </p>
+          <header class="preview-page-header">
+            <p class="section-kicker">Prepared journal content</p>
+            <h2 id="weekly-preview-title">Preview &amp; Export</h2>
+            <p>Pick a saved week to review, correct, copy, or export. Save summary changes in Journal first.</p>
+            <p class="phase-note preview-purpose-note">This screen preview is optimized for reading. The exported DOCX keeps the official journal layout.</p>
+          </header>
 
           <div class="weekly-preview-layout">
-            <section class="week-panel" aria-labelledby="weekly-preview-controls-title">
+            <section class="week-panel preview-context-panel" aria-labelledby="weekly-preview-controls-title">
               <div class="panel-header">
                 <div>
-                  <span class="card-label">Weekly journal</span>
+                  <span class="card-label">Selected-week context</span>
                   <h3 id="weekly-preview-controls-title">Choose a saved week</h3>
                 </div>
                 <p id="weekly-preview-help">Choose a week to preview, copy, or export the journal.</p>
               </div>
 
-              <label class="field">
-                <span>OJT week</span>
-                <select id="weekly-preview-week-select"></select>
-              </label>
-
-              <div class="form-actions weekly-preview-actions">
+              <div class="preview-context-controls">
+                <label class="field">
+                  <span>OJT week</span>
+                  <select id="weekly-preview-week-select"></select>
+                </label>
                 <button class="secondary-button" type="button" id="preview-edit-selected-week">Edit selected week in Journal</button>
-                <button class="primary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
-                <button class="secondary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" disabled>Export Official DOCX</button>
-                <p class="form-message" id="weekly-preview-message" hidden></p>
               </div>
-              <p class="phase-note weekly-preview-export-note" id="weekly-preview-export-note">Downloads a Word file for manual review, signing, and submission.</p>
             </section>
 
-            <div class="weekly-preview-output" id="weekly-preview-output" aria-live="polite">
+            <p class="form-message preview-status-region" id="weekly-preview-message" hidden></p>
+
+            <div class="weekly-preview-output" id="weekly-preview-output">
               <p class="empty-state">Choose a saved week to preview your weekly journal.</p>
             </div>
+
+            <section class="week-panel preview-export-panel" aria-labelledby="weekly-preview-export-actions-title">
+              <div class="panel-header">
+                <div>
+                  <span class="card-label">Export actions</span>
+                  <h3 id="weekly-preview-export-actions-title">Prepare the journal for submission</h3>
+                </div>
+                <p>Use DOCX for the editable formal document. Copy is a secondary convenience action.</p>
+              </div>
+              <div class="weekly-preview-actions">
+                <button class="primary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" aria-busy="false" disabled>Export Official DOCX</button>
+                <button class="secondary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
+              </div>
+              <p class="phase-note weekly-preview-export-note" id="weekly-preview-export-note">Downloads an editable Word file for manual review, signing, and submission. DOCX cannot restore app data.</p>
+            </section>
           </div>
         </section>
 
@@ -640,60 +744,7 @@
     </div>
   </div>
 
-  <button class="drawer-overlay" type="button" aria-label="Close navigation menu" hidden></button>
-
-  <aside class="mobile-drawer" id="mobile-nav-drawer" aria-label="Mobile navigation" aria-hidden="true" hidden>
-    <div class="drawer-header">
-      <div>
-        <p class="eyebrow">Menu</p>
-        <h2>Navigate</h2>
-      </div>
-      <button class="drawer-close" type="button" aria-label="Close navigation menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M6 6l12 12M18 6 6 18"></path>
-        </svg>
-      </button>
-    </div>
-
-    <nav class="drawer-nav" aria-label="Mobile main navigation">
-      <button class="nav-button is-active" type="button" data-section="dashboard" aria-current="page">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M4 11.5 12 5l8 6.5v7a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-7Z"></path>
-            <path d="M9.5 20v-5h5v5"></path>
-          </svg>
-        </span>
-        <span>Dashboard</span>
-      </button>
-      <button class="nav-button" type="button" data-section="journal">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5Z"></path>
-              <path d="M8 3.5v3M16 3.5v3M4.5 9h15M8 13h2.5M13.5 13H16M8 16.5h2.5"></path>
-            </svg>
-          </span>
-          <span>Journal</span>
-        </button>
-        <button class="nav-button" type="button" data-section="weekly-preview">
-        <span class="nav-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M5.5 5.5h13v13h-13z"></path>
-            <path d="M8.5 9h7M8.5 12h7M8.5 15h4"></path>
-          </svg>
-        </span>
-        <span>Preview &amp; Export</span>
-      </button>
-        <button class="nav-button" type="button" data-section="settings">
-          <span class="nav-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"></path>
-            </svg>
-          </span>
-          <span>Settings</span>
-        </button>
-      </nav>
-  </aside>
+  <div id="daily-log-editor-root"></div>
 
   <script src="assets/js/db.js"></script>
   <script src="assets/js/storage.js"></script>

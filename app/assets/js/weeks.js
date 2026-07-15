@@ -527,7 +527,9 @@
 
   async function saveWeek(event) {
     event.preventDefault();
+    const form = event.target;
     const messageElement = getElement("week-form-message");
+    window.OJTUI.clearFieldValidation(form);
     window.OJTUI.clearFormMessage(messageElement);
 
     const isNewWeek = !getValue("week-id");
@@ -535,7 +537,15 @@
     const validationMessage = validateWeek(weekRecord);
 
     if (validationMessage) {
+      const fieldId = /start date/i.test(validationMessage) ? "inclusive-start-date" :
+        /end date/i.test(validationMessage) ? "inclusive-end-date" : "week-number";
+      const field = getElement(fieldId);
+      field?.setAttribute("aria-invalid", "true");
+      if (field && messageElement?.id) {
+        field.setAttribute("aria-describedby", messageElement.id);
+      }
       window.OJTUI.showFormMessage(messageElement, validationMessage, "error");
+      window.requestAnimationFrame(() => field?.focus());
       return;
     }
 
@@ -580,9 +590,57 @@
     };
   }
 
+  function isUsableWeeklySummaryFocusTarget(element) {
+    if (!element || element === document.body || element === document.documentElement || !element.isConnected || element.disabled || element.hidden || element.closest("[inert]") || element.closest("[aria-hidden=\"true\"]")) {
+      return false;
+    }
+
+    const styles = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return styles.display !== "none" && styles.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
+  }
+
+  function getWeeklySummaryFocusTarget(focusKey) {
+    const match = /^weekly-summary:([^:]+):save$/.exec(String(focusKey || ""));
+    const exactTarget = match
+      ? document.querySelector(`[data-week-summary-form][data-week-id="${CSS.escape(match[1])}"] button[type="submit"]`)
+      : null;
+    if (isUsableWeeklySummaryFocusTarget(exactTarget)) {
+      return exactTarget;
+    }
+
+    const currentSummaryButton = document.querySelector("[data-week-summary-form] button[type=\"submit\"]");
+    if (isUsableWeeklySummaryFocusTarget(currentSummaryButton)) {
+      return currentSummaryButton;
+    }
+
+    const summaryHeading = document.getElementById("journal-weekly-summary-title");
+    if (isUsableWeeklySummaryFocusTarget(summaryHeading)) {
+      return summaryHeading;
+    }
+
+    const journalHeading = document.getElementById("journal-title");
+    return isUsableWeeklySummaryFocusTarget(journalHeading) ? journalHeading : null;
+  }
+
+  function focusWeeklySummarySaveButton(focusKey) {
+    window.requestAnimationFrame(() => {
+      if (isUsableWeeklySummaryFocusTarget(document.activeElement)) {
+        return;
+      }
+      const target = getWeeklySummaryFocusTarget(focusKey);
+      if (target?.matches("h1, h2, h3, h4, h5, h6") && !target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+      }
+      if (isUsableWeeklySummaryFocusTarget(target)) {
+        target.focus();
+      }
+    });
+  }
   async function saveWeeklySummary(event) {
     event.preventDefault();
     const form = event.target;
+    const focusKey = form.dataset.weekId ? `weekly-summary:${form.dataset.weekId}:save` : "";
     const summaryRecord = buildWeeklySummaryRecord(form);
     const messageElement = form.querySelector(".form-message");
     window.OJTUI.clearFormMessage(messageElement);
@@ -604,6 +662,7 @@
       window.OJTUI.updateWeeksSummary(state.weeks);
       document.dispatchEvent(new CustomEvent("ojt:weeks-data-change"));
       window.OJTUI.showFormMessage(getElement("weekly-summary-message"), "Weekly summary saved.", "success");
+      focusWeeklySummarySaveButton(focusKey || `weekly-summary:${savedWeek.id}:save`);
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Weekly summary could not be saved. Please try again.", "error");
       console.error(error);
