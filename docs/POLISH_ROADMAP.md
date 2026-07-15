@@ -59,7 +59,7 @@ These decisions are approved and must not be reopened unless the current code re
 | 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | Additive optional metadata fields on existing PhotoAttachment records; no new object store, IndexedDB version increase, migration, or backup-version increase | Phase 1 | Batch upload/export acceptance | Complete |
 | 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Complete |
 | 4 | Accessible Responsive Visual Redesign | Apply the accessible responsive shell and visual system. | None | Phases 1-3 | Accessibility/responsive acceptance | Complete |
-| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Planned |
+| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Current: Phase 5C next |
 | 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3â€“5 | Hosted/PWA readiness | Planned |
 | 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
 | 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance | Planned |
@@ -226,6 +226,8 @@ No new object store, IndexedDB version increase, migration, backup-format change
 - Phase 4E — Appearance refinement, final UX refinement, responsive regression, and restored-ID rendering safety: Complete. Outcomes include System/Dark/Light, the quick Light/Dark switch, final responsive regression, the restored-ID safety correction, and documentation synchronization.
 
 ### Phase 5 â€” Brand Architecture
+
+**Current status:** Phase 5A - Brand Discovery and Current Identity Audit is complete. Phase 5B - Brand Strategy and Visual Direction is complete. Brand strategy is approved and docs/BRAND_GUIDELINES.md is the source of truth. The official name, tagline, Work Journal + Growth Journey direction, 70/30 balance, symbol, color, typography, icon, placement, accessibility, DOCX, backup, institutional, and offline boundaries are documented. Visual assets remain unfinished and belong to Phase 5C. Phase 5C - Logo, Brand Mark, and Icon Asset Exploration is next/not started; Phase 5D - Brand Integration Across the App and Phase 5E - Regression, Documentation, and Closeout remain later/not started. No application branding has been implemented.
 
 **Objective:** Make identity configurable while retaining a safe generic open-source default.
 

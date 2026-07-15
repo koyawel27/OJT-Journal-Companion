@@ -8,10 +8,12 @@ Phase 1 — Journal UX Architecture: Complete
 Phase 2 — Batch Photo Documentation: Complete
 Phase 3 — Data and Recovery Hardening: Complete
 Phase 4 — Accessible Responsive Visual Redesign: Complete
+Phase 5A — Brand Discovery and Current Identity Audit: Complete
+Phase 5B — Brand Strategy and Visual Direction: Complete
 
-Phase 4 implementation and regression work are complete. Documentation synchronization is complete after this task. Feature-branch merge remains the next repository action.
+Phase 4 implementation and regression work are complete. Phase 5A and Phase 5B are complete. Brand strategy is approved and docs/BRAND_GUIDELINES.md is the approved brand source of truth. No application branding has been implemented; asset exploration and review come before application integration.
 
-The active branch is feature/accessible-responsive-redesign. The latest tagged stable release remains v1.1. Phase 4 is post-v1.1 roadmap work and has not created a release or tag. The expected worktree state after the documentation commit is clean. No v1.2 release is implied.
+The active branch is feature/brand-architecture. The latest tagged stable release remains v1.1. Phase 4 and Phase 5 brand work are post-v1.1 roadmap work and have not created a release or tag. No v1.2 release is implied.
 
 ## Immediate repository sequence
 
@@ -101,9 +103,9 @@ The safety patch is committed as c89d5a6 (fix: escape restored IDs in daily log 
 
 ## Next phase
 
-**Phase 5 — Brand Architecture**
+**Phase 5C — Logo, Brand Mark, and Icon Asset Exploration**
 
-Phase 4 introduced no permanent institutional branding. Phase 5 should define generic or authorized brand direction deliberately, using source-driven assets and explicit permission before any institutional identity is introduced.
+Phase 5B is complete. docs/BRAND_GUIDELINES.md is the approved brand source of truth. Phase 5C is the next planned phase and is not started. Asset exploration and review come before application integration; no application branding, logo, favicon, icon set, or other brand asset exists yet. Generic or authorized brand direction must remain source-driven and require explicit permission before any institutional identity is introduced.
 
 ## Historical documents
 
