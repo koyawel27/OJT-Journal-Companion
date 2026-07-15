@@ -513,8 +513,8 @@
                 ${notesText}
               </div>
               <div class="task-bullet-actions">
-                <button class="secondary-button" type="button" data-task-action="edit" data-task-id="${task.id}">Edit</button>
-                <button class="danger-button" type="button" data-task-action="delete" data-task-id="${task.id}">Delete</button>
+                <button class="secondary-button" type="button" data-task-action="edit" data-task-id="${escapeHtml(task.id)}">Edit</button>
+                <button class="danger-button" type="button" data-task-action="delete" data-task-id="${escapeHtml(task.id)}">Delete</button>
               </div>
             </li>
           `;
@@ -725,7 +725,7 @@
     const deleteButton = dailyLog
       ? `<div class="destructive-actions">
           <span class="destructive-label">Danger zone</span>
-          <button class="danger-button" type="button" data-log-action="delete" data-log-id="${dailyLog.id}">Delete day record</button>
+          <button class="danger-button" type="button" data-log-action="delete" data-log-id="${escapeHtml(dailyLog.id)}">Delete day record</button>
         </div>`
       : "";
 
