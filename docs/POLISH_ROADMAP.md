@@ -1,4 +1,4 @@
-# OJT Journal Companion Post-v1.1 Roadmap
+﻿# OJT Journal Companion Post-v1.1 Roadmap
 
 ## 1. Document Purpose
 
@@ -6,7 +6,7 @@ This is the authoritative post-v1.1 product, UX, hardening, PWA, and beta roadma
 
 v1.1 is the stable released and tagged baseline. Future work must be phased, reviewable, reversible where practical, and protected by regression checks. This roadmap defines sequencing and outcomes, not implementation code. Implementation details remain governed by the current app and its source documents, including `PROJECT_BRIEF.md`, `FEATURES.md`, `DATA_STRUCTURE.md`, `WORKFLOWS.md`, and the DOCX documents.
 
-Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboard progress, the Daily Logs editor, the muted theme, intern-focused microcopy, reset, and Official DOCX Export—is now regression history, not active work. The deferred broad utility/IndexedDB refactor is not an approved standalone phase; any maintainability change must be justified within an active phase and kept narrow.
+Completed pre-v1.1 polishâ€”backup safety, Preview & Export formatting, Dashboard progress, the Daily Logs editor, the muted theme, intern-focused microcopy, reset, and Official DOCX Exportâ€”is now regression history, not active work. The deferred broad utility/IndexedDB refactor is not an approved standalone phase; any maintainability change must be justified within an active phase and kept narrow.
 
 ## 2. Current Baseline
 
@@ -18,7 +18,7 @@ Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboar
 | Capabilities | Profiles/settings, week management, daily records, tasks, photos, weekly summaries, preview/copy, JSON backup/restore/reset, and Official DOCX Export. |
 | DOCX | Client-side `docx-templates` v2 export with a private-first official template and tracked sanitized fallback. |
 | Strengths | Mature single-user feature set, offline-first data ownership, official rendered-hours rules, editable output, responsive foundations, and no server dependency. |
-| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow. Phase 2 batch photo documentation and Phase 3 Data and Recovery Hardening are complete; Phase 4 Accessible Responsive Visual Redesign is the next active concern. |
+| Main weakness | Former v1.1 weakness resolved by Phase 1: the weekly workflow was split across Weeks, Daily Logs, Dashboard, and a separate preview destination with independent week selection. The shared selected-week Journal architecture now owns that workflow. Phase 2 batch photo documentation, Phase 3 Data and Recovery Hardening, and Phase 4 Accessible Responsive Visual Redesign are complete; documentation synchronization is the current closeout step. |
 
 ## 3. Product Principles
 
@@ -58,16 +58,16 @@ These decisions are approved and must not be reopened unless the current code re
 | 1 | Journal UX Architecture | Unify the weekly workflow and selected-week state. | None expected | Phase 0 | Journal workflow acceptance | Complete |
 | 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | Additive optional metadata fields on existing PhotoAttachment records; no new object store, IndexedDB version increase, migration, or backup-version increase | Phase 1 | Batch upload/export acceptance | Complete |
 | 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Complete |
-| 4 | Accessible Responsive Visual Redesign | Apply an accessible shell and responsive component system. | None expected | Phases 1-3 | Accessibility/responsive acceptance | Next |
+| 4 | Accessible Responsive Visual Redesign | Apply the accessible responsive shell and visual system. | None | Phases 1-3 | Accessibility/responsive acceptance | Complete |
 | 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Planned |
-| 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3–5 | Hosted/PWA readiness | Planned |
+| 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3â€“5 | Hosted/PWA readiness | Planned |
 | 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
 | 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance | Planned |
 | 9 | Native Packaging Decision | Decide whether PWA limitations justify one native path. | Decision-dependent | Phase 7 evidence | Explicit adoption or deferral | Planned |
 
 ## 6. Detailed Phase Plans
 
-### Phase 0 — Baseline and Roadmap Alignment
+### Phase 0 â€” Baseline and Roadmap Alignment
 
 **Objective:** Make the released v1.1 state and post-v1.1 sequence unambiguous.
 
@@ -91,7 +91,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Dependencies on earlier phases:** None.
 
-### Phase 1 — Journal UX Architecture
+### Phase 1 â€” Journal UX Architecture
 
 **Objective:** Create one Journal workspace with shared selected-week context.
 
@@ -103,7 +103,7 @@ These decisions are approved and must not be reopened unless the current code re
 - Full Weeks/Daily Logs merge; compact selector, previous/next controls, and New Week action.
 - Selection priority: today-containing, last valid, latest, or none; new-week auto-selection and safe fallback after edits/deletion.
 - One selected-week view with dates, rendered hours, logged-day count, and summary-completion status.
-- Compact rows like `Tue, Jul 7 · Worked · 7h · 4 tasks · 2 photos`, with collapsible details.
+- Compact rows like `Tue, Jul 7 Â· Worked Â· 7h Â· 4 tasks Â· 2 photos`, with collapsible details.
 - Compact old-week history; never render every old week's complete days at once.
 - Journal editing for Skills Learned, Problems Encountered, Reflection / Points of Learning, and existing optional notes.
 - Selected-week Preview & Export handoff and an easy quick/floating Log Today action.
@@ -119,7 +119,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Risks:** Selection loops/staleness, wrong-week Preview/DOCX, slow long-history rendering, or lost today-log convenience.
 
-**Required testing:** No weeks; one; two; 10–20; today-containing and none; new week; edited dates; deleted selection; reload; Dashboard/Journal/Preview synchronization; Preview handoff; copy/DOCX selected-week correctness; desktop/mobile navigation and Log Today.
+**Required testing:** No weeks; one; two; 10â€“20; today-containing and none; new week; edited dates; deleted selection; reload; Dashboard/Journal/Preview synchronization; Preview handoff; copy/DOCX selected-week correctness; desktop/mobile navigation and Log Today.
 
 **Exit criteria:** A user can create/select one week, complete daily/summary work in Journal, and open Preview & Export without reselecting or changing weeks; v1.1 regression passes.
 
@@ -129,7 +129,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Dependencies on earlier phases:** Phase 0 approval and regression baseline.
 
-### Phase 2 — Batch Photo Documentation
+### Phase 2 â€” Batch Photo Documentation
 
 **Objective:** Let a student select one or multiple related JPEG, PNG, or WebP images in one upload action, apply one category and shared caption, and display that caption once in Journal and Official DOCX Export.
 
@@ -155,7 +155,7 @@ These decisions are approved and must not be reopened unless the current code re
 
 **Dependencies on earlier phases:** Phase 1 Journal structure and selected-week architecture.
 
-### Phase 3 — Data and Recovery Hardening
+### Phase 3 â€” Data and Recovery Hardening
 
 **Objective:** Make restore and browser-local storage risks understandable, validated, and recoverable before hosted reliance.
 
@@ -187,7 +187,7 @@ Settings now reports approximate site/origin usage, quota, and valid percentage 
 
 No new object store, IndexedDB version increase, migration, backup-format change, or backup-version increase was added. DB_VERSION remains 4; backupVersion remains "1.0". Focused automated assertions, syntax/repository checks, and primary-browser manual verification passed with no observed blocking defect; broader browser/device testing remains future testing.
 
-### Phase 4 — Accessible Responsive Visual Redesign
+### Phase 4 â€” Accessible Responsive Visual Redesign
 
 **Objective:** Apply a coherent accessible shell and responsive component system after Journal architecture stabilizes.
 
@@ -211,13 +211,21 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 **Risks:** Color-only meaning, lost focus, mobile sheet traps, excessive motion, broad CSS regression, or accidental institutional styling.
 
-**Required testing:** Keyboard-only and screen-reader use; focus lifecycle/Escape/restoration; reduced motion; 320px through wide desktop; touch targets; zoom/text scaling; empty/long content; 10–20 weeks; full v1.1 regression.
+**Required testing:** Keyboard-only and screen-reader use; focus lifecycle/Escape/restoration; reduced motion; 320px through wide desktop; touch targets; zoom/text scaling; empty/long content; 10â€“20 weeks; full v1.1 regression.
 
 **Exit criteria:** The stable Journal is usable at target sizes; critical dialogs/sheets meet the accessibility contract; responsive/accessibility review passes.
 
 **Dependencies on earlier phases:** Phase 1 architecture, Phase 2 batch-photo behavior, and known Phase 3 feedback requirements.
+**Completion status:** Complete — ready for feature-branch merge. Phase 4 delivered the accessible responsive shell, desktop sidebar, fixed four-item mobile navigation, Journal redesign, accessible Daily Log dialog/mobile sheet, Dashboard and Preview & Export refinements, Settings and Recovery improvements, System/Dark/Light appearance, top Light/Dark quick switch, warm Light and Urban Earth Dark identities, responsive/focus improvements, final regression, restored-ID rendering safety correction, and documentation synchronization. No permanent institutional branding or formal WCAG conformance claim was introduced.
+**Phase 4 subphase closeout:**
 
-### Phase 5 — Brand Architecture
+- Phase 4A — UI, Responsive, and Accessibility Audit: Complete.
+- Phase 4B — Design Foundation and App Shell: Complete.
+- Phase 4C — Journal Workspace Redesign: Complete.
+- Phase 4D — Dashboard, Preview, Settings, and Recovery Redesign: Complete.
+- Phase 4E — Appearance refinement, final UX refinement, responsive regression, and restored-ID rendering safety: Complete. Outcomes include System/Dark/Light, the quick Light/Dark switch, final responsive regression, the restored-ID safety correction, and documentation synchronization.
+
+### Phase 5 â€” Brand Architecture
 
 **Objective:** Make identity configurable while retaining a safe generic open-source default.
 
@@ -241,7 +249,7 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 **Dependencies on earlier phases:** Phase 4 tokens and responsive shell.
 
-### Phase 6 — Static Deployment and PWA
+### Phase 6 â€” Static Deployment and PWA
 
 **Objective:** Let testers open one GitHub Pages URL, optionally install, and use the app offline without XAMPP, commands, or a terminal.
 
@@ -264,7 +272,7 @@ No new object store, IndexedDB version increase, migration, backup-format change
 **Exit criteria:** A tester can open one URL, complete the core workflow, install where supported, cold-launch offline, safely update, export DOCX, and understand storage/backup risk.
 
 **Dependencies on earlier phases:** Phase 3 hardening, Phase 4 quality, and Phase 5 generic or authorized identity.
-### Phase 7 — Friend Beta
+### Phase 7 â€” Friend Beta
 
 **Objective:** Validate the hosted workflow with real users and collect evidence for fixes and later decisions.
 
@@ -286,9 +294,9 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 **Exit criteria:** No unresolved data-loss/core blocker; recovery and DOCX targets pass; findings are triaged; evidence supports Phase 8 necessity and Phase 9 deferral/adoption.
 
-**Dependencies on earlier phases:** Phase 6 hosted PWA and Phases 1–5 gates.
+**Dependencies on earlier phases:** Phase 6 hosted PWA and Phases 1â€“5 gates.
 
-### Phase 8 — Official DOCX Template Import
+### Phase 8 â€” Official DOCX Template Import
 
 **Objective:** If beta confirms the need, manage an approved private DOCX template locally without committing or backing it up by default.
 
@@ -312,7 +320,7 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 **Dependencies on earlier phases:** Phase 7 evidence, Phase 3 validation, Phase 6 hosted storage.
 
-### Phase 9 — Native Packaging Decision
+### Phase 9 â€” Native Packaging Decision
 
 **Objective:** Decide from beta evidence whether to remain PWA-only or pursue one native path.
 
@@ -391,7 +399,7 @@ Only these remain unresolved:
 ## 11. Roadmap Change Control
 
 - v1.1 remains the stable rollback/regression baseline.
-- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation and Phase 3 Data and Recovery Hardening are complete. **Phase 4 - Accessible Responsive Visual Redesign is the next approved roadmap phase.**
+- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation, Phase 3 Data and Recovery Hardening, and Phase 4 Accessible Responsive Visual Redesign are complete post-v1.1 roadmap work. **Phase 5 - Brand Architecture is the next planned phase.**
 - Review phase scope, current code, likely files, risks, and tests before coding.
 - Data-model phases require explicit IndexedDB migration, backup-version, restore-compatibility, and rollback/recovery review.
 - Keep changes phase-scoped; do not combine opportunistic framework/platform work.
