@@ -4002,7 +4002,9 @@ body,
 }
 
 .settings-panel .profile-form {
+  width: 100%;
   max-width: 780px;
+  margin-inline: auto;
   border-top: 3px solid var(--accent);
   padding: var(--space-5);
 }
@@ -4546,5 +4548,221 @@ body,
   .settings-tab[aria-selected="true"] {
     border-color: Highlight;
     color: Highlight;
+  }
+}
+/* Phase 5D S1 responsive app-shell mechanics. */
+.stitch-app-shell {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+.top-app-bar {
+  position: sticky;
+  z-index: 30;
+  top: 0;
+  width: 100%;
+}
+
+.top-app-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: min(calc(100% - 32px), 1200px);
+  min-height: 64px;
+  margin: 0 auto;
+}
+
+.top-app-bar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.stitch-content-canvas {
+  display: block;
+  width: min(calc(100% - 32px), 1200px);
+  margin: 0 auto;
+  padding: var(--space-6) 0 calc(112px + var(--mobile-safe-area-bottom));
+}
+
+.stitch-main-content {
+  width: 100%;
+  min-height: 520px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.primary-navigation {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: max(var(--space-4), var(--mobile-safe-area-bottom));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+  width: min(calc(100% - 32px), 680px);
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  padding: 6px;
+  transform: translateX(-50%);
+}
+
+.primary-navigation .primary-nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.15;
+  padding: 6px 8px;
+  text-align: center;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.primary-nav-icon {
+  display: grid;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+}
+
+.primary-nav-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.top-app-bar .appearance-switch {
+  width: 74px;
+  min-width: 74px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .primary-navigation .primary-nav-button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 760px) {
+  .top-app-bar-inner,
+  .stitch-content-canvas {
+    width: min(calc(100% - 32px), 1200px);
+  }
+
+  .stitch-content-canvas {
+    padding-top: var(--space-5);
+  }
+
+  .primary-navigation {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    gap: 3px;
+    width: 100%;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 24px 24px 0 0;
+    padding: 5px max(5px, env(safe-area-inset-right, 0px)) calc(5px + var(--mobile-safe-area-bottom)) max(5px, env(safe-area-inset-left, 0px));
+    transform: none;
+  }
+
+  .primary-navigation .primary-nav-button {
+    min-height: 60px;
+    padding: 6px 2px;
+    font-size: clamp(0.66rem, 2.6vw, 0.78rem);
+    white-space: normal;
+  }
+}
+
+@media (max-width: 360px) {
+  .top-app-bar-inner,
+  .stitch-content-canvas {
+    width: calc(100% - 24px);
+  }
+
+  .top-app-bar .appearance-switch {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .primary-navigation .primary-nav-button {
+    font-size: 0.64rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary-navigation .primary-nav-button {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .top-app-bar,
+  .primary-navigation {
+    border-color: ButtonText;
+  }
+
+  .primary-navigation .primary-nav-button.is-active {
+    border-color: Highlight;
+    background: Canvas;
+    color: Highlight;
+  }
+}
+/* Phase 5D S1.1: center each top-level screen on the shared shell axis. */
+.stitch-content-canvas {
+  grid-template-columns: none;
+  gap: 0;
+  margin-top: 0;
+}
+
+.stitch-main-content {
+  margin-inline: auto;
+}
+
+.stitch-main-content > .app-section {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.stitch-main-content > #dashboard,
+.stitch-main-content > #journal {
+  max-width: 1200px;
+}
+
+.stitch-main-content > #weekly-preview,
+.stitch-main-content > #settings {
+  max-width: 960px;
+}
+
+@media (max-width: 760px) {
+  .stitch-main-content > .app-section,
+  .stitch-main-content > #dashboard,
+  .stitch-main-content > #journal,
+  .stitch-main-content > #weekly-preview,
+  .stitch-main-content > #settings {
+    max-width: none;
   }
 }

@@ -1,21 +1,17 @@
 /* Phase 5D: Stitch Warm Journal visual translation. */
 
-.mobile-brand-bar {
-  display: none;
-}
-
 .brand-lockup {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   min-width: 0;
 }
 
 .brand-mark {
   display: grid;
-  flex: 0 0 52px;
-  width: 52px;
-  height: 52px;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   color: var(--color-text-primary);
 }
@@ -37,74 +33,55 @@
   stroke: var(--color-progress-fill);
 }
 
-.brand-copy {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.brand-copy > span {
-  color: var(--color-text-muted);
-  font-size: 0.76rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.sidebar-identity .brand-lockup {
-  align-items: flex-start;
-}
-
-.sidebar-identity .brand-mark {
-  flex-basis: 46px;
-  width: 46px;
-  height: 46px;
-  color: inherit;
-}
-
-.sidebar-identity .brand-mark-progress {
-  stroke: #d3e89b;
-}
-
-:root[data-theme="dark"] .sidebar-identity .brand-mark-progress {
-  stroke: #d8b99d;
-}
-
-.sidebar-identity .brand-copy h1 {
+.brand-lockup h1 {
   margin: 0;
-  font-size: 1.06rem;
-  line-height: 1.18;
+  color: var(--color-text-primary);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
   overflow-wrap: normal;
-}
-
-.sidebar-identity .brand-copy > span {
-  color: inherit;
-  font-size: 0.7rem;
-  opacity: 0.82;
 }
 
 body {
   letter-spacing: -0.005em;
 }
 
-.app-shell {
-  width: min(100% - 32px, 1280px);
+.top-app-bar {
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-canvas);
+  background: color-mix(in srgb, var(--color-canvas) 94%, transparent);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.app-layout {
-  grid-template-columns: 264px minmax(0, 1fr);
+.primary-navigation {
+  border-color: var(--color-border-subtle);
+  background: var(--color-shell);
+  background: color-mix(in srgb, var(--color-shell) 96%, transparent);
+  box-shadow: var(--shadow-mobile-nav);
+  backdrop-filter: blur(14px);
 }
 
-.sidebar {
-  border-radius: var(--radius-dialog);
+.primary-navigation .primary-nav-button {
+  color: var(--color-text-secondary);
 }
 
-.sidebar .nav-button {
-  border-radius: var(--radius-pill);
-  padding-inline: var(--space-3);
+.primary-navigation .primary-nav-button:hover {
+  background: var(--color-state-hover);
 }
 
-.content-utility {
-  margin-bottom: var(--space-5);
+.primary-navigation .primary-nav-button.is-active {
+  background: var(--color-state-active);
+  color: var(--color-text-interactive);
+}
+
+.primary-nav-icon {
+  color: var(--color-text-muted);
+}
+
+.primary-navigation .primary-nav-button.is-active .primary-nav-icon {
+  color: currentColor;
 }
 
 .app-section h2,
@@ -185,7 +162,7 @@ body {
   border-radius: var(--radius-pill) var(--radius-pill) 0 0;
 }
 
-.mobile-tab-icon svg {
+.primary-nav-icon svg {
   width: 20px;
   height: 20px;
   fill: none;
@@ -229,68 +206,20 @@ body {
 }
 
 @media (max-width: 760px) {
-  .app-shell {
-    width: 100%;
-    padding-top: 0;
+  .brand-mark {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
   }
 
-  .mobile-brand-bar {
-    position: sticky;
-    z-index: 18;
-    top: 0;
-    display: flex;
-    align-items: center;
-    min-height: 64px;
-    border-bottom: 1px solid var(--color-border-subtle);
-    background: var(--color-canvas);
-    padding: var(--space-2) var(--space-4);
+  .brand-lockup h1 {
+    max-width: 17ch;
+    font-size: 0.92rem;
   }
 
-  .mobile-brand-bar .brand-mark {
-    flex-basis: 40px;
-    width: 40px;
-    height: 40px;
-  }
-
-  .mobile-brand-bar .brand-copy strong {
-    font-size: 0.96rem;
-    line-height: 1.2;
-  }
-
-  .mobile-brand-bar .brand-copy > span {
-    font-size: 0.68rem;
-  }
-
-  .app-layout {
-    margin-top: 0;
-  }
-
-  .content {
-    border-radius: 0;
-    padding-top: var(--space-5);
-  }
-
-  .mobile-section-tabs {
-    gap: var(--space-1);
-    border-radius: 22px 22px 0 0;
-    padding: 6px 5px calc(6px + var(--mobile-safe-area-bottom));
-  }
-
-  .mobile-tab-button {
-    min-height: 58px;
-    border-radius: var(--radius-pill);
-    padding: 6px 2px;
-  }
-
-  .mobile-tab-button.is-active {
-    border-color: transparent;
-    background: var(--color-state-active);
-  }
-
-  .mobile-tab-icon {
-    width: 22px;
-    height: 22px;
-    font-size: 0;
+  .primary-navigation {
+    border-color: var(--color-border-subtle);
+    box-shadow: var(--shadow-mobile-nav);
   }
 
   .dashboard-ojt-progress-card,
@@ -307,12 +236,19 @@ body {
 }
 
 @media (max-width: 360px) {
-  .mobile-brand-bar .brand-copy > span {
-    display: none;
+  .brand-lockup {
+    gap: 6px;
   }
 
-  .mobile-tab-button {
-    font-size: 0.66rem;
+  .brand-mark {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-lockup h1 {
+    max-width: 14ch;
+    font-size: 0.82rem;
   }
 }
 
@@ -322,7 +258,8 @@ body {
     stroke: CanvasText;
   }
 
-  .mobile-brand-bar {
+  .top-app-bar,
+  .primary-navigation {
     border-color: CanvasText;
   }
 }
