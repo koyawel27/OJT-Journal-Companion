@@ -6,15 +6,15 @@ Source file: docs/BRAND_GUIDELINES.md
 
 Purpose: This document is the source of truth for the product brand strategy, visual direction, product-facing copy, future local brand assets, Phase 5C exploration, and Phase 5D integration.
 
-Current phase: Phase 5B - Brand Strategy and Visual Direction: Complete. Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Next / Not started.
+Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. Phase 5D - Initial brand integration complete; high-fidelity Stitch screen translation planned. Phase 5E - Regression, Documentation, and Closeout: Waiting for the revised Phase 5D translation.
 
 Authority: This document governs generic product identity decisions for OJT Journal Companion. The current application source, protected data contracts, official DOCX template, and explicit institutional permissions remain higher-priority constraints where applicable.
 
-Version/status: Brand strategy approved. Phase 5B complete. Phase 5C asset exploration next. Visual assets not yet finalized.
+Version/status: Stitch Warm Journal direction selected as a refinement of Concept A. Local SVG mark, favicon, SVG navigation family, Light tokens, and component treatment are integrated. The project owner has requested a more faithful translation of the supplied Stitch frontend, especially Journal and Daily Log Editor. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` governs that work. Visual browser regression remains before closeout.
 
 Controls: Product naming, brand position, promise, tagline, personality, anti-traits, visual principles, symbol direction, color philosophy, typography, icon direction, voice, placement rules, DOCX and backup boundaries, and later asset/integration requirements.
 
-Pending for Phase 5C: Logo and brand-mark exploration, favicon simplification, icon-family exploration, monochrome and Light/Dark tests, and small-size legibility tests. No unfinished logo work is final.
+Pending before Phase 5E: high-fidelity Stitch translation for Journal and Daily Log Editor, followed by the remaining shared screens after owner approval. Pending for Phase 5E: browser-based responsive visual review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final closeout regression.
 
 ## 2. Product identity
 
@@ -211,11 +211,11 @@ The progress cue must not be a literal generic arrow. The symbol should be simpl
 
 Fallback: Page corner plus subtle milestone. Use this only if small-size testing shows the primary construction cannot remain legible.
 
-No final artwork is included in Phase 5B.
+The selected production direction is the Stitch Warm Journal refinement of Concept A — Rising Rule. The decision is recorded in `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md`.
 
 ## 13. Symbol construction constraints
 
-Phase 5C should explore a square canvas with:
+The selected square-canvas mark uses:
 
 - rounded page geometry;
 - restrained corner radius;
@@ -246,7 +246,7 @@ Future variants may include:
     Reverse mark
     Favicon simplification
 
-Use live text for the wordmark where practical. Retain the system-font identity. Do not embed a decorative display font or place the full product name inside tiny raster assets. These assets are not being created yet.
+Use live text for the wordmark where practical. Retain the system-font identity. Do not embed a decorative display font or place the full product name inside tiny raster assets. The app uses local scalable SVG mark assets and live product-name text.
 
 ## 15. Compact identity rule
 
@@ -340,7 +340,7 @@ Future UI icons should use:
 
 An icon cannot be the only accessible name for an unfamiliar action.
 
-Desktop and mobile navigation should eventually use one SVG family. The current mobile Unicode navigation icons are a Phase 5D consistency target. They must not be replaced during Phase 5B.
+Desktop and mobile navigation use one local inline SVG family with visible text labels and unchanged navigation targets.
 
 ## 22. Imagery and illustration
 
@@ -423,13 +423,13 @@ No placement is implemented during Phase 5B.
 
 ## 28. Favicon and app-icon strategy
 
-Phase 5C may explore a local brand-mark SVG, an SVG favicon where supported, and a small PNG fallback when justified. Light/Dark-compatible treatment is required.
+The app includes a local scalable brand mark and an SVG favicon with Light/Dark-compatible styling. PWA PNG install icons remain Phase 6 work.
 
 Installable PWA work is not automatically part of this phase. A service worker, offline installation flow, web app manifest, and 192px/512px install icons require an explicitly approved deployment feature. Do not add manifest.webmanifest as part of branding alone.
 
 ## 29. Asset-format rules
 
-The provisional future asset path is:
+The active asset path is:
 
     app/assets/brand/
 
@@ -439,7 +439,7 @@ Potential later assets include:
     favicon.svg
     favicon-32.png
 
-Names remain provisional until Phase 5C. Future assets must be local, optimized, small, free of external font embedding, free of remote dependencies, and accessible in HTML. The directory and assets are not created in Phase 5B.
+Assets are local, optimized, small, free of external font embedding, free of remote dependencies, and paired with accessible product-name text in the interface.
 
 ## 30. Official DOCX boundary
 
@@ -489,7 +489,7 @@ Brand identity must use local assets, avoid runtime brand fetches, avoid externa
 
 ## 35. Phase 5C design brief
 
-Phase 5C should explore the primary journal-page plus subtle-rising-progress-line direction and the page-corner plus milestone fallback.
+Phase 5C selected the primary journal-page plus subtle-rising-progress-line direction through the Stitch Warm Journal refinement of Concept A.
 
 Future exploration requirements:
 
@@ -504,7 +504,7 @@ Future exploration requirements:
 - 128px documentation mark; and
 - 512px source master.
 
-These are future requirements only. No assets are generated in Phase 5B.
+The scalable master and simplified favicon are prepared. Phase 5E must finish browser-based small-size and Light/Dark visual confirmation before closeout.
 
 ## 36. Phase 5D integration boundaries
 
@@ -549,15 +549,15 @@ Before brand integration is accepted:
 | Balance | Locked | 70% Work Journal / 30% Growth Journey |
 | Personality | Locked | Grounded, Organized, Reflective, Progressive, Dependable, Encouraging |
 | Anti-traits | Locked | No childish, gamified, corporate HR, surveillance, rustic/vintage, scrapbook, government-form, or unauthorized institutional identity |
-| Primary symbol | Approved for Phase 5C exploration | Structured journal page + subtle rising progress line |
-| Fallback symbol | Approved for Phase 5C exploration | Page corner + subtle milestone, only if small-size testing requires it |
+| Primary symbol | Locked and implemented | Stitch Warm Journal refinement of Concept A: structured journal page + subtle rising progress line |
+| Fallback symbol | Retained as exploration history | Page corner + subtle milestone remains available only if Phase 5E small-size testing rejects the primary mark |
 | Palette family | Locked foundation | Existing Light and Dark earth-toned families; semantic roles remain authoritative |
 | Typography | Locked | Existing system UI stack |
-| Icon style | Approved for Phase 5C/5D exploration | Local inline SVG, simple outline family; current mobile Unicode icons remain until Phase 5D |
-| Favicon | Approved for Phase 5C exploration | Local mark simplification; no asset created yet |
+| Icon style | Locked and implemented | Local inline SVG, simple outline family shared by desktop and mobile navigation |
+| Favicon | Implemented | `app/assets/brand/favicon.svg`; PWA PNG install icons remain deferred |
 | Web app manifest | Deferred | Not automatically in scope for branding |
 | DOCX branding | Protected boundary | Excluded by default; requires explicit approval |
 | Backup identity | Protected boundary | appName = OJT Journal Companion; backupVersion = "1.0" |
 | Institutional theming | Deferred | Requires authoritative assets, permission, and separate scope |
-| Asset path | Deferred | Provisional future path app/assets/brand/ |
+| Asset path | Active | `app/assets/brand/` |
 | External dependencies | Locked | No remote fonts, icon libraries, image fetches, or branding runtime dependency |

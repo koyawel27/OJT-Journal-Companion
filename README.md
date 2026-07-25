@@ -4,7 +4,7 @@ A lightweight, offline-first personal browser app for one student or intern. Rec
 
 ## Current status
 
-The latest tagged stable release remains **v1.1**. Phase 4 — Accessible Responsive Visual Redesign is complete post-v1.1 roadmap work on feature/accessible-responsive-redesign; it has not created a new release or tag. Final merge into master remains a separate closeout step. No v1.2 release is implied.
+The latest tagged stable release remains **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected and initially integrated the Stitch Warm Journal direction on `feature/brand-architecture`. A higher-fidelity translation of the supplied Stitch Journal and Daily Log Editor is planned before Phase 5E visual regression and closeout. This work has not created a new release or tag. No v1.2 release is implied.
 
 ## What this app is
 
@@ -19,6 +19,7 @@ Browser storage can be cleared by the browser, device maintenance, or the user. 
 - Dashboard progress, current-week status, and backup reminders
 - Journal workspace with week management, Daily Logs, day statuses, rendered-hour calculations, Daily Tasks, weekly summaries, and day handoffs
 - Responsive desktop sidebar navigation and fixed mobile bottom navigation with four destinations: Dashboard, Journal, Preview & Export, and Settings
+- Local Warm Journal identity with the full product name, official tagline, scalable mark/favicon, shared SVG navigation icons, and no remote brand dependency
 - System, Dark, and Light appearance preferences, plus a top Light/Dark quick switch; the preference persists and System remains available in Settings
 - Batch Photo Documentation for JPEG, PNG, and WebP files
 - JSON backup, Restore Review, replace-style restore, Storage Health, and guarded local-data reset

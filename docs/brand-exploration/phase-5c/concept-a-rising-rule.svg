@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="concept-a-title">
+  <title id="concept-a-title">Concept A, Rising Rule: a journal page whose final ruled line rises gently</title>
+  <defs>
+    <g id="concept-a-small-frame" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="10" y="6" width="44" height="52" rx="7" />
+      <path d="M20 24h25" />
+    </g>
+    <g id="concept-a-small-progress" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 43h13c6 0 9-5 14-8" />
+    </g>
+  </defs>
+  <g id="concept-a-frame" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="11" y="6" width="42" height="52" rx="6" />
+    <path d="M20 20h25M20 30h25" />
+  </g>
+  <g id="concept-a-progress" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 42h11c5 0 9-3 12-6 2-2 3-3 4-3" />
+  </g>
+</svg>

@@ -1,0 +1,328 @@
+/* Phase 5D: Stitch Warm Journal visual translation. */
+
+.mobile-brand-bar {
+  display: none;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.brand-mark {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: var(--color-text-primary);
+}
+
+.brand-mark svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke-width: 3.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-mark-frame {
+  stroke: currentColor;
+}
+
+.brand-mark-progress {
+  stroke: var(--color-progress-fill);
+}
+
+.brand-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.brand-copy > span {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sidebar-identity .brand-lockup {
+  align-items: flex-start;
+}
+
+.sidebar-identity .brand-mark {
+  flex-basis: 46px;
+  width: 46px;
+  height: 46px;
+  color: inherit;
+}
+
+.sidebar-identity .brand-mark-progress {
+  stroke: #d3e89b;
+}
+
+:root[data-theme="dark"] .sidebar-identity .brand-mark-progress {
+  stroke: #d8b99d;
+}
+
+.sidebar-identity .brand-copy h1 {
+  margin: 0;
+  font-size: 1.06rem;
+  line-height: 1.18;
+  overflow-wrap: normal;
+}
+
+.sidebar-identity .brand-copy > span {
+  color: inherit;
+  font-size: 0.7rem;
+  opacity: 0.82;
+}
+
+body {
+  letter-spacing: -0.005em;
+}
+
+.app-shell {
+  width: min(100% - 32px, 1280px);
+}
+
+.app-layout {
+  grid-template-columns: 264px minmax(0, 1fr);
+}
+
+.sidebar {
+  border-radius: var(--radius-dialog);
+}
+
+.sidebar .nav-button {
+  border-radius: var(--radius-pill);
+  padding-inline: var(--space-3);
+}
+
+.content-utility {
+  margin-bottom: var(--space-5);
+}
+
+.app-section h2,
+.dashboard-intro h2,
+.journal-page-header h2,
+.preview-page-header h2,
+.settings-page-header h2 {
+  letter-spacing: -0.025em;
+}
+
+.app-section h3,
+.app-section h4 {
+  letter-spacing: -0.012em;
+}
+
+.section-kicker,
+.card-label {
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.settings-tab {
+  font-weight: 700;
+}
+
+.dashboard-ojt-progress-card,
+.dashboard-week-card,
+.dashboard-identity-strip,
+.profile-form,
+.week-panel,
+.backup-panel,
+.summary-card,
+.storage-health-card,
+.journal-preview-card,
+.daily-log-editor-panel {
+  border-color: var(--color-border-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-week-card,
+.journal-overview {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-week-card::after,
+.journal-overview::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -1px;
+  right: -1px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, transparent 49%, var(--color-state-active) 50%);
+  pointer-events: none;
+}
+
+.dashboard-week-card > *,
+.journal-overview > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-ojt-progress-bar-wrap {
+  height: 6px;
+  border-radius: 2px;
+}
+
+.dashboard-ojt-progress-bar {
+  border-radius: 0 2px 2px 0;
+}
+
+.settings-tab {
+  border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+}
+
+.mobile-tab-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:root[data-theme="light"] .content {
+  border-color: transparent;
+  background: transparent;
+}
+
+:root[data-theme="light"] .dashboard-ojt-progress-card,
+:root[data-theme="light"] .dashboard-week-card,
+:root[data-theme="light"] .dashboard-identity-strip,
+:root[data-theme="light"] .profile-form,
+:root[data-theme="light"] .week-panel,
+:root[data-theme="light"] .backup-panel,
+:root[data-theme="light"] .summary-card,
+:root[data-theme="light"] .storage-health-card,
+:root[data-theme="light"] .journal-preview-card,
+:root[data-theme="light"] .daily-log-editor-panel {
+  background: var(--color-page);
+}
+
+:root[data-theme="light"] .field input,
+:root[data-theme="light"] .field textarea,
+:root[data-theme="light"] .field select {
+  background: var(--color-shell);
+}
+
+:root[data-theme="light"] .secondary-button {
+  background: var(--color-page);
+}
+
+:root[data-theme="light"] .section-kicker,
+:root[data-theme="light"] .card-label {
+  color: #546526;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .mobile-brand-bar {
+    position: sticky;
+    z-index: 18;
+    top: 0;
+    display: flex;
+    align-items: center;
+    min-height: 64px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: var(--color-canvas);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .mobile-brand-bar .brand-mark {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-brand-bar .brand-copy strong {
+    font-size: 0.96rem;
+    line-height: 1.2;
+  }
+
+  .mobile-brand-bar .brand-copy > span {
+    font-size: 0.68rem;
+  }
+
+  .app-layout {
+    margin-top: 0;
+  }
+
+  .content {
+    border-radius: 0;
+    padding-top: var(--space-5);
+  }
+
+  .mobile-section-tabs {
+    gap: var(--space-1);
+    border-radius: 22px 22px 0 0;
+    padding: 6px 5px calc(6px + var(--mobile-safe-area-bottom));
+  }
+
+  .mobile-tab-button {
+    min-height: 58px;
+    border-radius: var(--radius-pill);
+    padding: 6px 2px;
+  }
+
+  .mobile-tab-button.is-active {
+    border-color: transparent;
+    background: var(--color-state-active);
+  }
+
+  .mobile-tab-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 0;
+  }
+
+  .dashboard-ojt-progress-card,
+  .dashboard-week-card,
+  .dashboard-identity-strip,
+  .profile-form,
+  .week-panel,
+  .backup-panel,
+  .summary-card,
+  .storage-health-card,
+  .journal-preview-card {
+    border-radius: var(--radius-card);
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-brand-bar .brand-copy > span {
+    display: none;
+  }
+
+  .mobile-tab-button {
+    font-size: 0.66rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .brand-mark-frame,
+  .brand-mark-progress {
+    stroke: CanvasText;
+  }
+
+  .mobile-brand-bar {
+    border-color: CanvasText;
+  }
+}

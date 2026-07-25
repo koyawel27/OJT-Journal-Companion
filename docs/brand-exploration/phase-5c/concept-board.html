@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 5C-1 Brand Mark Concept Board — OJT Journal Companion</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --vanilla: #f0ead2;
+      --tea: #dde5b6;
+      --olive: #adc178;
+      --copper: #a98467;
+      --ash: #6c584c;
+      --matterhorn: #4e3c3b;
+      --cameo: #d8b99d;
+      --siam: #5c5f4f;
+      --tundora: #474747;
+      --mine: #292929;
+      --paper: #fffdf6;
+      --ink: #302825;
+      --rule: rgba(108, 88, 76, 0.24);
+      --shadow: 0 12px 34px rgba(76, 58, 50, 0.09);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--vanilla);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--ash);
+      text-underline-offset: 0.18em;
+    }
+
+    a:focus-visible {
+      outline: 3px solid var(--ash);
+      outline-offset: 4px;
+      border-radius: 0.2rem;
+    }
+
+    .sheet {
+      width: min(calc(100% - 2rem), 74rem);
+      margin: 1rem auto 4rem;
+      background: var(--paper);
+      border: 1px solid var(--copper);
+      border-radius: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .board-header {
+      position: relative;
+      padding: clamp(1.5rem, 5vw, 4.5rem);
+      border-bottom: 1px solid var(--rule);
+      overflow: hidden;
+    }
+
+    .board-header::after {
+      content: "";
+      position: absolute;
+      right: clamp(1.5rem, 8vw, 6rem);
+      bottom: 2.25rem;
+      width: clamp(5rem, 18vw, 12rem);
+      height: 2.5rem;
+      border-bottom: 3px solid var(--olive);
+      border-radius: 0 0 70% 0;
+      transform: rotate(-5deg);
+      transform-origin: right bottom;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .sample-label,
+    .concept-code {
+      margin: 0;
+      color: var(--ash);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      overflow-wrap: anywhere;
+    }
+
+    h1 {
+      max-width: 16ch;
+      margin: 0.5rem 0 1rem;
+      font-size: clamp(2.2rem, 7vw, 5.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    h2 {
+      margin: 0.35rem 0 0.75rem;
+      color: var(--matterhorn);
+      font-size: clamp(1.55rem, 4vw, 2.45rem);
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+    }
+
+    h3 {
+      margin: 0.2rem 0 0.35rem;
+      color: var(--matterhorn);
+      font-size: 1.05rem;
+      line-height: 1.25;
+    }
+
+    .lede {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--ash);
+      font-size: clamp(1rem, 2.3vw, 1.25rem);
+    }
+
+    .status-note {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.7rem;
+      margin-top: 1.5rem;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--copper);
+      border-radius: 0.55rem;
+      background: var(--vanilla);
+      color: var(--ash);
+      font-weight: 650;
+    }
+
+    .board-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.1rem;
+      padding: 1rem clamp(1.5rem, 5vw, 4.5rem);
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .board-section {
+      padding: clamp(2.25rem, 6vw, 5rem) clamp(1rem, 5vw, 4.5rem);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .board-section:last-child {
+      border-bottom: 0;
+    }
+
+    .section-intro {
+      max-width: 66ch;
+      margin: 0 0 1.6rem;
+      color: var(--ash);
+    }
+
+    .concept-grid,
+    .treatment-grid,
+    .identity-grid,
+    .silhouette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+      gap: 1rem;
+    }
+
+    .master-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .concept-card,
+    .treatment-card,
+    .size-card,
+    .identity-card,
+    .master-card {
+      min-width: 0;
+      border: 1px solid var(--rule);
+      border-radius: 0.85rem;
+      background: #fff;
+    }
+
+    .concept-card {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .concept-stage {
+      display: grid;
+      min-height: 13rem;
+      place-items: center;
+      padding: 1.5rem;
+      background: var(--vanilla);
+    }
+
+    .concept-caption {
+      padding: 1rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .concept-caption p:last-child {
+      margin: 0.45rem 0 0;
+      color: var(--ash);
+      font-size: 0.9rem;
+    }
+
+    .mark {
+      display: block;
+      width: var(--mark-size, 8rem);
+      height: var(--mark-size, 8rem);
+      max-width: 100%;
+      flex: 0 0 auto;
+      color: var(--mark-primary, currentColor);
+    }
+
+    .mark-primary {
+      color: var(--mark-primary, currentColor);
+    }
+
+    .mark-progress {
+      color: var(--mark-accent, var(--mark-primary, currentColor));
+    }
+
+    .treatment-card {
+      overflow: hidden;
+    }
+
+    .treatment-card > h3 {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .paired-stages {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .treatment-stage,
+    .silhouette-stage {
+      display: grid;
+      min-width: 0;
+      min-height: 10rem;
+      place-items: center;
+      padding: 1rem;
+    }
+
+    .treatment-stage + .treatment-stage {
+      border-left: 1px solid var(--rule);
+    }
+
+    .sample-label {
+      align-self: end;
+      margin-top: 0.65rem;
+      text-align: center;
+    }
+
+    .mono-light {
+      --mark-primary: #26211f;
+      --mark-accent: #26211f;
+      background: #fff;
+    }
+
+    .mono-dark {
+      --mark-primary: #fff;
+      --mark-accent: #fff;
+      background: #242424;
+      color: #fff;
+    }
+
+    .light-cream {
+      --mark-primary: var(--ash);
+      --mark-accent: var(--olive);
+      background: var(--vanilla);
+    }
+
+    .light-tea {
+      --mark-primary: var(--ash);
+      --mark-accent: var(--olive);
+      background: var(--tea);
+    }
+
+    .dark-mine {
+      --mark-primary: var(--vanilla);
+      --mark-accent: var(--cameo);
+      background: var(--mine);
+      color: var(--vanilla);
+    }
+
+    .dark-matterhorn {
+      --mark-primary: var(--vanilla);
+      --mark-accent: var(--cameo);
+      background: var(--matterhorn);
+      color: var(--vanilla);
+    }
+
+    .mono-dark .sample-label,
+    .dark-mine .sample-label,
+    .dark-matterhorn .sample-label {
+      color: var(--vanilla);
+    }
+
+    .size-card {
+      margin-top: 1.5rem;
+      padding: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .size-samples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .size-sample {
+      display: grid;
+      min-height: 9rem;
+      place-items: center;
+      align-content: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border: 1px solid var(--rule);
+      border-radius: 0.65rem;
+      background: var(--vanilla);
+      --mark-primary: var(--ash);
+      --mark-accent: var(--ash);
+    }
+
+    .size-value {
+      color: var(--ash);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .silhouette-stage {
+      min-height: 13rem;
+      border: 1px solid #d4d4d4;
+      background: #fff;
+      --mark-primary: #000;
+      --mark-accent: #000;
+    }
+
+    .identity-card {
+      display: flex;
+      min-height: 11rem;
+      align-items: center;
+      gap: clamp(0.9rem, 3vw, 1.5rem);
+      padding: clamp(1rem, 4vw, 2rem);
+    }
+
+    .identity-card.dark-mine {
+      border-color: var(--tundora);
+    }
+
+    .identity-name {
+      margin: 0;
+      font-size: clamp(1.15rem, 3vw, 1.65rem);
+      font-weight: 750;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+    }
+
+    .identity-tagline {
+      margin: 0.45rem 0 0;
+      color: inherit;
+      font-size: 0.9rem;
+      opacity: 0.82;
+    }
+
+    .master-card {
+      display: grid;
+      margin-top: 1.5rem;
+      place-items: center;
+      padding: clamp(1rem, 3vw, 2rem);
+      background: var(--vanilla);
+      --mark-primary: var(--ash);
+      --mark-accent: var(--ash);
+    }
+
+    .master-card .mark {
+      width: min(32rem, 100%);
+      height: auto;
+      aspect-ratio: 1;
+    }
+
+    .master-caption {
+      margin: 1rem 0 0;
+      color: var(--ash);
+      text-align: center;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 36rem) {
+      .sheet {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .board-header::after {
+        width: 5rem;
+        bottom: 1.25rem;
+      }
+
+      .paired-stages {
+        grid-template-columns: 1fr;
+      }
+
+      .treatment-stage + .treatment-stage {
+        border-top: 1px solid var(--rule);
+        border-left: 0;
+      }
+
+      .identity-card {
+        align-items: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .sheet,
+      .concept-card,
+      .treatment-card,
+      .size-card,
+      .identity-card,
+      .master-card,
+      .size-sample,
+      .silhouette-stage {
+        border: 1px solid CanvasText;
+      }
+
+      .mark-primary,
+      .mark-progress {
+        color: CanvasText;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <header class="board-header">
+      <p class="eyebrow">Phase 5C-1 · Concept exploration only</p>
+      <h1>Four ways to draw quiet progress.</h1>
+      <p class="lede">OJT Journal Companion is a work journal first. Each mark begins with an organized page and lets growth appear as a restrained continuation—not an arrow, score, or achievement badge.</p>
+      <p class="status-note"><span>No final mark selected.</span><span>No production asset approved.</span></p>
+    </header>
+
+    <nav class="board-nav" aria-label="Concept board sections">
+      <a href="#overview">Overview</a>
+      <a href="#monochrome">Monochrome</a>
+      <a href="#light-treatment">Light</a>
+      <a href="#dark-treatment">Dark</a>
+      <a href="#size-matrix">Sizes</a>
+      <a href="#silhouette">Silhouette</a>
+      <a href="#identity">Identity</a>
+      <a href="#master">512px master</a>
+    </nav>
+
+    <section class="board-section" id="overview" aria-labelledby="overview-heading">
+      <p class="section-kicker">01 · Overview</p>
+      <h2 id="overview-heading">Same premise, four different structures</h2>
+      <p class="section-intro">The page carries the Work Journal meaning. The line, path, or endpoint carries the quieter Growth Journey meaning. All examples below use one color so silhouette and proportion do the work first.</p>
+      <div class="concept-grid">
+        <figure class="concept-card">
+          <div class="concept-stage mono-light">
+            <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept A Rising Rule, monochrome preview">
+              <use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use>
+              <use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use>
+            </svg>
+          </div>
+          <figcaption class="concept-caption"><p class="concept-code">Concept A</p><h3>Rising Rule</h3><p>One journal rule becomes the progress cue, keeping the two ideas visually inseparable.</p></figcaption>
+        </figure>
+        <figure class="concept-card">
+          <div class="concept-stage mono-light">
+            <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept B Guided Path, monochrome preview">
+              <use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use>
+              <use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use>
+            </svg>
+          </div>
+          <figcaption class="concept-caption"><p class="concept-code">Concept B</p><h3>Guided Path</h3><p>A margin and staggered entries organize the page while one line moves thoughtfully through it.</p></figcaption>
+        </figure>
+        <figure class="concept-card">
+          <div class="concept-stage mono-light">
+            <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept C Progress Milestone, monochrome preview">
+              <use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use>
+              <use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use>
+            </svg>
+          </div>
+          <figcaption class="concept-caption"><p class="concept-code">Concept C</p><h3>Progress Milestone</h3><p>A terminal dot makes accumulated progress more explicit without changing the dominant page.</p></figcaption>
+        </figure>
+        <figure class="concept-card">
+          <div class="concept-stage mono-light">
+            <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept D Page Corner Milestone, monochrome preview">
+              <use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use>
+              <use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use>
+            </svg>
+          </div>
+          <figcaption class="concept-caption"><p class="concept-code">Concept D</p><h3>Page Corner Milestone</h3><p>The fallback prioritizes a compact folded-page silhouette and removes detailed journal ruling.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="board-section" id="monochrome" aria-labelledby="monochrome-heading">
+      <p class="section-kicker">02 · Monochrome</p>
+      <h2 id="monochrome-heading">No color required</h2>
+      <p class="section-intro">Each concept is shown as a single dark mark on light and a single light mark on dark. The progress cue does not depend on an accent.</p>
+      <div class="treatment-grid">
+        <article class="treatment-card"><h3>Concept A · Rising Rule</h3><div class="paired-stages">
+          <div class="treatment-stage mono-light"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Dark on light</p></div></div>
+          <div class="treatment-stage mono-dark"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Light on dark</p></div></div>
+        </div></article>
+        <article class="treatment-card"><h3>Concept B · Guided Path</h3><div class="paired-stages">
+          <div class="treatment-stage mono-light"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Dark on light</p></div></div>
+          <div class="treatment-stage mono-dark"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Light on dark</p></div></div>
+        </div></article>
+        <article class="treatment-card"><h3>Concept C · Progress Milestone</h3><div class="paired-stages">
+          <div class="treatment-stage mono-light"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Dark on light</p></div></div>
+          <div class="treatment-stage mono-dark"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Light on dark</p></div></div>
+        </div></article>
+        <article class="treatment-card"><h3>Concept D · Page Corner Milestone</h3><div class="paired-stages">
+          <div class="treatment-stage mono-light"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Dark on light</p></div></div>
+          <div class="treatment-stage mono-dark"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Light on dark</p></div></div>
+        </div></article>
+      </div>
+    </section>
+
+    <section class="board-section" id="light-treatment" aria-labelledby="light-heading">
+      <p class="section-kicker">03 · Light treatment</p>
+      <h2 id="light-heading">Warm structure, restrained olive progress</h2>
+      <p class="section-intro">Ash Brown carries the page. Muted Olive is limited to the nonessential progress cue. Every concept remains readable when that accent is removed.</p>
+      <div class="treatment-grid">
+        <article class="treatment-card"><h3>Concept A</h3><div class="paired-stages"><div class="treatment-stage light-cream"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Vanilla Cream</p></div></div><div class="treatment-stage light-tea"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Tea Green</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept B</h3><div class="paired-stages"><div class="treatment-stage light-cream"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Vanilla Cream</p></div></div><div class="treatment-stage light-tea"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Tea Green</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept C</h3><div class="paired-stages"><div class="treatment-stage light-cream"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Vanilla Cream</p></div></div><div class="treatment-stage light-tea"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Tea Green</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept D</h3><div class="paired-stages"><div class="treatment-stage light-cream"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Vanilla Cream</p></div></div><div class="treatment-stage light-tea"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Tea Green</p></div></div></div></article>
+      </div>
+    </section>
+
+    <section class="board-section" id="dark-treatment" aria-labelledby="dark-heading">
+      <p class="section-kicker">04 · Dark treatment</p>
+      <h2 id="dark-heading">Cream page, quiet Cameo progress</h2>
+      <p class="section-intro">Vanilla Cream carries the page on Mine Shaft and Matterhorn. Cameo remains a decorative accent only; it does not carry text or essential meaning.</p>
+      <div class="treatment-grid">
+        <article class="treatment-card"><h3>Concept A</h3><div class="paired-stages"><div class="treatment-stage dark-mine"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Mine Shaft</p></div></div><div class="treatment-stage dark-matterhorn"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><p class="sample-label">Matterhorn</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept B</h3><div class="paired-stages"><div class="treatment-stage dark-mine"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Mine Shaft</p></div></div><div class="treatment-stage dark-matterhorn"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><p class="sample-label">Matterhorn</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept C</h3><div class="paired-stages"><div class="treatment-stage dark-mine"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Mine Shaft</p></div></div><div class="treatment-stage dark-matterhorn"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><p class="sample-label">Matterhorn</p></div></div></div></article>
+        <article class="treatment-card"><h3>Concept D</h3><div class="paired-stages"><div class="treatment-stage dark-mine"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Mine Shaft</p></div></div><div class="treatment-stage dark-matterhorn"><div><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><p class="sample-label">Matterhorn</p></div></div></div></article>
+      </div>
+    </section>
+
+    <section class="board-section" id="size-matrix" aria-labelledby="sizes-heading">
+      <p class="section-kicker">05 · Size matrix</p>
+      <h2 id="sizes-heading">UI-scale proof</h2>
+      <p class="section-intro">The 16px samples use optically simplified fragments from the same SVG source: fewer rules, a wider stroke, and a slightly stronger progress cue. Other sizes use the master geometry.</p>
+
+      <article class="size-card"><h3>Concept A · Rising Rule</h3><div class="size-samples">
+        <div class="size-sample"><svg class="mark" style="--mark-size:16px" viewBox="0 0 64 64" aria-label="Concept A at 16 pixels"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-small-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-small-progress"></use></svg><span class="size-value">16px · simplified</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:24px" viewBox="0 0 64 64" aria-label="Concept A at 24 pixels"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><span class="size-value">24px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:32px" viewBox="0 0 64 64" aria-label="Concept A at 32 pixels"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><span class="size-value">32px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:48px" viewBox="0 0 64 64" aria-label="Concept A at 48 pixels"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><span class="size-value">48px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:128px" viewBox="0 0 64 64" aria-label="Concept A at 128 pixels"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><span class="size-value">128px</span></div>
+      </div></article>
+
+      <article class="size-card"><h3>Concept B · Guided Path</h3><div class="size-samples">
+        <div class="size-sample"><svg class="mark" style="--mark-size:16px" viewBox="0 0 64 64" aria-label="Concept B at 16 pixels"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-small-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-small-progress"></use></svg><span class="size-value">16px · simplified</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:24px" viewBox="0 0 64 64" aria-label="Concept B at 24 pixels"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><span class="size-value">24px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:32px" viewBox="0 0 64 64" aria-label="Concept B at 32 pixels"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><span class="size-value">32px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:48px" viewBox="0 0 64 64" aria-label="Concept B at 48 pixels"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><span class="size-value">48px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:128px" viewBox="0 0 64 64" aria-label="Concept B at 128 pixels"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><span class="size-value">128px</span></div>
+      </div></article>
+
+      <article class="size-card"><h3>Concept C · Progress Milestone</h3><div class="size-samples">
+        <div class="size-sample"><svg class="mark" style="--mark-size:16px" viewBox="0 0 64 64" aria-label="Concept C at 16 pixels"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-small-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-small-progress"></use></svg><span class="size-value">16px · simplified</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:24px" viewBox="0 0 64 64" aria-label="Concept C at 24 pixels"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><span class="size-value">24px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:32px" viewBox="0 0 64 64" aria-label="Concept C at 32 pixels"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><span class="size-value">32px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:48px" viewBox="0 0 64 64" aria-label="Concept C at 48 pixels"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><span class="size-value">48px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:128px" viewBox="0 0 64 64" aria-label="Concept C at 128 pixels"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><span class="size-value">128px</span></div>
+      </div></article>
+
+      <article class="size-card"><h3>Concept D · Page Corner Milestone</h3><div class="size-samples">
+        <div class="size-sample"><svg class="mark" style="--mark-size:16px" viewBox="0 0 64 64" aria-label="Concept D at 16 pixels"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-small-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-small-progress"></use></svg><span class="size-value">16px · simplified</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:24px" viewBox="0 0 64 64" aria-label="Concept D at 24 pixels"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><span class="size-value">24px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:32px" viewBox="0 0 64 64" aria-label="Concept D at 32 pixels"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><span class="size-value">32px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:48px" viewBox="0 0 64 64" aria-label="Concept D at 48 pixels"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><span class="size-value">48px</span></div>
+        <div class="size-sample"><svg class="mark" style="--mark-size:128px" viewBox="0 0 64 64" aria-label="Concept D at 128 pixels"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><span class="size-value">128px</span></div>
+      </div></article>
+    </section>
+
+    <section class="board-section" id="silhouette" aria-labelledby="silhouette-heading">
+      <p class="section-kicker">06 · Silhouette check</p>
+      <h2 id="silhouette-heading">One color. Nothing helping.</h2>
+      <p class="section-intro">Pure black marks on plain white. There is no accent, texture, shadow, or adjacent explanation inside the check.</p>
+      <div class="silhouette-grid">
+        <figure class="silhouette-stage" aria-label="Concept A one-color silhouette"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg></figure>
+        <figure class="silhouette-stage" aria-label="Concept B one-color silhouette"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg></figure>
+        <figure class="silhouette-stage" aria-label="Concept C one-color silhouette"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg></figure>
+        <figure class="silhouette-stage" aria-label="Concept D one-color silhouette"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg></figure>
+      </div>
+    </section>
+
+    <section class="board-section" id="identity" aria-labelledby="identity-heading">
+      <p class="section-kicker">07 · Full identity preview</p>
+      <h2 id="identity-heading">The mark beside the official name</h2>
+      <p class="section-intro">Live system-font text only. The tagline appears at documentation scale and is intentionally absent from compact size tests.</p>
+      <div class="identity-grid">
+        <article class="identity-card light-cream" aria-label="Concept A full identity preview"><svg class="mark" style="--mark-size:64px" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use><use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use></svg><div><p class="identity-name">OJT Journal Companion</p><p class="identity-tagline">Record the work. Reflect on the journey.</p></div></article>
+        <article class="identity-card dark-mine" aria-label="Concept B full identity preview"><svg class="mark" style="--mark-size:64px" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use><use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use></svg><div><p class="identity-name">OJT Journal Companion</p><p class="identity-tagline">Record the work. Reflect on the journey.</p></div></article>
+        <article class="identity-card light-cream" aria-label="Concept C full identity preview"><svg class="mark" style="--mark-size:64px" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use><use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use></svg><div><p class="identity-name">OJT Journal Companion</p><p class="identity-tagline">Record the work. Reflect on the journey.</p></div></article>
+        <article class="identity-card dark-mine" aria-label="Concept D full identity preview"><svg class="mark" style="--mark-size:64px" viewBox="0 0 64 64" aria-hidden="true"><use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use><use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use></svg><div><p class="identity-name">OJT Journal Companion</p><p class="identity-tagline">Record the work. Reflect on the journey.</p></div></article>
+      </div>
+    </section>
+
+    <section class="board-section" id="master" aria-labelledby="master-heading">
+      <p class="section-kicker">08 · 512px master preview</p>
+      <h2 id="master-heading">Geometry under a larger lens</h2>
+      <p class="section-intro">Each concept is shown at a 512px source view on wide screens. A master scales down only when its grid cell or the viewport cannot contain it, preserving narrow-screen usability.</p>
+      <div class="master-grid">
+        <figure class="master-card">
+          <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept A Rising Rule at 512 pixel master size">
+            <use class="mark-primary" href="concept-a-rising-rule.svg#concept-a-frame"></use>
+            <use class="mark-progress" href="concept-a-rising-rule.svg#concept-a-progress"></use>
+          </svg>
+          <figcaption class="master-caption">Concept A · Rising Rule · 512px source view</figcaption>
+        </figure>
+        <figure class="master-card">
+          <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept B Guided Path at 512 pixel master size">
+            <use class="mark-primary" href="concept-b-guided-path.svg#concept-b-frame"></use>
+            <use class="mark-progress" href="concept-b-guided-path.svg#concept-b-progress"></use>
+          </svg>
+          <figcaption class="master-caption">Concept B · Guided Path · 512px source view</figcaption>
+        </figure>
+        <figure class="master-card">
+          <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept C Progress Milestone at 512 pixel master size">
+            <use class="mark-primary" href="concept-c-progress-milestone.svg#concept-c-frame"></use>
+            <use class="mark-progress" href="concept-c-progress-milestone.svg#concept-c-progress"></use>
+          </svg>
+          <figcaption class="master-caption">Concept C · Progress Milestone · 512px source view</figcaption>
+        </figure>
+        <figure class="master-card">
+          <svg class="mark" viewBox="0 0 64 64" role="img" aria-label="Concept D Page Corner Milestone at 512 pixel master size">
+            <use class="mark-primary" href="concept-d-page-corner-milestone.svg#concept-d-frame"></use>
+            <use class="mark-progress" href="concept-d-page-corner-milestone.svg#concept-d-progress"></use>
+          </svg>
+          <figcaption class="master-caption">Concept D · Page Corner Milestone · 512px source view</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -10,21 +10,29 @@ Phase 3 — Data and Recovery Hardening: Complete
 Phase 4 — Accessible Responsive Visual Redesign: Complete
 Phase 5A — Brand Discovery and Current Identity Audit: Complete
 Phase 5B — Brand Strategy and Visual Direction: Complete
+Phase 5C — Logo, Brand Mark, and Icon Asset Exploration: Complete
+Phase 5D — Brand Integration Across the App: Initial integration complete; high-fidelity Stitch screen translation planned
+Phase 5E — Regression, Documentation, and Closeout: Waiting for the revised Phase 5D screen translation
 
-Phase 4 implementation and regression work are complete. Phase 5A and Phase 5B are complete. Brand strategy is approved and docs/BRAND_GUIDELINES.md is the approved brand source of truth. No application branding has been implemented; asset exploration and review come before application integration.
+The Stitch Warm Journal direction is selected as a production refinement of Concept A. Local SVG mark and favicon assets, the full product lockup and tagline, shared SVG navigation icons, Warm Journal Light tokens, and the restrained component layer are integrated. `docs/BRAND_GUIDELINES.md` and `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md` control the result.
 
-The active branch is feature/brand-architecture. The latest tagged stable release remains v1.1. Phase 4 and Phase 5 brand work are post-v1.1 roadmap work and have not created a release or tag. No v1.2 release is implied.
+The project owner has clarified that Stitch should be the visual source of truth rather than only a brand reference. The next implementation priority is a faithful translation of the uploaded Stitch Journal and Daily Log Editor while preserving the application's real persistence, validation, photo, backup, accessibility, preview, and DOCX behavior. See `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md`.
+
+The active branch is `feature/brand-architecture`. The latest tagged stable release remains v1.1. Phase 4 is merged into master; Phase 5 brand work remains post-v1.1 roadmap work and has not created a release or tag. No v1.2 release is implied.
 
 ## Immediate repository sequence
 
 ~~~text
-review documentation diff
-→ commit documentation
-→ merge feature branch into master
-→ verify master
+inspect the uploaded Stitch package and the scoped integration plan
+→ implement and review the faithful Journal translation
+→ implement and review the faithful Daily Log Editor translation
+→ extend the accepted component system to the remaining screens
+→ verify responsive Light, Dark, and System appearance
+→ run focused workflow and accessibility regression
+→ close Phase 5 and prepare the Phase 6 branch
 ~~~
 
-Do not merge or tag as part of the documentation synchronization task.
+Do not merge, tag, or release until the revised Phase 5D translation and the browser-based Phase 5E visual and interaction checks are completed.
 
 ## Runtime architecture
 
@@ -99,13 +107,13 @@ Browser storage can be cleared or lost. JSON backup is the portable recovery pat
 
 ## Verification and protected behavior
 
-The safety patch is committed as c89d5a6 (fix: escape restored IDs in daily log markup). The accepted application boundaries remain unchanged for Dashboard, Journal, Daily Log editing, photos, Weekly Summary, Preview & Export, Copy Weekly Journal, Official DOCX Export, Settings, backup/restore, Storage Health, reset, appearance, and responsive navigation.
+The safety patch is committed as c89d5a6 (fix: escape restored IDs in daily log markup). The accepted application boundaries remain unchanged for Dashboard, Journal, Daily Log editing, photos, Weekly Summary, Preview & Export, Copy Weekly Journal, Official DOCX Export, Settings, backup/restore, Storage Health, reset, appearance, and responsive navigation. JavaScript syntax, SVG XML, CSS structure, navigation targets, localhost asset serving, protected DB/backup versions, and the no-remote-brand-dependency scan pass. The in-app browser connection remains blocked by the local Windows sandbox, so rendered visual and interaction regression is still required.
 
 ## Next phase
 
-**Phase 5C — Logo, Brand Mark, and Icon Asset Exploration**
+**Phase 5E — Regression, Documentation, and Closeout**
 
-Phase 5B is complete. docs/BRAND_GUIDELINES.md is the approved brand source of truth. Phase 5C is the next planned phase and is not started. Asset exploration and review come before application integration; no application branding, logo, favicon, icon set, or other brand asset exists yet. Generic or authorized brand direction must remain source-driven and require explicit permission before any institutional identity is introduced.
+Complete rendered desktop/mobile review at the accepted breakpoints, confirm Light/Dark/System behavior and small-size mark clarity, exercise keyboard focus and the four navigation destinations, and rerun focused core workflows before closing Phase 5. No database, backup, DOCX, or deployment change belongs in this gate.
 
 ## Historical documents
 

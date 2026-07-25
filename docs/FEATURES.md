@@ -2,7 +2,7 @@
 
 ## Current status
 
-The latest tagged stable release is **v1.1**. Phase 4 — Accessible Responsive Visual Redesign is complete post-v1.1 roadmap work on feature/accessible-responsive-redesign; it is not a new release or tag. No v1.2 release is implied.
+The latest tagged stable release is **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected and integrated the Stitch Warm Journal direction on `feature/brand-architecture`; Phase 5E visual regression and closeout remain. It is not a new release or tag. No v1.2 release is implied.
 
 The app is a local, offline-first companion for one student on one browser/device. It has no account/login, backend, cloud sync, online submission, coordinator/admin dashboard, or formal accessibility certification.
 
@@ -14,6 +14,7 @@ The app is a local, offline-first companion for one student on one browser/devic
 - Mobile fixed bottom navigation with exactly Dashboard, Journal, Preview & Export, and Settings.
 - Safe-area support and responsive desktop, tablet, and mobile layouts.
 - The mobile drawer navigation is not part of the current interface.
+- Local full-name brand lockups, official tagline, scalable SVG mark/favicon, and one shared local SVG navigation family with no remote brand dependency.
 
 ### Journal and dashboard
 

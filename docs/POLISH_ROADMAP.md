@@ -1,4 +1,4 @@
-﻿# OJT Journal Companion Post-v1.1 Roadmap
+# OJT Journal Companion Post-v1.1 Roadmap
 
 ## 1. Document Purpose
 
@@ -59,7 +59,7 @@ These decisions are approved and must not be reopened unless the current code re
 | 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | Additive optional metadata fields on existing PhotoAttachment records; no new object store, IndexedDB version increase, migration, or backup-version increase | Phase 1 | Batch upload/export acceptance | Complete |
 | 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Complete |
 | 4 | Accessible Responsive Visual Redesign | Apply the accessible responsive shell and visual system. | None | Phases 1-3 | Accessibility/responsive acceptance | Complete |
-| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Current: Phase 5C next |
+| 5 | Brand Architecture | Make identity configurable; apply authorized assets only. | Config/settings only if reviewed | Phase 4 and asset permission | Identity approval or generic fallback | Current: Phase 5D high-fidelity Stitch translation planned |
 | 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3â€“5 | Hosted/PWA readiness | Planned |
 | 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
 | 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance | Planned |
@@ -227,7 +227,7 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 ### Phase 5 â€” Brand Architecture
 
-**Current status:** Phase 5A - Brand Discovery and Current Identity Audit is complete. Phase 5B - Brand Strategy and Visual Direction is complete. Brand strategy is approved and docs/BRAND_GUIDELINES.md is the source of truth. The official name, tagline, Work Journal + Growth Journey direction, 70/30 balance, symbol, color, typography, icon, placement, accessibility, DOCX, backup, institutional, and offline boundaries are documented. Visual assets remain unfinished and belong to Phase 5C. Phase 5C - Logo, Brand Mark, and Icon Asset Exploration is next/not started; Phase 5D - Brand Integration Across the App and Phase 5E - Regression, Documentation, and Closeout remain later/not started. No application branding has been implemented.
+**Current status:** Phase 5A and Phase 5B are complete. Phase 5C selected the Stitch Warm Journal direction as a refinement of Concept A and prepared local scalable brand-mark and favicon assets. The initial Phase 5D pass integrated the full product lockup, tagline, shared SVG navigation family, Warm Journal Light tokens, and restrained page/card treatment without changing application JavaScript, data, backup, DOCX, or deployment behavior. The project owner then reopened Phase 5D for a higher-fidelity translation of the uploaded Stitch frontend, beginning with Journal and Daily Log Editor. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` controls that scoped translation. Phase 5E regression and closeout must follow it. Structural, syntax, local-serving, asset, and offline-dependency checks for the initial pass succeeded; browser-based visual and interaction review remains blocked by the local Windows browser sandbox.
 
 **Objective:** Make identity configurable while retaining a safe generic open-source default.
 
@@ -401,7 +401,7 @@ Only these remain unresolved:
 ## 11. Roadmap Change Control
 
 - v1.1 remains the stable rollback/regression baseline.
-- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation, Phase 3 Data and Recovery Hardening, and Phase 4 Accessible Responsive Visual Redesign are complete post-v1.1 roadmap work. **Phase 5 - Brand Architecture is the next planned phase.**
+- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation, Phase 3 Data and Recovery Hardening, and Phase 4 Accessible Responsive Visual Redesign are complete post-v1.1 roadmap work. **Phase 5 - Brand Architecture is current; Phase 5E regression and closeout remain before merge.**
 - Review phase scope, current code, likely files, risks, and tests before coding.
 - Data-model phases require explicit IndexedDB migration, backup-version, restore-compatibility, and rollback/recovery review.
 - Keep changes phase-scoped; do not combine opportunistic framework/platform work.

@@ -141,26 +141,26 @@
   color-scheme: light;
 
   /* Phase 4E-1B: warm journal light palette. */
-  --color-canvas: #f0ead2;
-  --color-shell: #f8f5e8;
-  --color-page: #fffdf7;
-  --color-card: #fffdf7;
-  --color-inset: #dde5b6;
-  --color-modal: #fffdf7;
+  --color-canvas: #fff8f5;
+  --color-shell: #fff1e9;
+  --color-page: #ffffff;
+  --color-card: #fffdfb;
+  --color-inset: #f1dfd3;
+  --color-modal: #ffffff;
   --color-overlay: rgba(63, 52, 44, 0.52);
-  --color-text-primary: #3f342c;
-  --color-text-secondary: #6c584c;
-  --color-text-muted: #6c584c;
-  --color-text-inverse: #fffdf7;
-  --color-text-interactive: #45372f;
-  --color-border-default: #a98467;
-  --color-border-subtle: #e5ddc5;
-  --color-border-strong: #8d7059;
-  --color-border-interactive: #6c584c;
-  --color-state-hover: #f1ebdc;
-  --color-state-active: rgba(173, 193, 120, 0.3);
-  --color-focus-ring: #7c4f00;
-  --color-progress-fill: #adc178;
+  --color-text-primary: #231a13;
+  --color-text-secondary: #4e453f;
+  --color-text-muted: #6e625c;
+  --color-text-inverse: #fff8f5;
+  --color-text-interactive: #534136;
+  --color-border-default: #80756f;
+  --color-border-subtle: #d2c4bc;
+  --color-border-strong: #6c584c;
+  --color-border-interactive: #546526;
+  --color-state-hover: #f7e5d9;
+  --color-state-active: rgba(211, 232, 155, 0.52);
+  --color-focus-ring: #546526;
+  --color-progress-fill: #546526;
   --color-status-success: #22663a;
   --color-status-success-bg: #e5f2e8;
   --color-status-success-border: #72a482;
@@ -173,18 +173,18 @@
   --color-status-info: #245b86;
   --color-status-info-bg: #e6f0f8;
   --color-status-info-border: #7fa7c7;
-  --shadow-card: 0 8px 24px rgba(108, 88, 76, 0.14);
-  --shadow-modal: 0 18px 52px rgba(63, 52, 44, 0.24);
-  --shadow-mobile-nav: 0 -12px 28px rgba(63, 52, 44, 0.18);
+  --shadow-card: 0 2px 4px rgba(63, 52, 44, 0.06);
+  --shadow-modal: 0 8px 16px rgba(63, 52, 44, 0.12);
+  --shadow-mobile-nav: 0 -4px 16px rgba(63, 52, 44, 0.14);
   --color-status-danger-bg-strong: #f5d4d4;
-  --accent-deep: #3f342c;
-  --accent-muted: rgba(169, 132, 103, 0.42);
-  --shadow-sm: 0 2px 8px rgba(108, 88, 76, 0.08);
+  --accent-deep: #3f2f26;
+  --accent-muted: rgba(169, 132, 103, 0.34);
+  --shadow-sm: 0 2px 4px rgba(63, 52, 44, 0.05);
 }
 
 :root[data-theme="light"] .sidebar {
-  border-color: #a98467;
-  background: #6c584c;
+  border-color: #6c584c;
+  background: #534136;
   color: #f0ead2;
 }
 
@@ -193,24 +193,24 @@
 }
 
 :root[data-theme="light"] .sidebar .nav-icon {
-  background: rgba(221, 229, 182, 0.16);
-  color: #dde5b6;
+  background: rgba(211, 232, 155, 0.16);
+  color: #d3e89b;
 }
 
 :root[data-theme="light"] .sidebar .nav-button:hover {
-  border-color: rgba(221, 229, 182, 0.58);
-  background: rgba(221, 229, 182, 0.16);
+  border-color: rgba(211, 232, 155, 0.58);
+  background: rgba(211, 232, 155, 0.16);
 }
 
 :root[data-theme="light"] .sidebar .nav-button.is-active {
-  border-color: #dde5b6;
-  background: #dde5b6;
-  color: #45372f;
+  border-color: #d3e89b;
+  background: #d3e89b;
+  color: #3c4c10;
 }
 
 :root[data-theme="light"] .sidebar .nav-button.is-active .nav-icon {
-  background: #f8f5e8;
-  color: #45372f;
+  background: #fff8f5;
+  color: #3c4c10;
 }
 
 

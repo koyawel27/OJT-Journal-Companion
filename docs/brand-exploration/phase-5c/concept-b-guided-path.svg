@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="concept-b-title">
+  <title id="concept-b-title">Concept B, Guided Path: a journal page with a continuous reflective path through organized entries</title>
+  <defs>
+    <g id="concept-b-small-frame" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="10" y="6" width="44" height="52" rx="7" />
+      <path d="M21 18v30M28 24h17" />
+    </g>
+    <g id="concept-b-small-progress" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 45c7-1 5-8 11-10 6-2 5-8 13-11" />
+    </g>
+  </defs>
+  <g id="concept-b-frame" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="11" y="6" width="42" height="52" rx="6" />
+    <path d="M20 16v32M26 21h19M26 33h13M26 45h8" />
+  </g>
+  <g id="concept-b-progress" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 46c7-1 5-8 11-10 6-2 4-7 9-8 4-1 3-5 7-6" />
+  </g>
+</svg>

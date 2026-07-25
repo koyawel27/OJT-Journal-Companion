@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="favicon-title">
+  <title id="favicon-title">OJT Journal Companion</title>
+  <style>
+    .favicon-frame { stroke: #534136; }
+    .favicon-progress { stroke: #546526; }
+    @media (prefers-color-scheme: dark) {
+      .favicon-frame { stroke: #f0ead2; }
+      .favicon-progress { stroke: #d8b99d; }
+    }
+  </style>
+  <g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+    <rect class="favicon-frame" x="5" y="3" width="22" height="26" rx="4" />
+    <path class="favicon-frame" d="M10 11h12" />
+    <path class="favicon-progress" d="M10 21h5c3 0 4.5-2 6-3.5l2-1.5" />
+  </g>
+</svg>

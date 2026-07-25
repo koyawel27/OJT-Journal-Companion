@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="brand-mark-title brand-mark-description">
+  <title id="brand-mark-title">OJT Journal Companion mark</title>
+  <desc id="brand-mark-description">A structured journal page whose final ruled line rises gently to represent professional growth.</desc>
+  <style>
+    .brand-mark-frame { stroke: #534136; }
+    .brand-mark-progress { stroke: #546526; }
+    @media (prefers-color-scheme: dark) {
+      .brand-mark-frame { stroke: #f0ead2; }
+      .brand-mark-progress { stroke: #d8b99d; }
+    }
+  </style>
+  <g fill="none" stroke-width="3.75" stroke-linecap="round" stroke-linejoin="round">
+    <rect class="brand-mark-frame" x="11" y="6" width="42" height="52" rx="6" />
+    <path class="brand-mark-frame" d="M20 20h25M20 30h25" />
+    <path class="brand-mark-progress" d="M20 42h11c5 0 9-3 12-6 2-2 3-3 4-3" />
+  </g>
+</svg>
