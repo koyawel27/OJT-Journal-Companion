@@ -11,26 +11,31 @@ Phase 4 — Accessible Responsive Visual Redesign: Complete
 Phase 5A — Brand Discovery and Current Identity Audit: Complete
 Phase 5B — Brand Strategy and Visual Direction: Complete
 Phase 5C — Logo, Brand Mark, and Icon Asset Exploration: Complete
-Phase 5D — Brand Integration Across the App: Initial integration complete; high-fidelity Stitch screen translation planned
-Phase 5E — Regression, Documentation, and Closeout: Waiting for the revised Phase 5D screen translation
+Phase 5D — Brand Integration Across the App: Initial integration checkpointed; reopened/in progress for high-fidelity Stitch translation
+Phase 5E — Regression, Documentation, and Closeout: Not started; blocked by revised Phase 5D work and approvals
 
-The Stitch Warm Journal direction is selected as a production refinement of Concept A. Local SVG mark and favicon assets, the full product lockup and tagline, shared SVG navigation icons, Warm Journal Light tokens, and the restrained component layer are integrated. `docs/BRAND_GUIDELINES.md` and `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md` control the result.
+The Stitch Warm Journal direction is selected as a production refinement of Concept A. The initial integration is safely preserved at `d5411e0 chore(brand): checkpoint initial Warm Journal integration`; it is a recovery checkpoint, not Phase 5D completion or visual acceptance. `docs/BRAND_GUIDELINES.md` and `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` control the reopened work.
 
-The project owner has clarified that Stitch should be the visual source of truth rather than only a brand reference. The next implementation priority is a faithful translation of the uploaded Stitch Journal and Daily Log Editor while preserving the application's real persistence, validation, photo, backup, accessibility, preview, and DOCX behavior. See `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md`.
+The project owner has clarified that Stitch controls layout, hierarchy, spacing, geometry, and interaction character rather than serving only as a palette reference. The immediate target is Journal static composition and accessible read-only day summaries. Daily Log Editor translation must not begin until Journal receives visual and functional review plus explicit owner approval. Existing persistence, validation, photo, backup, accessibility, Preview & Export, and DOCX behavior remain authoritative.
 
 The active branch is `feature/brand-architecture`. The latest tagged stable release remains v1.1. Phase 4 is merged into master; Phase 5 brand work remains post-v1.1 roadmap work and has not created a release or tag. No v1.2 release is implied.
 
 ## Immediate repository sequence
 
-~~~text
-inspect the uploaded Stitch package and the scoped integration plan
-→ implement and review the faithful Journal translation
-→ implement and review the faithful Daily Log Editor translation
-→ extend the accepted component system to the remaining screens
-→ verify responsive Light, Dark, and System appearance
-→ run focused workflow and accessibility regression
-→ close Phase 5 and prepare the Phase 6 branch
-~~~
+```text
+Journal static composition
+→ accessible read-only day summaries
+→ Journal visual and functional review
+→ explicit owner approval
+→ Daily Log Editor shell and lifecycle
+→ editor form/task/photo presentation
+→ Editor visual and functional review
+→ explicit owner approval
+→ remaining screens
+→ Phase 5E regression and closeout
+```
+
+Do not begin the editor translation before Journal approval. Do not extend the accepted system to Dashboard, Preview & Export, or Settings before both screen approvals.
 
 Do not merge, tag, or release until the revised Phase 5D translation and the browser-based Phase 5E visual and interaction checks are completed.
 
@@ -41,7 +46,7 @@ Do not merge, tag, or release until the revised Phase 5D translation and the bro
 | App | HTML, CSS, vanilla JavaScript |
 | Storage | IndexedDB version 4 |
 | Backup format | backupVersion = "1.0" |
-| DOCX | Client-side Official DOCX Export with private-first template fallback |
+| DOCX | Client-side `docx-templates` Official DOCX Export with private-first v2 template loading and sanitized v2 fallback |
 | Server requirement | Local/static HTTP for reliable template fetches |
 | Build tooling | None |
 | Product boundary | Offline-first personal app for one student on one browser/device |
@@ -57,7 +62,19 @@ The app has four top-level destinations:
 - **Preview & Export:** responsive browser Preview, Copy Weekly Journal, Official DOCX Export, and correction handoffs.
 - **Settings:** Student Details, Company/OJT Placement, App Preferences, Data & Recovery, Restore Review, and Storage Health.
 
-Desktop uses sidebar navigation. Mobile uses a fixed bottom navigation with exactly the same four destinations and safe-area support. The top Light/Dark quick switch is an appearance control, not a fifth destination.
+Desktop uses sidebar navigation. Mobile uses a fixed bottom navigation with exactly the same four destinations and safe-area support. The top Light/Dark quick switch is an appearance control, not a fifth destination. The checkpointed sticky mobile full-name-plus-tagline header is provisional and may be simplified during Journal translation; the full accessible product name must remain available, and the tagline must not repeat persistently.
+
+## Locked translation contract
+
+- Production identity is `OJT Journal Companion`; production navigation is `Preview & Export`, never the Stitch shorthand or standalone `Export`.
+- Typography remains `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. There is no Google Fonts request or new bundled font dependency.
+- Daily Record headers expose accessible read-only summaries with real status, time, remarks, tasks, and photo summaries. Explicit Open/Create/Edit actions own the full editor; inline expansion is not a second editing workflow.
+- Compact/mobile editor presentation is a rounded bottom sheet; desktop is a contained responsive dialog. Existing dialog semantics, focus trap, initial focus, Escape, inertness, scroll lock, rerender focus, and opener restoration remain authoritative.
+- Exit motion requires one centralized opening/open/closing/removal lifecycle with transition and timeout completion, reduced-motion bypass, error cleanup, and guaranteed inertness/focus restoration.
+- Existing semantic theme tokens own production Dark-mode colors and contrast. Stitch Dark is incomplete and must not be treated as authoritative or produced by mechanically inverting Light.
+- `styles.css` owns tokens, theme-neutral structure, mechanics, accessibility, dialog/sheet behavior, focus, motion, reduced motion, and semantic states. `warm-journal.css` owns the Warm Journal visual skin and non-mechanical brand refinement.
+- `app/assets/brand/brand-mark.svg` is the canonical mark geometry. Inline copies must match it or an explicitly documented approved variant.
+- Photo thumbnails may use temporary object URLs from stored Blobs. Revoke them when replaced, rerendered, closed, or unused; never persist them to IndexedDB, backups, or DOCX payloads.
 
 ## Completed Phase 4 scope
 
@@ -83,6 +100,10 @@ No formal WCAG conformance is claimed, and no permanent institutional branding w
 - DB_VERSION = 4
 - backupVersion = "1.0"
 - Seven IndexedDB object stores: studentProfile, companyProfile, appSettings, ojtWeeks, dailyLogs, dailyTasks, and photoAttachments
+- Existing selected-week architecture remains authoritative
+- Existing photo-set model and metadata remain unchanged
+- Official `docx-templates` engine, private-first v2 path, and sanitized v2 fallback remain unchanged
+- System, Dark, and Light appearance support remains
 - JSON restore remains replace-style, not merge-style
 - One student on one browser/device
 - No cloud sync
@@ -109,11 +130,11 @@ Browser storage can be cleared or lost. JSON backup is the portable recovery pat
 
 The safety patch is committed as c89d5a6 (fix: escape restored IDs in daily log markup). The accepted application boundaries remain unchanged for Dashboard, Journal, Daily Log editing, photos, Weekly Summary, Preview & Export, Copy Weekly Journal, Official DOCX Export, Settings, backup/restore, Storage Health, reset, appearance, and responsive navigation. JavaScript syntax, SVG XML, CSS structure, navigation targets, localhost asset serving, protected DB/backup versions, and the no-remote-brand-dependency scan pass. The in-app browser connection remains blocked by the local Windows sandbox, so rendered visual and interaction regression is still required.
 
-## Next phase
+## Next work
 
-**Phase 5E — Regression, Documentation, and Closeout**
+**Phase 5D — Journal approval gate**
 
-Complete rendered desktop/mobile review at the accepted breakpoints, confirm Light/Dark/System behavior and small-size mark clarity, exercise keyboard focus and the four navigation destinations, and rerun focused core workflows before closing Phase 5. No database, backup, DOCX, or deployment change belongs in this gate.
+Implement only the Journal static composition and accessible read-only Daily Record summaries first. Review Journal visually and functionally, then obtain explicit owner approval before beginning the Daily Log Editor shell or lifecycle. Phase 5E has not started. No database, backup, photo-set, DOCX, deployment, release, or tag change belongs in this gate.
 
 ## Historical documents
 

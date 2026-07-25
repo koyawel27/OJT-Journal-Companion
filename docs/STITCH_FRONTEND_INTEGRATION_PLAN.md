@@ -1,7 +1,7 @@
 # Stitch Frontend Integration Plan and Current-Chat Handoff
 
-Prepared: July 25, 2026  
-Project: OJT Journal Companion  
+Prepared: July 25, 2026
+Project: OJT Journal Companion
 Audience: Project mentor, collaborating agent, and future implementation reviewer
 
 ## 1. Purpose
@@ -29,7 +29,7 @@ The project owner then clarified that the desired result is not merely a brand-i
 
 This is technically feasible. The Stitch package uses Tailwind CSS, remote Google Fonts, Material Symbols, HTML, and small vanilla-JavaScript mock scripts. The existing application is also an HTML/CSS/vanilla-JavaScript application. No framework migration is required.
 
-The correct approach is to treat the Stitch screenshots and design system as the visual source of truth while translating the prototype markup into the working application's existing data, validation, accessibility, backup, photo, and DOCX workflows.
+The correct approach is to treat the Stitch screenshots and design system as the source of truth for layout, hierarchy, spacing, geometry, and interaction character while translating the prototype markup into the working application's existing data, validation, accessibility, backup, photo, and DOCX workflows. Existing semantic theme tokens remain authoritative for production Dark-mode colors and contrast.
 
 ## 3. What happened during this chat
 
@@ -60,7 +60,7 @@ The package contained visual and HTML references for:
 - Journal;
 - Settings;
 - Daily Log Editor;
-- Preview and Export; and
+- Preview & Export; and
 - the Warm Journal design system.
 
 The package showed a consistent visual direction built around warm paper-like surfaces, earth-brown structural colors, olive progress cues, rounded controls, quiet elevation, mobile-first navigation, and short scale/slide interactions.
@@ -114,31 +114,15 @@ After seeing the distinction between the Stitch prototype and the conservative i
 
 Therefore, Phase 5D should be treated as **reopened for a fidelity expansion**. Phase 5E closeout should wait until the closer Journal and Daily Log Editor translation is implemented and reviewed.
 
-## 4. Current working-tree state
+## 4. Current checkpoint state
 
-The current work is local and uncommitted on `feature/brand-architecture`.
+The initial integration is preserved on `feature/brand-architecture` in the pushed checkpoint:
 
-Tracked files modified during the current brand work include:
+`d5411e0 chore(brand): checkpoint initial Warm Journal integration`
 
-- `README.md`;
-- `app/index.html`;
-- `app/assets/css/styles.css`;
-- `docs/BRAND_GUIDELINES.md`;
-- `docs/FEATURES.md`;
-- `docs/POLISH_ROADMAP.md`; and
-- `docs/PROJECT_HANDOFF.md`.
+That checkpoint contains the local mark and favicon, Warm Journal stylesheet, application-shell integration, and synchronized brand/roadmap/handoff material. It is a recovery point only. It does not mean Phase 5D is complete or visually accepted.
 
-New local files include:
-
-- `app/assets/brand/brand-mark.svg`;
-- `app/assets/brand/favicon.svg`;
-- `app/assets/css/warm-journal.css`;
-- `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md`;
-- `docs/brand-exploration/phase-5c/PHASE_5C_CONCEPT_REVIEW.md`;
-- the Phase 5C concept SVGs; and
-- the Phase 5C concept board.
-
-No files were staged or committed during this chat.
+Phase 5C is complete. Phase 5D is reopened and in progress for the high-fidelity Stitch translation. Journal and Daily Log Editor are the immediate targets, with separate approval gates. Phase 5E has not started and must wait for the revised Phase 5D work. No merge, release, tag, or v1.2 is implied.
 
 ## 5. Verification already completed
 
@@ -224,19 +208,166 @@ Create a high-fidelity, responsive translation of the Stitch Warm Journal fronte
 
 The result should feel like the Stitch application rather than an application that merely borrowed its colors.
 
-## 9. Proposed implementation plan
+## 9. Locked production contracts
+
+These contracts resolve the confirmed differences between the Stitch prototype, the initial checkpoint, and the production application. They are implementation requirements, not open options.
+
+### 9.1 Typography
+
+The production font stack is locked:
+
+```text
+system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+```
+
+- There is no Google Fonts runtime request.
+- There is no new bundled font dependency.
+- Stitch typography must be approximated through size, weight, spacing, line height, and layout.
+- Plus Jakarta Sans and Work Sans are rejected prototype dependencies, not active Phase 5D implementation options.
+- Changing this policy requires a separate explicit brand decision.
+
+### 9.2 Product identity and navigation wording
+
+The official production strings are:
+
+```text
+OJT Journal Companion
+Preview & Export
+```
+
+The Stitch prototype strings `OJT Companion` and standalone navigation label `Export` must not replace them. The full product name remains the official application identity.
+
+### 9.3 Journal day interaction
+
+Journal uses one hybrid interaction:
+
+1. A Daily Record header expands or collapses a read-only summary.
+2. The summary may show day status, rendered time, day remarks, real task information, and real photo summaries or thumbnails.
+3. An explicit `Open Daily Log`, `Create Daily Log`, or `Edit Daily Log` action opens the full existing Daily Log Editor.
+4. `Log Today` may directly open the editor for today.
+5. Inline expansion must not become a second editing workflow.
+6. The existing selected-week architecture remains authoritative.
+
+Daily Record accordions must use suitable buttons with `aria-expanded` and `aria-controls`. Collapsed content must not remain incorrectly available to keyboard or assistive-technology navigation.
+
+### 9.4 Daily Log Editor presentation and accessibility
+
+- Compact/mobile presentation is a Stitch-style rounded bottom sheet.
+- Desktop presentation is a contained responsive dialog that retains the Stitch visual character.
+- A bottom sheet must not be forced across large desktop screens.
+- Existing production dialog semantics and functionality remain authoritative.
+
+The translation must preserve:
+
+- `role="dialog"` and `aria-modal`;
+- labelled and described relationships;
+- focus trapping and initial focus;
+- Escape close;
+- background inertness and body scroll locking;
+- focus preservation during rerenders; and
+- opener/day-card focus restoration.
+
+### 9.5 Editor motion lifecycle
+
+The current editor cannot receive a true exit animation through CSS alone because its DOM is destroyed immediately. Entrance and exit motion therefore require one centralized lifecycle:
+
+```text
+closed
+→ opening/open
+→ closing
+→ transition completed or timeout fallback
+→ DOM removed
+→ inertness and aria-hidden cleared
+→ focus restored
+```
+
+That lifecycle must safely handle repeated close attempts, Escape during closing, backdrop close, save or delete during closing, transition-end failure, timeout fallback, reduced-motion bypass, and error cleanup. It must prevent the application from remaining permanently inert or `aria-hidden`.
+
+No mock Stitch `setTimeout` close script may replace the production lifecycle.
+
+### 9.6 Dark-mode authority
+
+- Stitch screenshots control layout, hierarchy, spacing, geometry, and interaction character.
+- Existing application semantic theme tokens control production Dark-mode colors and contrast.
+- The supplied Stitch Dark implementation is incomplete and is not the production source of truth.
+- Do not mechanically invert the Light screenshot.
+- New components must use semantic tokens in Light, Dark, and System appearance.
+
+### 9.7 CSS ownership
+
+`styles.css` owns:
+
+- semantic tokens;
+- theme-neutral structure and responsive layout;
+- component mechanics and accessibility;
+- focus states;
+- dialog and sheet behavior;
+- motion lifecycle and reduced-motion behavior; and
+- semantic success, warning, danger, and information states.
+
+`warm-journal.css` owns:
+
+- the Warm Journal visual skin;
+- approved brand relationships and restrained decorative details;
+- brand-specific surface treatment;
+- visual radii and shadow refinement that do not alter functional mechanics; and
+- product lockup and mark presentation.
+
+Do not maintain competing complete layout definitions for one component in both files. Do not normalize the implementation through broad late overrides or unnecessary `!important`.
+
+### 9.8 Mobile header
+
+- A persistent mobile header containing the full product name plus tagline is not part of the accepted final direction.
+- The checkpointed full sticky mobile brand header is provisional and may be removed or simplified during the Journal translation.
+- A compact functional page bar or restrained mark-only treatment may be used when it does not crowd the page.
+- The full accessible product name must remain available.
+- The tagline must not repeat persistently on mobile screens.
+
+This contract does not remove or change the current runtime header by itself.
+
+### 9.9 Brand-mark source of truth
+
+`app/assets/brand/brand-mark.svg` is the canonical mark geometry. Inline copies must not become independently redesigned versions. Any later inline SVG must match the canonical geometry or be generated from an explicitly documented approved variant. Changes begin with the canonical asset to prevent visual drift.
+
+### 9.10 Photo-thumbnail lifecycle
+
+Journal and editor thumbnails may be generated from stored photo Blobs. Temporary object URLs are runtime-only and must be revoked when replaced, rerendered, closed, or no longer used. Object URLs must never be saved to IndexedDB, backups, or DOCX payload contracts.
+
+Existing photo-set grouping, metadata, individual download and deletion, backup, restore, and DOCX behavior remain unchanged.
+
+### 9.11 Protected application boundaries
+
+Phase 5D must preserve:
+
+```text
+DB_VERSION = 4
+backupVersion = "1.0"
+seven IndexedDB stores
+replace-style restore
+selected-week architecture
+photo-set model
+Official DOCX engine
+private-first v2 template loading
+sanitized fallback template
+System, Dark, and Light appearance support
+one-student local/offline-first boundary
+```
+
+## 10. Proposed implementation plan
 
 ### Stage 0 — Protect and document the baseline
 
 Before additional edits:
 
 1. Inspect `git status` and the complete diff.
-2. Preserve all current uncommitted brand work.
+2. Preserve checkpoint `d5411e0` and any later accepted documentation contract.
 3. Confirm `DB_VERSION = 4`.
 4. Confirm `backupVersion = "1.0"`.
-5. Confirm the active private-first and sanitized DOCX v2 template paths.
-6. Record baseline screenshots if browser tooling is available.
-7. Do not stage, commit, merge, tag, or release unless the project owner separately requests it.
+5. Confirm all seven IndexedDB stores and replace-style restore.
+6. Confirm the selected-week architecture and photo-set model.
+7. Confirm the active Official DOCX engine and private-first/sanitized v2 template paths.
+8. Record baseline screenshots if browser tooling is available.
+9. Do not merge, tag, release, rebase, squash, or force-push unless separately authorized.
 
 ### Stage 1 — Extract the Stitch screen contract
 
@@ -249,7 +380,8 @@ For Journal, map:
 - Log Today action;
 - week overview;
 - journal tip;
-- daily-record accordion cards;
+- accessible read-only Daily Record accordion summaries;
+- explicit Open/Create/Edit Daily Log actions;
 - task and photo summaries;
 - Weekly Summary fields; and
 - mobile navigation and floating action treatment.
@@ -268,7 +400,7 @@ For Daily Log Editor, map:
 - delete action; and
 - internal scrolling and responsive behavior.
 
-Resolve differences in favor of preserving real application capabilities.
+Resolve differences in favor of the locked production contracts and real application capabilities.
 
 ### Stage 2 — Faithful Journal page translation
 
@@ -276,7 +408,8 @@ Reshape the current Journal workspace to follow the Stitch composition:
 
 - use the Stitch content width, vertical rhythm, card hierarchy, and twelve-column desktop composition;
 - reproduce the Week Overview card and its bookmark/progress signature;
-- present Daily Records as smooth expandable cards;
+- present Daily Records as accessible expandable read-only summaries;
+- keep all Daily Log editing in the existing full editor reached through explicit actions;
 - retain meaningful task, rendered-time, and photo information;
 - reproduce the Weekly Summary grouping and action placement;
 - keep the existing week selector and real selected-week state;
@@ -295,9 +428,9 @@ Do not change stored record shapes for this visual work.
 
 ### Stage 3 — Faithful Daily Log Editor translation
 
-Reshape the working editor into the Stitch-style rounded bottom sheet or responsive drawer:
+Reshape the working editor into a Stitch-style rounded bottom sheet on compact/mobile screens and a contained responsive dialog on desktop:
 
-- approximately 300ms entrance and exit motion;
+- centralized entrance and exit motion with reduced-motion bypass and timeout fallback;
 - fixed backdrop;
 - rounded upper corners;
 - visible sheet handle on compact screens;
@@ -311,7 +444,7 @@ Reshape the working editor into the Stitch-style rounded bottom sheet or respons
 - quieter but clear destructive action; and
 - active press, hover, focus, disabled, success, and error states.
 
-Preserve all IDs, data attributes, event targets, validation messages, focus trapping, Escape behavior, and focus restoration unless a deliberate refactor provides equivalent verified behavior.
+Preserve all IDs, data attributes, event targets, validation messages, dialog semantics, labelled/described relationships, focus trapping, initial focus, Escape behavior, background inertness, body scroll locking, focus preservation during rerenders, and opener/day-card focus restoration unless a deliberate refactor provides equivalent verified behavior.
 
 Primary implementation areas:
 
@@ -328,7 +461,7 @@ Create a small, deliberate interaction system instead of scattered animation:
 - card hover elevation only on hover-capable devices;
 - restrained active-scale feedback;
 - smooth accordion expansion;
-- sheet entrance and exit;
+- centralized dialog/sheet entrance and exit lifecycle;
 - clear focus-visible treatment;
 - disabled and loading states;
 - `prefers-reduced-motion` support; and
@@ -336,18 +469,19 @@ Create a small, deliberate interaction system instead of scattered animation:
 
 Use local SVG icons rather than remote Material Symbols.
 
-Typography decision:
+Typography contract:
 
-- closest Stitch match: bundle Plus Jakarta Sans and Work Sans locally after confirming the project owner and mentor approve the asset addition;
-- lower-risk fallback: retain the approved system font stack with adjusted weights, sizes, and spacing;
-- never add a Google Fonts runtime dependency.
+- use only `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+- approximate Stitch through weight, size, spacing, line height, and layout;
+- do not add Google Fonts or a bundled font dependency; and
+- require a separate explicit brand decision before changing the locked font policy.
 
 ### Stage 5 — Extend the direction to remaining screens
 
-After Journal and Daily Log Editor are accepted, apply the same system to:
+Only after separate owner approval of Journal and Daily Log Editor, apply the same system to:
 
 - Dashboard;
-- Preview and Export;
+- Preview & Export;
 - Settings; and
 - remaining shared shell and navigation details.
 
@@ -378,7 +512,7 @@ Run:
 
 Do not close Phase 5 until rendered visual review and core workflow regression pass.
 
-## 10. Acceptance criteria
+## 11. Acceptance criteria
 
 The work is accepted when:
 
@@ -396,11 +530,13 @@ The work is accepted when:
 12. No private institutional template is staged or exposed.
 13. The final diff contains no unrelated redesign or roadmap work.
 
-## 11. Protected non-goals
+## 12. Protected non-goals
 
 This frontend fidelity pass does not authorize:
 
 - a framework migration;
+- a Tailwind production dependency;
+- Google Fonts or Material Symbols;
 - a database redesign;
 - a backup-format change;
 - cloud sync;
@@ -413,25 +549,26 @@ This frontend fidelity pass does not authorize:
 
 Any of these requires a separate decision and scope.
 
-## 12. Recommended execution order
+## 13. Approval-gated execution order
 
-The recommended order is:
+The required order is:
 
-1. preserve the current branch and diff;
-2. inspect the uploaded Stitch folder;
-3. produce the visual-to-functional mapping;
-4. implement Journal;
-5. verify Journal;
-6. implement Daily Log Editor;
-7. verify Daily Log Editor;
-8. obtain project-owner visual approval;
-9. extend the accepted system to remaining screens;
-10. complete Phase 5E regression and documentation;
-11. only then consider merge, release, or Phase 6.
+```text
+Journal static composition
+→ accessible read-only day summaries
+→ Journal visual and functional review
+→ explicit owner approval
+→ Daily Log Editor shell and lifecycle
+→ editor form/task/photo presentation
+→ Editor visual and functional review
+→ explicit owner approval
+→ remaining screens
+→ Phase 5E regression and closeout
+```
 
-Journal should be reviewed before the Daily Log Editor is finalized because the editor is opened from the Journal workflow and should inherit the accepted layout, spacing, typography, and component decisions.
+Do not begin the editor translation before the Journal approval gate. Do not extend the visual system to Dashboard, Preview & Export, or Settings before Journal and Editor approval.
 
-## 13. Handoff instruction for the next agent
+## 14. Handoff instruction for the next agent
 
 Start by reading:
 
@@ -446,14 +583,16 @@ Then inspect the current source and diff before proposing or applying changes.
 
 Do not restart the project, discard the existing brand work, replace the working data layer, or assume the Stitch mock scripts are production implementations.
 
-The immediate implementation target is a **faithful Stitch Journal and Daily Log Editor translation with existing functionality preserved**.
+The immediate implementation target is the **Journal static composition and accessible read-only day summaries**. Daily Log Editor implementation is blocked until explicit Journal approval.
 
-## 14. Mentor review points
+## 15. Mentor review points
 
-The mentor may wish to confirm:
+The mentor review should verify:
 
-- whether locally bundled Plus Jakarta Sans and Work Sans are acceptable;
-- whether the Daily Log Editor should remain a bottom sheet on desktop or become a contained desktop dialog while retaining the Stitch character;
-- whether Journal and Daily Log Editor should be approved before the remaining screens are translated;
-- whether the final Phase 5 work should be merged as one brand/frontend change or separated into reviewable commits; and
-- what rendered browser and device evidence is required before Phase 5 closeout.
+- the locked system-font policy and absence of new font dependencies;
+- the hybrid read-only Journal accordion plus explicit editor workflow;
+- compact/mobile bottom-sheet and contained desktop-dialog behavior;
+- the centralized editor exit lifecycle and complete accessibility cleanup;
+- semantic-token authority for Dark mode and the `styles.css`/`warm-journal.css` ownership boundary;
+- separate Journal and Daily Log Editor approval gates; and
+- the rendered browser and device evidence required before Phase 5E closeout.

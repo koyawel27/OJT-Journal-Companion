@@ -6,15 +6,15 @@ Source file: docs/BRAND_GUIDELINES.md
 
 Purpose: This document is the source of truth for the product brand strategy, visual direction, product-facing copy, future local brand assets, Phase 5C exploration, and Phase 5D integration.
 
-Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. Phase 5D - Initial brand integration complete; high-fidelity Stitch screen translation planned. Phase 5E - Regression, Documentation, and Closeout: Waiting for the revised Phase 5D translation.
+Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. The initial Phase 5D integration is checkpointed at `d5411e0`; Phase 5D is reopened and in progress for high-fidelity Stitch translation. Journal and Daily Log Editor are the immediate targets with separate owner approval gates. Phase 5E has not started and must wait for the revised Phase 5D work.
 
 Authority: This document governs generic product identity decisions for OJT Journal Companion. The current application source, protected data contracts, official DOCX template, and explicit institutional permissions remain higher-priority constraints where applicable.
 
-Version/status: Stitch Warm Journal direction selected as a refinement of Concept A. Local SVG mark, favicon, SVG navigation family, Light tokens, and component treatment are integrated. The project owner has requested a more faithful translation of the supplied Stitch frontend, especially Journal and Daily Log Editor. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` governs that work. Visual browser regression remains before closeout.
+Version/status: Stitch Warm Journal direction selected as a refinement of Concept A. Local SVG mark, favicon, SVG navigation family, Light tokens, and component treatment are preserved in the initial checkpoint but are not yet visually accepted. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` governs the reopened Phase 5D translation and approval gates. No merge, release, tag, or v1.2 is implied.
 
 Controls: Product naming, brand position, promise, tagline, personality, anti-traits, visual principles, symbol direction, color philosophy, typography, icon direction, voice, placement rules, DOCX and backup boundaries, and later asset/integration requirements.
 
-Pending before Phase 5E: high-fidelity Stitch translation for Journal and Daily Log Editor, followed by the remaining shared screens after owner approval. Pending for Phase 5E: browser-based responsive visual review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final closeout regression.
+Pending in Phase 5D: Journal composition and accessible read-only day summaries, Journal review and explicit owner approval, Daily Log Editor shell/lifecycle and content presentation, Editor review and explicit owner approval, then remaining screens. Phase 5E has not started; its later gate includes responsive browser review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final regression.
 
 ## 2. Product identity
 
@@ -27,6 +27,7 @@ Name rules:
 - Do not substitute OJC.
 - Do not introduce OJT Companion as a second official name.
 - Mark-only use is allowed in extremely constrained visual contexts when an accessible product name remains available.
+- The production navigation destination is Preview & Export; do not shorten it to standalone Export.
 
 The protected technical identity is:
 
@@ -99,7 +100,7 @@ Approved placement includes:
 - future documentation cover; and
 - an optional Dashboard introduction when it is not repetitive.
 
-Avoid using the tagline in every page, navigation labels, form headings, modal headings, status messages, validation messages, the official DOCX, JSON backup metadata, filenames, or restore validation. The tagline is not being added to the application during Phase 5B.
+Avoid using the tagline in every page, navigation labels, form headings, modal headings, status messages, validation messages, the official DOCX, JSON backup metadata, filenames, or restore validation. Do not repeat the tagline persistently on mobile screens. The checkpointed full sticky mobile brand header is provisional and is not the accepted final direction.
 
 ## 9. Personality
 
@@ -211,7 +212,7 @@ The progress cue must not be a literal generic arrow. The symbol should be simpl
 
 Fallback: Page corner plus subtle milestone. Use this only if small-size testing shows the primary construction cannot remain legible.
 
-The selected production direction is the Stitch Warm Journal refinement of Concept A — Rising Rule. The decision is recorded in `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md`.
+The selected production direction is the Stitch Warm Journal refinement of Concept A — Rising Rule. The decision is recorded in `docs/brand-exploration/phase-5c/STITCH_DIRECTION_DECISION.md`. `app/assets/brand/brand-mark.svg` is the canonical mark geometry; inline copies must match it or an explicitly documented approved variant, and mark changes begin with the canonical asset.
 
 ## 13. Symbol construction constraints
 
@@ -257,11 +258,11 @@ Use live text for the wordmark where practical. Retain the system-font identity.
 - Mobile UI must not become crowded merely to display branding.
 - Do not require a new mobile logo header.
 
-OJT Companion is deferred informal shorthand only, not an approved interface label.
+`OJT Companion` is a rejected Stitch prototype shorthand, not an approved production identity or interface label.
 
 ## 16. Color philosophy
 
-The color foundation uses warm earth tones to create journal warmth and grounded professionalism. Olive and green cues communicate measured progress without becoming reward colors. The Dark family maintains continuity through earth, charcoal, cream, and muted olive relationships rather than simply inverting the Light theme.
+The color foundation uses warm earth tones to create journal warmth and grounded professionalism. Olive and green cues communicate measured progress without becoming reward colors. Existing semantic theme tokens are authoritative for production Dark-mode colors and contrast. The incomplete Stitch Dark implementation is not a source of truth, and the Light screenshot must not be mechanically inverted. New components must work through semantic tokens in Light, Dark, and System appearance.
 
 Semantic tokens control components. Brand colors do not override accessibility roles.
 
@@ -288,7 +289,7 @@ These are provisional brand roles over the existing semantic CSS foundation. CSS
 | Tundora #474747 | Elevated surface hierarchy | Shell and elevated neutral surfaces | Do not flatten all dark surfaces to the same gray |
 | Mine Shaft #292929 | Deep canvas | Main dark canvas and strong contrast base | Avoid low-contrast text or muted decoration against it |
 
-Known constraint: Cameo on Siam is not appropriate for normal body text. Weak decorative pairs must remain decorative only. Do not perform a CSS redesign in this phase.
+Known constraint: Cameo on Siam is not appropriate for normal body text. Weak decorative pairs must remain decorative only. Semantic theme tokens, not raw Stitch swatches, control production contrast and Dark-mode behavior.
 
 ## 19. Brand-color usage rules
 
@@ -310,11 +311,13 @@ The existing system stack is locked:
 
 Rules:
 
-- No external font fetch.
-- No required bundled font.
+- No Google Fonts or other runtime font request.
+- No new bundled font dependency.
+- Plus Jakarta Sans and Work Sans are rejected Stitch prototype dependencies, not Phase 5D options.
+- Approximate Stitch typography through size, weight, spacing, line height, and layout.
 - No handwritten or script font.
 - No decorative serif in the live application.
-- Express brand through hierarchy, weight, spacing, line length, and casing.
+- Changing the locked font policy requires a separate explicit brand decision.
 
 Practical weight roles are:
 
@@ -411,7 +414,7 @@ These roles must not be mixed. The tagline is not a form label, the promise is n
 | Surface | Rule |
 | --- | --- |
 | Sidebar | Future direction may pair the brand mark with the full product name. Do not replace the name with an unexplained abbreviation. |
-| Mobile | Do not force a new logo header. Use browser identity or mark-only treatment only when the existing layout supports it without crowding, with accessible naming retained. |
+| Mobile | Do not retain a persistent full-name-plus-tagline header as the final direction. The checkpointed header is provisional. A compact functional page bar or restrained mark-only treatment may be used without crowding, with the full accessible product name retained and no persistent tagline repetition. |
 | Dashboard | Allow one restrained tagline or brand-promise use, preferably in onboarding or an empty state. Avoid repetition on every card. |
 | Navigation | Do not use the tagline. Keep labels functional. |
 | Dialogs and forms | Prioritize clarity and safety. Do not add decorative brand copy. |
@@ -419,7 +422,7 @@ These roles must not be mixed. The tagline is not a form label, the promise is n
 | Settings and Recovery | Prioritize clarity, safety, and honest storage guidance over decoration. |
 | README | Approved future use includes product name, mark, tagline, and a concise product promise. |
 
-No placement is implemented during Phase 5B.
+The checkpointed full sticky mobile brand header remains runtime state for now, but it may be removed or simplified during the Journal translation after review.
 
 ## 28. Favicon and app-icon strategy
 
@@ -439,7 +442,7 @@ Potential later assets include:
     favicon.svg
     favicon-32.png
 
-Assets are local, optimized, small, free of external font embedding, free of remote dependencies, and paired with accessible product-name text in the interface.
+Assets are local, optimized, small, free of external font embedding, free of remote dependencies, and paired with accessible product-name text in the interface. `app/assets/brand/brand-mark.svg` remains the canonical source for mark geometry.
 
 ## 30. Official DOCX boundary
 
@@ -508,22 +511,25 @@ The scalable master and simplified favicon are prepared. Phase 5E must finish br
 
 ## 36. Phase 5D integration boundaries
 
-Likely later integration areas are:
+`docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` is the implementation contract. The locked boundaries are:
 
-    app/index.html
-    app/assets/css/styles.css
-    local brand assets
-    navigation icons
-    favicon metadata
-    README.md
+- Journal Daily Record headers control accessible read-only accordion summaries; explicit Open/Create/Edit actions own full editing, and Log Today may open today's editor directly.
+- Compact/mobile uses a rounded bottom sheet; desktop uses a contained responsive dialog. Existing dialog semantics, focus lifecycle, inertness, scroll locking, Escape behavior, and focus restoration remain authoritative.
+- A real exit animation requires one centralized open/closing/removal lifecycle with transition and timeout completion, reduced-motion bypass, error cleanup, and protection against permanently inert application state.
+- `styles.css` owns semantic tokens, theme-neutral structure, responsive mechanics, accessibility, dialog/sheet behavior, focus, motion lifecycle, reduced motion, and semantic status states.
+- `warm-journal.css` owns the Warm Journal visual skin, approved brand relationships, restrained decorative treatment, non-mechanical radius/shadow refinement, and product lockup/mark presentation.
+- Do not maintain competing complete layouts in both stylesheets, broad late overrides, or unnecessary `!important`.
+- Stored photo Blobs may produce runtime-only thumbnail object URLs. Revoke them when replaced, rerendered, closed, or unused; never persist them to IndexedDB, backups, or DOCX payloads.
+- Journal must receive visual and functional review plus explicit owner approval before Daily Log Editor implementation begins. Editor must receive its own approval before Dashboard, Preview & Export, Settings, or remaining screens are translated.
 
-Documentation may also be updated when integration changes user-facing identity. Do not assume database changes, backup changes, DOCX changes, a manifest, or a service worker.
+No database, backup, photo-set, DOCX, deployment, framework, font, icon-library, or product-boundary change is authorized by this visual translation.
 
 ## 37. Acceptance checklist
 
 Before brand integration is accepted:
 
-- The product name remains consistent.
+- The product name remains OJT Journal Companion, and production navigation remains Preview & Export.
+- The Journal and Daily Log Editor pass their separate approval gates before remaining screens.
 - The mark works at 16px and in one color.
 - The mark works in Light and Dark.
 - No external dependency is required.
@@ -541,6 +547,7 @@ Before brand integration is accepted:
 | Decision | Status | Current rule |
 | --- | --- | --- |
 | Official name | Locked | OJT Journal Companion |
+| Production export navigation | Locked | Preview & Export; never standalone Export |
 | Compact name | Locked | No second official compact name; mark-only use is allowed when accessible naming remains available |
 | Tagline | Locked | Record the work. Reflect on the journey. |
 | Brand position | Locked | Warm, dependable digital work journal supporting documentation, reflection, and professional growth |
@@ -550,9 +557,13 @@ Before brand integration is accepted:
 | Personality | Locked | Grounded, Organized, Reflective, Progressive, Dependable, Encouraging |
 | Anti-traits | Locked | No childish, gamified, corporate HR, surveillance, rustic/vintage, scrapbook, government-form, or unauthorized institutional identity |
 | Primary symbol | Locked and implemented | Stitch Warm Journal refinement of Concept A: structured journal page + subtle rising progress line |
+| Canonical mark source | Locked | `app/assets/brand/brand-mark.svg`; inline use must match canonical or an approved documented variant |
 | Fallback symbol | Retained as exploration history | Page corner + subtle milestone remains available only if Phase 5E small-size testing rejects the primary mark |
 | Palette family | Locked foundation | Existing Light and Dark earth-toned families; semantic roles remain authoritative |
-| Typography | Locked | Existing system UI stack |
+| Dark-mode authority | Locked | Existing semantic theme tokens control production colors and contrast; Stitch Dark is not authoritative |
+| Mobile header | Locked | Full-name-plus-tagline sticky header is provisional, not the accepted final direction |
+| CSS ownership | Locked | `styles.css` owns mechanics/accessibility; `warm-journal.css` owns the Warm Journal skin |
+| Typography | Locked | `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; no runtime or bundled font dependency |
 | Icon style | Locked and implemented | Local inline SVG, simple outline family shared by desktop and mobile navigation |
 | Favicon | Implemented | `app/assets/brand/favicon.svg`; PWA PNG install icons remain deferred |
 | Web app manifest | Deferred | Not automatically in scope for branding |
