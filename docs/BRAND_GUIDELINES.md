@@ -6,7 +6,7 @@ Source file: docs/BRAND_GUIDELINES.md
 
 Purpose: This document is the source of truth for the product brand strategy, visual direction, product-facing copy, future local brand assets, Phase 5C exploration, and Phase 5D integration.
 
-Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. The initial Phase 5D integration is checkpointed at `d5411e0`; Phase 5D is reopened and in progress for high-fidelity Stitch translation. Journal and Daily Log Editor are the immediate targets with separate owner approval gates. Phase 5E has not started and must wait for the revised Phase 5D work.
+Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. The initial Phase 5D integration is checkpointed at `d5411e0`; the rejected sidebar-constrained J1 experiment was restored completely. Phase 5D is reopened for the accepted responsive shell, then Journal and Daily Log Editor under separate owner approval gates. Phase 5E has not started and must wait for the revised Phase 5D work.
 
 Authority: This document governs generic product identity decisions for OJT Journal Companion. The current application source, protected data contracts, official DOCX template, and explicit institutional permissions remain higher-priority constraints where applicable.
 
@@ -14,7 +14,7 @@ Version/status: Stitch Warm Journal direction selected as a refinement of Concep
 
 Controls: Product naming, brand position, promise, tagline, personality, anti-traits, visual principles, symbol direction, color philosophy, typography, icon direction, voice, placement rules, DOCX and backup boundaries, and later asset/integration requirements.
 
-Pending in Phase 5D: Journal composition and accessible read-only day summaries, Journal review and explicit owner approval, Daily Log Editor shell/lifecycle and content presentation, Editor review and explicit owner approval, then remaining screens. Phase 5E has not started; its later gate includes responsive browser review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final regression.
+Pending in Phase 5D: primary responsive shell translation, Journal composition and accessible read-only day summaries, Journal review and explicit owner approval, Daily Log Editor shell/lifecycle and content presentation, Editor review and explicit owner approval, then remaining page bodies. Phase 5E has not started; its later gate includes responsive browser review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final regression.
 
 ## 2. Product identity
 
@@ -260,6 +260,19 @@ Use live text for the wordmark where practical. Retain the system-font identity.
 
 `OJT Companion` is a rejected Stitch prototype shorthand, not an approved production identity or interface label.
 
+### 15.1 Primary responsive shell
+
+- Use one compact top app bar with the theme control reachable from it.
+- Keep the full accessible product name available without persistently repeating the tagline.
+- Use one centered responsive content canvas.
+- Use a full-width fixed bottom navigation bar on compact/mobile screens.
+- Use a centered floating bottom-navigation dock on wider tablet and desktop screens.
+- Keep navigation exactly Dashboard, Journal, Preview & Export, and Settings while preserving targets, labels, `aria-current`, and `data-section` values.
+- Preserve bottom clearance, safe areas, keyboard access, visible focus, touch targets, zoom, and reduced motion.
+- Do not use a permanent desktop sidebar in the accepted Phase 5D translation.
+
+The desktop sidebar remains historical Phase 4 behavior and is intentionally superseded for Phase 5D presentation only. This shell decision does not authorize functional or data changes.
+
 ## 16. Color philosophy
 
 The color foundation uses warm earth tones to create journal warmth and grounded professionalism. Olive and green cues communicate measured progress without becoming reward colors. Existing semantic theme tokens are authoritative for production Dark-mode colors and contrast. The incomplete Stitch Dark implementation is not a source of truth, and the Light screenshot must not be mechanically inverted. New components must work through semantic tokens in Light, Dark, and System appearance.
@@ -271,7 +284,7 @@ Semantic tokens control components. Brand colors do not override accessibility r
 | Color | Provisional role | Preferred use | Restricted use / overuse risk |
 | --- | --- | --- | --- |
 | Vanilla Cream #f0ead2 | Primary warm canvas | Main background, calm reading surfaces, light mark support | Avoid using it for low-contrast text or every elevated surface |
-| Ash Brown #6c584c | Strongest Light brand anchor | Sidebar, secondary text, grounded structural emphasis | Do not use for small text where contrast is insufficient |
+| Ash Brown #6c584c | Strongest Light brand anchor | Top app bar, navigation dock, secondary text, grounded structural emphasis | Do not use for small text where contrast is insufficient |
 | Muted Olive #adc178 | Progress/accent support | Progress fill, selected emphasis, restrained active cues | Do not make every action green or imply status by color alone |
 | Tea Green #dde5b6 | Calm selected/inset support | Inset panels, selected surfaces, gentle grouping | Large-area overuse can make the interface feel pastel or childish |
 | Faded Copper #a98467 | Structural/detail accent | Borders, quiet dividers, limited interaction accents | Do not use as body text or as a dominant decorative color |
@@ -282,7 +295,7 @@ These are provisional brand roles over the existing semantic CSS foundation. CSS
 
 | Color | Provisional role | Preferred use | Restricted use / overuse risk |
 | --- | --- | --- | --- |
-| Matterhorn #4e3c3b | Dark structural brand anchor | Sidebar, strong earth-toned shell surfaces | Avoid making every surface brown or reducing hierarchy |
+| Matterhorn #4e3c3b | Dark structural brand anchor | Top app bar, navigation dock, strong earth-toned shell surfaces | Avoid making every surface brown or reducing hierarchy |
 | Cameo #d8b99d | Primary Dark highlight/accent | Interactive emphasis, borders, restrained highlights | Cameo on Siam is not appropriate for normal body text |
 | Vanilla Cream #f0ead2 | High-readability text/light mark support | Primary text and reversed mark support | Reserve for readable emphasis, not decorative noise |
 | Siam #5c5f4f | Muted selected/inset/progress support | Inset surfaces and subdued active states | Weak decorative pairs remain decorative only |
@@ -413,8 +426,8 @@ These roles must not be mixed. The tagline is not a form label, the promise is n
 
 | Surface | Rule |
 | --- | --- |
-| Sidebar | Future direction may pair the brand mark with the full product name. Do not replace the name with an unexplained abbreviation. |
-| Mobile | Do not retain a persistent full-name-plus-tagline header as the final direction. The checkpointed header is provisional. A compact functional page bar or restrained mark-only treatment may be used without crowding, with the full accessible product name retained and no persistent tagline repetition. |
+| Top app bar | Pair a compact mark treatment with the full accessible product name. Keep the theme control reachable and do not persistently repeat the tagline. |
+| Primary navigation | Use a full-width fixed bottom bar on compact/mobile screens and a centered floating bottom dock on wider tablet and desktop screens. Keep exactly four production destinations. |
 | Dashboard | Allow one restrained tagline or brand-promise use, preferably in onboarding or an empty state. Avoid repetition on every card. |
 | Navigation | Do not use the tagline. Keep labels functional. |
 | Dialogs and forms | Prioritize clarity and safety. Do not add decorative brand copy. |
@@ -422,7 +435,7 @@ These roles must not be mixed. The tagline is not a form label, the promise is n
 | Settings and Recovery | Prioritize clarity, safety, and honest storage guidance over decoration. |
 | README | Approved future use includes product name, mark, tagline, and a concise product promise. |
 
-The checkpointed full sticky mobile brand header remains runtime state for now, but it may be removed or simplified during the Journal translation after review.
+The checkpointed sticky mobile header and permanent desktop sidebar are historical Phase 4 runtime behavior. The accepted Phase 5D presentation intentionally supersedes both with the compact top app bar and responsive bottom-navigation system.
 
 ## 28. Favicon and app-icon strategy
 
@@ -503,7 +516,7 @@ Future exploration requirements:
 - Dark treatment;
 - 16px simplification;
 - 24px UI mark;
-- 32px sidebar mark;
+- 32px navigation-dock mark;
 - 128px documentation mark; and
 - 512px source master.
 
@@ -520,9 +533,10 @@ The scalable master and simplified favicon are prepared. Phase 5E must finish br
 - `warm-journal.css` owns the Warm Journal visual skin, approved brand relationships, restrained decorative treatment, non-mechanical radius/shadow refinement, and product lockup/mark presentation.
 - Do not maintain competing complete layouts in both stylesheets, broad late overrides, or unnecessary `!important`.
 - Stored photo Blobs may produce runtime-only thumbnail object URLs. Revoke them when replaced, rerendered, closed, or unused; never persist them to IndexedDB, backups, or DOCX payloads.
-- Journal must receive visual and functional review plus explicit owner approval before Daily Log Editor implementation begins. Editor must receive its own approval before Dashboard, Preview & Export, Settings, or remaining screens are translated.
+- Establish the compact top app bar, centered canvas, fixed compact/mobile bottom bar, and centered floating wider-screen dock before restarting Journal composition. Do not retain a permanent desktop sidebar.
+- Journal must receive visual and functional review plus explicit owner approval before Daily Log Editor implementation begins. Editor must receive its own approval before Dashboard, Preview & Export, Settings, or remaining page bodies are translated.
 
-No database, backup, photo-set, DOCX, deployment, framework, font, icon-library, or product-boundary change is authorized by this visual translation.
+No selected-week, Journal ownership, Log Today, handoff, Settings, Daily Log Editor, database, backup, photo-set, DOCX, appearance-persistence, deployment, framework, font, icon-library, or product-boundary change is authorized by this visual translation.
 
 ## 37. Acceptance checklist
 
@@ -561,7 +575,8 @@ Before brand integration is accepted:
 | Fallback symbol | Retained as exploration history | Page corner + subtle milestone remains available only if Phase 5E small-size testing rejects the primary mark |
 | Palette family | Locked foundation | Existing Light and Dark earth-toned families; semantic roles remain authoritative |
 | Dark-mode authority | Locked | Existing semantic theme tokens control production colors and contrast; Stitch Dark is not authoritative |
-| Mobile header | Locked | Full-name-plus-tagline sticky header is provisional, not the accepted final direction |
+| Primary shell | Locked | Compact top app bar; centered canvas; fixed full-width compact/mobile bottom bar; centered floating wider-screen dock; no permanent desktop sidebar |
+| Mobile header | Locked | The compact top app bar keeps the accessible product name and theme control available without persistent tagline repetition |
 | CSS ownership | Locked | `styles.css` owns mechanics/accessibility; `warm-journal.css` owns the Warm Journal skin |
 | Typography | Locked | `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; no runtime or bundled font dependency |
 | Icon style | Locked and implemented | Local inline SVG, simple outline family shared by desktop and mobile navigation |

@@ -2,7 +2,7 @@
 
 ## Current status
 
-The latest tagged stable release is **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected and integrated the Stitch Warm Journal direction on `feature/brand-architecture`; Phase 5E visual regression and closeout remain. It is not a new release or tag. No v1.2 release is implied.
+The latest tagged stable release is **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected the Stitch Warm Journal direction on `feature/brand-architecture`; Phase 5D is reopened for the accepted responsive shell, Journal, and Daily Log Editor approval gates. Phase 5E remains blocked. It is not a new release or tag. No v1.2 release is implied.
 
 The app is a local, offline-first companion for one student on one browser/device. It has no account/login, backend, cloud sync, online submission, coordinator/admin dashboard, or formal accessibility certification.
 
@@ -10,11 +10,15 @@ The app is a local, offline-first companion for one student on one browser/devic
 
 ### Responsive app shell
 
-- Desktop sidebar navigation with app identity and four destinations.
-- Mobile fixed bottom navigation with exactly Dashboard, Journal, Preview & Export, and Settings.
-- Safe-area support and responsive desktop, tablet, and mobile layouts.
-- The mobile drawer navigation is not part of the current interface.
-- Local full-name brand lockups, official tagline, scalable SVG mark/favicon, and one shared local SVG navigation family with no remote brand dependency.
+- The completed Phase 4 runtime uses desktop sidebar navigation; this is historical behavior and is intentionally superseded by the accepted Phase 5D presentation contract.
+- Phase 5D uses one compact top app bar, one centered responsive content canvas, a full-width fixed bottom bar on compact/mobile screens, and a centered floating bottom-navigation dock on wider tablet and desktop screens.
+- Primary navigation remains exactly Dashboard, Journal, Preview & Export, and Settings, with existing targets, labels, `aria-current` behavior, and `data-section` values unchanged.
+- The full accessible product name and top-app-bar theme control remain available; the tagline is not persistently repeated.
+- Safe-area support, bottom-navigation clearance, keyboard access, visible focus, touch targets, zoom, reduced motion, and responsive desktop/tablet/mobile layouts remain required.
+- The mobile drawer navigation is not part of the accepted interface.
+- Local brand assets remain dependency-free.
+
+This is the accepted Phase 5D presentation contract, not a claim that the runtime shell has already been translated.
 
 ### Journal and dashboard
 

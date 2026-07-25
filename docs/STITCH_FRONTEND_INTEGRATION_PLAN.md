@@ -122,7 +122,7 @@ The initial integration is preserved on `feature/brand-architecture` in the push
 
 That checkpoint contains the local mark and favicon, Warm Journal stylesheet, application-shell integration, and synchronized brand/roadmap/handoff material. It is a recovery point only. It does not mean Phase 5D is complete or visually accepted.
 
-Phase 5C is complete. Phase 5D is reopened and in progress for the high-fidelity Stitch translation. Journal and Daily Log Editor are the immediate targets, with separate approval gates. Phase 5E has not started and must wait for the revised Phase 5D work. No merge, release, tag, or v1.2 is implied.
+Phase 5C is complete. Phase 5D is reopened and in progress for the high-fidelity Stitch translation. The first Journal J1 experiment was rejected because it retained the permanent desktop sidebar and was restored completely. The next runtime target is the primary responsive shell, then Journal and Daily Log Editor under separate approval gates. Phase 5E has not started and must wait for the revised Phase 5D work. No merge, release, tag, or v1.2 is implied.
 
 ## 5. Verification already completed
 
@@ -237,6 +237,25 @@ Preview & Export
 
 The Stitch prototype strings `OJT Companion` and standalone navigation label `Export` must not replace them. The full product name remains the official application identity.
 
+### 9.2.1 Primary responsive shell
+
+The accepted Phase 5D presentation shell is mobile-first and expands responsively without introducing a permanent navigation column:
+
+- use one compact top app bar at every supported width;
+- keep the theme control reachable from the top app bar;
+- keep the full accessible product name available without persistently repeating the tagline;
+- use one centered responsive main-content canvas;
+- use a full-width fixed bottom navigation bar on compact/mobile screens;
+- use a centered floating bottom-navigation dock on wider tablet and desktop screens;
+- preserve bottom-navigation clearance and safe-area behavior;
+- keep primary navigation exactly `Dashboard`, `Journal`, `Preview & Export`, and `Settings`;
+- preserve the existing navigation targets, labels, `aria-current` behavior, and `data-section` values; and
+- preserve keyboard access, visible focus, touch targets, zoom behavior, and reduced-motion support.
+
+There is no permanent desktop sidebar in the accepted Stitch translation. The sidebar remains historical Phase 4 runtime behavior, but Phase 5D intentionally supersedes it for presentation. Desktop width may expand the Journal's internal columns inside the centered content canvas; navigation must not consume a permanent left column.
+
+This presentation contract does not authorize changes to selected-week architecture, Journal ownership, Log Today, Dashboard handoffs, Preview & Export handoffs, Settings, Daily Log Editor behavior, database or backup contracts, photo-set behavior, DOCX behavior, or appearance persistence.
+
 ### 9.3 Journal day interaction
 
 Journal uses one hybrid interaction:
@@ -315,15 +334,15 @@ No mock Stitch `setTimeout` close script may replace the production lifecycle.
 
 Do not maintain competing complete layout definitions for one component in both files. Do not normalize the implementation through broad late overrides or unnecessary `!important`.
 
-### 9.8 Mobile header
+### 9.8 Compact top app bar
 
-- A persistent mobile header containing the full product name plus tagline is not part of the accepted final direction.
-- The checkpointed full sticky mobile brand header is provisional and may be removed or simplified during the Journal translation.
-- A compact functional page bar or restrained mark-only treatment may be used when it does not crowd the page.
-- The full accessible product name must remain available.
-- The tagline must not repeat persistently on mobile screens.
+- Use one compact top app bar across compact, tablet, and desktop widths.
+- Keep the full accessible product name available; constrained visual treatments may use the mark when the accessible name remains present.
+- Keep the theme control reachable from this app bar.
+- Do not persistently repeat the tagline in the app bar.
+- Do not pair the app bar with a permanent desktop sidebar.
 
-This contract does not remove or change the current runtime header by itself.
+This documentation contract does not change the current runtime shell by itself.
 
 ### 9.9 Brand-mark source of truth
 
@@ -402,9 +421,11 @@ For Daily Log Editor, map:
 
 Resolve differences in favor of the locked production contracts and real application capabilities.
 
-### Stage 2 — Faithful Journal page translation
+### Stage 2 — Primary responsive shell and faithful Journal page translation
 
-Reshape the current Journal workspace to follow the Stitch composition:
+Do not continue polishing the rejected sidebar-constrained J1 experiment. Establish the accepted Phase 5D shell first: compact top app bar, centered content canvas, fixed full-width mobile bottom navigation, and centered floating bottom-navigation dock on wider screens. Preserve the four production destinations and their existing functional contracts.
+
+Then reshape the current Journal workspace inside that centered canvas to follow the Stitch composition:
 
 - use the Stitch content width, vertical rhythm, card hierarchy, and twelve-column desktop composition;
 - reproduce the Week Overview card and its bookmark/progress signature;
@@ -483,9 +504,9 @@ Only after separate owner approval of Journal and Daily Log Editor, apply the sa
 - Dashboard;
 - Preview & Export;
 - Settings; and
-- remaining shared shell and navigation details.
+- remaining page-body details.
 
-This stage should reuse the accepted components rather than independently redesigning each page.
+The shared shell and navigation are established before the Journal approval gate and must not be independently redesigned in this later stage. This stage should reuse the accepted components rather than independently redesigning each page.
 
 ### Stage 6 — Functional and visual regression
 
@@ -554,7 +575,8 @@ Any of these requires a separate decision and scope.
 The required order is:
 
 ```text
-Journal static composition
+primary responsive shell translation
+→ Journal static composition
 → accessible read-only day summaries
 → Journal visual and functional review
 → explicit owner approval
@@ -566,7 +588,7 @@ Journal static composition
 → Phase 5E regression and closeout
 ```
 
-Do not begin the editor translation before the Journal approval gate. Do not extend the visual system to Dashboard, Preview & Export, or Settings before Journal and Editor approval.
+Do not begin the editor translation before the Journal approval gate. The primary shell is the shared presentation prerequisite, not a redesign of navigation destinations or other page workflows. Do not translate the Dashboard, Preview & Export, or Settings page bodies before Journal and Editor approval.
 
 ## 14. Handoff instruction for the next agent
 
@@ -583,13 +605,15 @@ Then inspect the current source and diff before proposing or applying changes.
 
 Do not restart the project, discard the existing brand work, replace the working data layer, or assume the Stitch mock scripts are production implementations.
 
-The immediate implementation target is the **Journal static composition and accessible read-only day summaries**. Daily Log Editor implementation is blocked until explicit Journal approval.
+The next runtime batch must first establish the accepted primary responsive shell, then restart the **Journal static composition and accessible read-only day summaries** inside that shell. No Journal runtime implementation is part of this documentation correction. Daily Log Editor implementation remains blocked until explicit Journal approval.
 
 ## 15. Mentor review points
 
 The mentor review should verify:
 
 - the locked system-font policy and absence of new font dependencies;
+- the compact top app bar, centered canvas, fixed mobile bottom bar, and centered floating wider-screen dock with no permanent sidebar;
+- the unchanged four navigation labels, targets, `aria-current` behavior, and `data-section` values;
 - the hybrid read-only Journal accordion plus explicit editor workflow;
 - compact/mobile bottom-sheet and contained desktop-dialog behavior;
 - the centralized editor exit lifecycle and complete accessibility cleanup;

@@ -16,14 +16,15 @@ Phase 5E — Regression, Documentation, and Closeout: Not started; blocked by re
 
 The Stitch Warm Journal direction is selected as a production refinement of Concept A. The initial integration is safely preserved at `d5411e0 chore(brand): checkpoint initial Warm Journal integration`; it is a recovery checkpoint, not Phase 5D completion or visual acceptance. `docs/BRAND_GUIDELINES.md` and `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` control the reopened work.
 
-The project owner has clarified that Stitch controls layout, hierarchy, spacing, geometry, and interaction character rather than serving only as a palette reference. The immediate target is Journal static composition and accessible read-only day summaries. Daily Log Editor translation must not begin until Journal receives visual and functional review plus explicit owner approval. Existing persistence, validation, photo, backup, accessibility, Preview & Export, and DOCX behavior remain authoritative.
+The project owner has clarified that Stitch controls layout, hierarchy, spacing, geometry, and interaction character rather than serving only as a palette reference. The first Journal J1 experiment was rejected because it retained the permanent desktop sidebar and embedded the Stitch composition inside the historical dashboard-style shell; all J1 runtime changes were restored. The next implementation must establish the accepted responsive shell before restarting Journal static composition and accessible read-only day summaries. Daily Log Editor translation must not begin until Journal receives visual and functional review plus explicit owner approval. Existing persistence, validation, photo, backup, accessibility, Preview & Export, and DOCX behavior remain authoritative.
 
 The active branch is `feature/brand-architecture`. The latest tagged stable release remains v1.1. Phase 4 is merged into master; Phase 5 brand work remains post-v1.1 roadmap work and has not created a release or tag. No v1.2 release is implied.
 
 ## Immediate repository sequence
 
 ```text
-Journal static composition
+primary responsive shell translation
+→ Journal static composition
 → accessible read-only day summaries
 → Journal visual and functional review
 → explicit owner approval
@@ -62,11 +63,12 @@ The app has four top-level destinations:
 - **Preview & Export:** responsive browser Preview, Copy Weekly Journal, Official DOCX Export, and correction handoffs.
 - **Settings:** Student Details, Company/OJT Placement, App Preferences, Data & Recovery, Restore Review, and Storage Health.
 
-Desktop uses sidebar navigation. Mobile uses a fixed bottom navigation with exactly the same four destinations and safe-area support. The top Light/Dark quick switch is an appearance control, not a fifth destination. The checkpointed sticky mobile full-name-plus-tagline header is provisional and may be simplified during Journal translation; the full accessible product name must remain available, and the tagline must not repeat persistently.
+The completed Phase 4 runtime uses a desktop sidebar and fixed mobile bottom navigation; that sidebar is historical behavior and is intentionally superseded for Phase 5D presentation. The accepted shell uses one compact top app bar, one centered responsive content canvas, a full-width fixed bottom navigation bar on compact/mobile screens, and a centered floating bottom-navigation dock on wider tablet and desktop screens. It keeps exactly the same four destinations, targets, labels, `aria-current` behavior, and `data-section` values. The theme control remains reachable from the top app bar, the full accessible product name remains available, the tagline is not persistently repeated, and safe-area/bottom clearance remains required.
 
 ## Locked translation contract
 
 - Production identity is `OJT Journal Companion`; production navigation is `Preview & Export`, never the Stitch shorthand or standalone `Export`.
+- The primary shell is a compact top app bar plus centered canvas, fixed full-width compact/mobile bottom bar, and centered floating wider-screen bottom dock. It has no permanent desktop sidebar and preserves all four navigation contracts, bottom clearance, safe areas, keyboard access, focus, touch targets, zoom, and reduced motion.
 - Typography remains `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. There is no Google Fonts request or new bundled font dependency.
 - Daily Record headers expose accessible read-only summaries with real status, time, remarks, tasks, and photo summaries. Explicit Open/Create/Edit actions own the full editor; inline expansion is not a second editing workflow.
 - Compact/mobile editor presentation is a rounded bottom sheet; desktop is a contained responsive dialog. Existing dialog semantics, focus trap, initial focus, Escape, inertness, scroll lock, rerender focus, and opener restoration remain authoritative.
@@ -81,7 +83,7 @@ Desktop uses sidebar navigation. Mobile uses a fixed bottom navigation with exac
 Phase 4 delivered:
 
 - Accessible responsive app shell and semantic design tokens.
-- Desktop sidebar navigation and fixed mobile bottom navigation.
+- Historical Phase 4 desktop sidebar navigation and fixed mobile bottom navigation, now intentionally superseded for Phase 5D presentation.
 - Journal workspace redesign with selected-week continuity.
 - Accessible Daily Log dialog/mobile sheet with focus containment, Escape close, background inertness, and opener-focus restoration.
 - Dashboard redesign and responsive day handoffs.
@@ -132,9 +134,9 @@ The safety patch is committed as c89d5a6 (fix: escape restored IDs in daily log 
 
 ## Next work
 
-**Phase 5D — Journal approval gate**
+**Phase 5D — Responsive shell and Journal approval gate**
 
-Implement only the Journal static composition and accessible read-only Daily Record summaries first. Review Journal visually and functionally, then obtain explicit owner approval before beginning the Daily Log Editor shell or lifecycle. Phase 5E has not started. No database, backup, photo-set, DOCX, deployment, release, or tag change belongs in this gate.
+No runtime implementation was restarted in this documentation correction. The next implementation batch establishes only the accepted presentation shell, then restarts Journal static composition and accessible read-only Daily Record summaries inside its centered canvas. Review Journal visually and functionally, then obtain explicit owner approval before beginning the Daily Log Editor shell or lifecycle. Phase 5E has not started. No selected-week, Journal ownership, Log Today, handoff, Settings, Daily Log Editor, database, backup, photo-set, DOCX, appearance-persistence, deployment, release, or tag change belongs in this gate.
 
 ## Historical documents
 

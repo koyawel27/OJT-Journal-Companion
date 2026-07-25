@@ -45,18 +45,25 @@ The top switch does not expose System. System remains available in Settings. The
 
 ## Responsive navigation
 
-Desktop:
+Accepted Phase 5D presentation flow:
 
-Sidebar
+Compact/mobile:
+
+Compact top app bar with reachable theme control
+→ centered content canvas
+→ full-width fixed bottom navigation
 → Dashboard / Journal / Preview & Export / Settings
 
-Mobile:
+Wider tablet/desktop:
 
-Fixed bottom navigation
+Compact top app bar with reachable theme control
+→ centered content canvas
+→ centered floating bottom-navigation dock
 → Dashboard / Journal / Preview & Export / Settings
 
-Mobile navigation has exactly four destinations and supports safe-area spacing. There is no mobile drawer and no separate appearance destination.
+Navigation keeps the existing targets, labels, `aria-current` behavior, and `data-section` values. The full accessible product name remains available, the tagline is not persistently repeated in the top app bar, and bottom clearance plus safe-area behavior remain required. Keyboard access, visible focus, touch targets, zoom, and reduced motion remain part of the workflow contract. There is no mobile drawer, separate appearance destination, or permanent desktop sidebar.
 
+The completed Phase 4 desktop sidebar remains historical runtime behavior and is intentionally superseded by this Phase 5D presentation contract. This documentation update does not change navigation destinations or application workflows.
 ## Journal and week workflow
 
 1. Open Journal.
