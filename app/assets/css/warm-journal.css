@@ -569,3 +569,52 @@ body {
     color: CanvasText;
   }
 }
+
+/* Phase 5D E1A: Warm Journal Daily Log Editor shell. */
+:root[data-theme="light"] .daily-log-editor-overlay {
+  background: color-mix(in srgb, var(--color-text-primary) 34%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+:root[data-theme="light"] .daily-log-editor-panel {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 24%, var(--color-border-subtle));
+  background: var(--color-page);
+  box-shadow: 0 18px 52px color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+}
+
+:root[data-theme="light"] .daily-log-editor-header {
+  border-bottom-color: var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-shell) 78%, var(--color-page));
+}
+
+@media (max-width: 760px) {
+  :root[data-theme="light"] .daily-log-editor-panel {
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -10px 34px color-mix(in srgb, var(--color-text-primary) 16%, transparent);
+  }
+
+  :root[data-theme="light"] .daily-log-editor-panel::before {
+    content: "";
+    display: block;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 5px;
+    margin: 10px auto 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-border-strong);
+  }
+}
+
+@media (forced-colors: active) {
+  :root[data-theme="light"] .daily-log-editor-overlay {
+    backdrop-filter: none;
+  }
+
+  :root[data-theme="light"] .daily-log-editor-panel {
+    border-color: CanvasText;
+  }
+
+  :root[data-theme="light"] .daily-log-editor-panel::before {
+    background: CanvasText;
+  }
+}

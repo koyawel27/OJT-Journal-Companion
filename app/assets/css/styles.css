@@ -2658,14 +2658,16 @@ body.daily-log-editor-open {
   display: grid;
   place-items: center;
   background: var(--overlay);
-  padding: 24px;
+  overflow: hidden;
+  padding: clamp(24px, 4vh, 48px) clamp(24px, 4vw, 56px);
 }
 
 .daily-log-editor-panel {
   display: flex;
+  min-height: 0;
   flex-direction: column;
-  width: min(980px, 100%);
-  max-height: calc(100vh - 48px);
+  width: min(920px, 100%);
+  max-height: min(820px, calc(100dvh - 64px));
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--panel);
@@ -2675,6 +2677,7 @@ body.daily-log-editor-open {
 
 .daily-log-editor-header {
   display: flex;
+  flex: 0 0 auto;
   align-items: start;
   justify-content: space-between;
   gap: 16px;
@@ -2683,18 +2686,29 @@ body.daily-log-editor-open {
   padding: 16px 18px;
 }
 
+.daily-log-editor-header > div {
+  min-width: 0;
+}
+
 .daily-log-editor-header h3 {
   margin: 4px 0 8px;
   font-size: 1.15rem;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .editor-close-button {
   flex: 0 0 auto;
+  min-width: 72px;
+  min-height: 44px;
 }
 
 .daily-log-editor-body {
-  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 18px;
 }
 
@@ -2789,33 +2803,37 @@ body.daily-log-editor-open {
   }
 
   .daily-log-editor-overlay {
-    display: block;
-    padding: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding:
+      max(8px, env(safe-area-inset-top, 0px))
+      max(8px, env(safe-area-inset-right, 0px))
+      0
+      max(8px, env(safe-area-inset-left, 0px));
   }
 
   .daily-log-editor-panel {
     width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    max-height: none;
-    border: 0;
-    border-radius: 0;
+    height: auto;
+    max-height: calc(100vh - 56px);
+    max-height: min(90dvh, calc(100dvh - 56px));
   }
 
   .daily-log-editor-header {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: flex-start;
+    flex-direction: row;
     gap: 12px;
-    padding: 14px;
+    padding: 10px 16px 14px;
   }
 
   .editor-close-button {
-    width: 100%;
+    width: auto;
     min-height: 44px;
   }
 
   .daily-log-editor-body {
-    padding: 14px;
+    padding: 16px;
   }
 
   .daily-log-editor-body .journal-row {
