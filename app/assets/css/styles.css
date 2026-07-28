@@ -2712,13 +2712,346 @@ body.daily-log-editor-open {
   padding: 18px;
 }
 
-.daily-log-editor-body .journal-row {
-  grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
+.daily-log-editor-flow {
+  display: grid;
+  width: min(100%, 820px);
+  margin-inline: auto;
+}
+
+.daily-log-editor-flow > .editor-section {
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 24px;
+}
+
+.daily-log-editor-flow > .editor-section + .editor-section {
+  padding-top: 10px;
+}
+
+.daily-log-editor-flow[hidden] {
+  display: none;
 }
 
 .daily-log-editor-body .day-record-form,
 .daily-log-editor-body .task-form {
   gap: 0;
+}
+
+.daily-details-heading {
+  min-width: 0;
+  margin-bottom: 12px;
+}
+
+.daily-details-heading .journal-day-heading {
+  margin-bottom: 0;
+  text-wrap: balance;
+}
+
+.daily-status-group {
+  display: grid;
+  grid-template-columns: minmax(0, 240px);
+  margin-bottom: 14px;
+}
+
+.daily-status-field,
+.time-entry-grid .field,
+.rendered-time-strip {
+  min-width: 0;
+}
+
+.daily-status-field select,
+.time-entry-grid input {
+  min-height: 52px;
+}
+
+.daily-log-editor-body .time-entry-fieldset {
+  margin-bottom: 0;
+  border: 0;
+  padding: 0;
+}
+
+.daily-log-editor-body .time-entry-fieldset legend {
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.time-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 0.8fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.time-entry-grid .field {
+  align-content: start;
+}
+
+.time-entry-grid input {
+  min-width: 0;
+  padding-inline: 10px;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.rendered-time-strip {
+  display: grid;
+  grid-template-columns: auto minmax(110px, 0.35fr) minmax(0, 1.65fr);
+  align-items: center;
+  gap: 4px 14px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+}
+
+.rendered-time-strip strong {
+  margin-top: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.rendered-time-strip p {
+  margin-top: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.rendered-time-strip .time-reference {
+  grid-column: 1 / -1;
+}
+
+.daily-tasks-section .journal-col-header,
+.photo-documentation-panel .journal-col-header,
+.daily-remarks-section .journal-col-header {
+  margin-bottom: 12px;
+}
+
+.daily-tasks-header {
+  display: grid;
+  gap: 6px;
+}
+
+.daily-tasks-heading-row {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.daily-tasks-heading-row > div {
+  min-width: 0;
+}
+
+.daily-tasks-heading-row h4 {
+  margin-bottom: 0;
+}
+
+.task-add-button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 8px 14px;
+}
+
+.daily-tasks-section .task-list-display {
+  margin-bottom: 16px;
+}
+
+.daily-tasks-section .task-bullet-item {
+  border-color: color-mix(in srgb, var(--line) 68%, transparent);
+  background: color-mix(in srgb, var(--surface-subtle) 72%, transparent);
+  box-shadow: none;
+}
+
+.task-editor-subview {
+  display: grid;
+  gap: 18px;
+  width: min(100%, 560px);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.task-editor-subview-header {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.task-editor-subview-header > div {
+  min-width: 0;
+}
+
+.task-editor-subview-header h4 {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.task-editor-subview-header .phase-note {
+  margin-top: 6px;
+}
+
+.task-editor-back-button {
+  justify-self: start;
+}
+
+.task-editor-actions .form-message {
+  flex-basis: 100%;
+}
+
+.task-editor-form {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  padding: 16px;
+}
+
+.task-form-heading {
+  margin-bottom: 12px;
+}
+
+.task-details-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.55fr);
+  align-items: end;
+  gap: 14px;
+}
+
+.task-duration-fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.task-duration-fieldset legend {
+  margin-bottom: 7px;
+  padding: 0;
+  color: var(--label);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.task-duration-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(88px, 128px));
+  gap: 10px;
+}
+
+.task-duration-fields .field,
+.task-status-field {
+  margin-bottom: 0;
+}
+
+.task-duration-fields input,
+.task-status-field select {
+  min-height: 48px;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-log-editor-flow .photo-documentation-panel {
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 10px;
+}
+
+.daily-remarks-section textarea {
+  min-height: 84px;
+}
+
+.editor-final-actions {
+  display: grid;
+  gap: 16px;
+  padding-top: 22px;
+}
+
+.editor-final-actions .day-record-actions {
+  justify-content: flex-end;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.editor-final-actions .destructive-actions {
+  margin-top: 6px;
+  border-top-color: color-mix(in srgb, var(--danger-border) 72%, transparent);
+}
+@media (max-width: 760px) {
+  .daily-status-group {
+    grid-template-columns: 1fr;
+  }
+
+  .time-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .time-entry-grid .field:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .rendered-time-strip {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .rendered-time-strip .time-reference {
+    grid-column: auto;
+  }
+
+  .daily-tasks-heading-row {
+    align-items: center;
+  }
+
+  .task-editor-subview {
+    width: 100%;
+  }
+
+  .task-editor-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .task-editor-actions .primary-button,
+  .task-editor-actions .secondary-button,
+  .task-editor-actions .form-message {
+    width: 100%;
+    grid-column: auto;
+  }
+
+  .task-details-row {
+    grid-template-columns: 1fr;
+  }
+
+  .task-duration-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .task-editor-actions .form-message {
+    grid-column: 1 / -1;
+  }
+
+  .editor-final-actions .day-record-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .editor-final-actions .day-record-actions .primary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .time-entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-tasks-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .task-add-button {
+    width: 100%;
+  }
 }
 
 .task-title-row {
@@ -2836,10 +3169,6 @@ body.daily-log-editor-open {
     padding: 16px;
   }
 
-  .daily-log-editor-body .journal-row {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
 
   .daily-log-editor-body .form-actions .secondary-button,
   .daily-log-editor-body .form-actions .danger-button {

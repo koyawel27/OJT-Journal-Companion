@@ -10,7 +10,11 @@
     expandedRecordDate: null,
     expandedDate: null,
     activeDailyLogId: null,
-    returnFocusElement: null
+    returnFocusElement: null,
+    taskEditorMode: "",
+    taskEditorTaskId: "",
+    taskEditorScrollTop: 0,
+    taskEditorOriginFocusKey: ""
   };
   let dailyLogKeydownHandler = null;
   const dailyRecordThumbnailUrls = new Map();
@@ -244,6 +248,19 @@
     }
 
     return parseDate(dateText).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function formatEditorDisplayDate(dateText) {
+    if (!dateText) {
+      return "No date";
+    }
+
+    return parseDate(dateText).toLocaleDateString(undefined, {
+      weekday: "long",
       month: "short",
       day: "numeric",
       year: "numeric"
@@ -620,7 +637,7 @@
     }
 
     return `
-      <div class="calculation-result" aria-live="polite">
+      <div class="calculation-result rendered-time-strip" aria-live="polite">
         <span class="card-label">Rendered time</span>
         <strong id="daily-rendered-time-preview">${escapeHtml(renderedText)}</strong>
         <p id="daily-rendered-time-help">${escapeHtml(helpText)}</p>
@@ -723,10 +740,10 @@
   function renderPhotoSection(dailyLog) {
     if (!dailyLog) {
       return `
-        <section class="photo-documentation-panel">
+        <section class="photo-documentation-panel editor-section">
           <div class="journal-col-header">
-            <span class="card-label">Photo documentation</span>
-            <h4>Attached photos</h4>
+            <span class="card-label">Attachments</span>
+            <h4>Photo Documentation</h4>
             <p class="phase-note">Save the day record before attaching photos.</p>
           </div>
         </section>
@@ -736,10 +753,10 @@
     const photoSets = getPhotoSetsForDailyLog(dailyLog.id);
 
     return `
-      <section class="photo-documentation-panel" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
+      <section class="photo-documentation-panel editor-section" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
         <div class="journal-col-header">
-          <span class="card-label">Photo documentation</span>
-          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Attached photos</h4>
+          <span class="card-label">Attachments</span>
+          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Photo Documentation</h4>
           <p class="phase-note">Optional — attach JPEG, PNG, or WebP up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
         </div>
 
@@ -775,6 +792,67 @@
     `;
   }
 
+  function renderTaskEditorSubview() {
+    return `
+      <section class="task-editor-subview" id="daily-task-editor-view" aria-labelledby="daily-task-form-title">
+        <div class="task-editor-subview-header">
+          <button class="secondary-button task-editor-back-button" type="button" data-task-action="cancel-editor">Back to Daily Log</button>
+          <div>
+            <span class="card-label">Task Editor</span>
+            <h4 id="daily-task-form-title">${state.taskEditorMode === "edit" ? "Edit Task" : "Add Task"}</h4>
+            <p class="phase-note">Record one work item without leaving this daily log.</p>
+          </div>
+        </div>
+
+        <form class="task-form task-editor-form" id="daily-task-form" aria-labelledby="daily-task-form-title" novalidate>
+          <input type="hidden" id="daily-task-id" value="">
+          <input type="hidden" id="daily-task-time-spent" value="">
+          <div class="form-grid">
+            <label class="field field-wide">
+              <span>Task or work item description</span>
+              <input type="text" id="daily-task-description" autocomplete="off" required>
+            </label>
+            <div class="task-details-row field-wide">
+              <fieldset class="task-duration-fieldset">
+                <legend>Task duration (optional)</legend>
+                <div class="task-duration-fields">
+                  <label class="field">
+                    <span>Hours</span>
+                    <input type="number" id="daily-task-time-hours" min="0" step="1" inputmode="numeric" autocomplete="off" aria-describedby="daily-task-duration-help">
+                  </label>
+                  <label class="field">
+                    <span>Minutes</span>
+                    <input type="number" id="daily-task-time-minutes" min="0" max="59" step="1" inputmode="numeric" autocomplete="off" aria-describedby="daily-task-duration-help">
+                  </label>
+                </div>
+              </fieldset>
+              <label class="field task-status-field">
+                <span>Status</span>
+                <select id="daily-task-status" autocomplete="off">
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </label>
+            </div>
+            <label class="field field-wide">
+              <span>Task notes</span>
+              <textarea id="daily-task-notes" rows="2" autocomplete="off"></textarea>
+            </label>
+          </div>
+
+          <p class="phase-note" id="daily-task-duration-help">Task duration is optional and for documentation only. Rendered hours still come from time in, time out, and break.</p>
+
+          <div class="form-actions task-editor-actions">
+            <button class="primary-button" type="submit" id="save-daily-task-button">Save Task</button>
+            <button class="secondary-button" type="button" id="cancel-daily-task-edit-button">Cancel</button>
+            <p class="form-message" id="daily-task-form-message" aria-live="polite" hidden></p>
+          </div>
+        </form>
+      </section>
+    `;
+  }
+
   function renderDayEditorBody(week, dateText, dailyLog) {
     const dayLabel = getDayLabel(week, dateText);
     const dayStatus = getDailyLogStatus(dailyLog);
@@ -791,101 +869,85 @@
       : "";
 
     return `
-      <div class="journal-row">
-        <div class="journal-col journal-col-time">
-          <form class="day-record-form" id="daily-log-form" novalidate>
+      <div class="daily-log-editor-flow">
+          <form class="day-record-form editor-section editor-details-section" id="daily-log-form" novalidate>
             <input type="hidden" id="daily-log-id" value="${escapeHtml(dailyLog?.id || "")}">
             <input type="hidden" id="daily-log-form-week" value="${escapeHtml(week.id)}">
             <input type="hidden" id="daily-log-entry-date" value="${escapeHtml(dateText)}">
 
-            <span class="card-label">${escapeHtml(dayLabel)}</span>
-            <h4 class="journal-day-heading">${escapeHtml(formatDisplayDate(dateText))}</h4>
+            <div class="daily-details-heading">
+              <span class="card-label">${escapeHtml(dayLabel)}</span>
+              <h4 class="journal-day-heading">${escapeHtml(formatEditorDisplayDate(dateText))}</h4>
+            </div>
 
-            <label class="field">
-              <span>Day status</span>
-              <select id="daily-log-day-status" data-editor-initial-focus="true">
-                ${renderOptions(dayStatuses, dayStatus)}
-              </select>
-            </label>
+            <div class="daily-status-group">
+              <label class="field daily-status-field">
+                <span>Day status</span>
+                <select id="daily-log-day-status" data-editor-initial-focus="true">
+                  ${renderOptions(dayStatuses, dayStatus)}
+                </select>
+              </label>
+            </div>
 
             <fieldset class="journal-fieldset time-entry-fieldset">
-              <legend>Worked-day timing</legend>
-              <label class="field time-field${timePanelClass}">
-                <span>Time in</span>
-                <input type="time" id="daily-log-time-in" value="${escapeHtml(dailyLog?.timeIn || "")}" ${timeFieldState}>
-              </label>
-              <label class="field time-field${timePanelClass}">
-                <span>Time out</span>
-                <input type="time" id="daily-log-time-out" value="${escapeHtml(dailyLog?.timeOut || "")}" ${timeFieldState}>
-              </label>
-              <label class="field time-field${timePanelClass}">
-                <span>Break minutes</span>
-                <input type="number" id="daily-log-break-minutes" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}" ${timeFieldState}>
-              </label>
+              <legend>Time fields</legend>
+              <div class="time-entry-grid">
+                <label class="field time-field${timePanelClass}">
+                  <span>Time in</span>
+                  <input type="time" id="daily-log-time-in" aria-describedby="daily-rendered-time-help" value="${escapeHtml(dailyLog?.timeIn || "")}" ${timeFieldState}>
+                </label>
+                <label class="field time-field${timePanelClass}">
+                  <span>Time out</span>
+                  <input type="time" id="daily-log-time-out" aria-describedby="daily-rendered-time-help" value="${escapeHtml(dailyLog?.timeOut || "")}" ${timeFieldState}>
+                </label>
+                <label class="field time-field${timePanelClass}">
+                  <span>Break minutes</span>
+                  <input type="number" id="daily-log-break-minutes" aria-describedby="daily-rendered-time-help" min="0" step="1" inputmode="numeric" placeholder="0" value="${dailyLog?.breakMinutes ? dailyLog.breakMinutes : ""}" ${timeFieldState}>
+                </label>
+              </div>
+              ${renderRenderedTimePanel(dailyLog, tasks)}
             </fieldset>
-            <label class="field field-wide">
-              <span>Day remarks</span>
-              <textarea id="daily-log-day-remarks" rows="2" placeholder="Optional reason or notes">${escapeHtml(dailyLog?.dayRemarks || "")}</textarea>
-            </label>
-
-            ${renderRenderedTimePanel(dailyLog, tasks)}
-
-            <div class="form-actions day-record-actions">
-              <button class="primary-button" type="submit" id="save-daily-log-button">Save day record</button>
-              <p class="form-message" id="daily-log-form-message" hidden></p>
-            </div>
           </form>
-          ${deleteButton}
-        </div>
 
-        <div class="journal-col journal-col-tasks">
-          <div class="journal-col-header">
-            <span class="card-label">Task/work items</span>
-            <h4>Accomplishments</h4>
+        <section class="editor-section daily-tasks-section" aria-labelledby="daily-tasks-title">
+          <div class="journal-col-header daily-tasks-header">
+            <div class="daily-tasks-heading-row">
+              <div>
+                <span class="card-label">Work completed</span>
+                <h4 id="daily-tasks-title">Daily Tasks</h4>
+              </div>
+              <button class="secondary-button task-add-button" type="button" id="daily-task-add-button" data-task-action="add" ${tasksEnabled ? "" : "disabled"}>Add Task</button>
+            </div>
             <p class="phase-note">${tasksEnabled ? "Add what you accomplished today - these become journal bullets." : "Save the day record first, then add task items here."}</p>
           </div>
 
           <div class="task-list-display" id="daily-task-list">
             ${tasksEnabled ? renderTaskBullets(tasks) : '<p class="empty-state">Task items appear here after you save the day record.</p>'}
           </div>
+          <p class="form-message" id="daily-task-list-message" aria-live="polite" hidden></p>
+        </section>
 
-          <form class="task-form" id="daily-task-form" novalidate>
-            <input type="hidden" id="daily-task-id" value="">
-            <div class="form-grid">
-              <label class="field field-wide">
-                <span>Task or work item description</span>
-                <input type="text" id="daily-task-description" ${tasksEnabled ? "" : "disabled"} required>
-              </label>
-              <label class="field">
-                <span>Time spent in minutes</span>
-                <input type="number" id="daily-task-time-spent" min="0" step="1" inputmode="numeric" placeholder="Optional" ${tasksEnabled ? "" : "disabled"}>
-              </label>
-              <label class="field">
-                <span>Status</span>
-                <select id="daily-task-status" ${tasksEnabled ? "" : "disabled"}>
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </label>
-              <label class="field field-wide">
-                <span>Task notes</span>
-                <textarea id="daily-task-notes" rows="2" ${tasksEnabled ? "" : "disabled"}></textarea>
-              </label>
-            </div>
+        ${renderPhotoSection(dailyLog)}
 
-            <p class="phase-note">Task time is for your notes only - rendered hours come from time in, time out, and break.</p>
+        <section class="editor-section daily-remarks-section" aria-labelledby="daily-remarks-title">
+          <div class="journal-col-header">
+            <span class="card-label">Optional notes</span>
+            <h4 id="daily-remarks-title">Day Remarks</h4>
+          </div>
+          <label class="field field-wide">
+            <span>Remarks for this day</span>
+            <textarea id="daily-log-day-remarks" form="daily-log-form" rows="2" placeholder="Optional reason or notes">${escapeHtml(dailyLog?.dayRemarks || "")}</textarea>
+          </label>
+        </section>
 
-            <div class="form-actions">
-              <button class="primary-button" type="submit" id="save-daily-task-button" ${tasksEnabled ? "" : "disabled"}>Save task item</button>
-              <button class="secondary-button" type="button" id="cancel-daily-task-edit-button" hidden>Cancel task edit</button>
-              <p class="form-message" id="daily-task-form-message" hidden></p>
-            </div>
-          </form>
+        <div class="editor-final-actions">
+          <div class="form-actions day-record-actions">
+            <button class="primary-button" type="submit" form="daily-log-form" id="save-daily-log-button">Save day record</button>
+            <p class="form-message" id="daily-log-form-message" hidden></p>
+          </div>
+          ${deleteButton}
         </div>
       </div>
-
-      ${renderPhotoSection(dailyLog)}
     `;
   }
   function getDayRecordToggleId(dateText) {
@@ -1047,6 +1109,10 @@
     state.expandedDate = null;
     state.activeDailyLogId = null;
     state.returnFocusElement = null;
+    state.taskEditorMode = "";
+    state.taskEditorTaskId = "";
+    state.taskEditorScrollTop = 0;
+    state.taskEditorOriginFocusKey = "";
 
     try {
       renderJournalWeek();
@@ -1097,6 +1163,11 @@
       return;
     }
     if (event.key === "Escape") {
+      if (state.taskEditorMode) {
+        event.preventDefault();
+        closeTaskEditor();
+        return;
+      }
       event.preventDefault();
       closeDailyLogEditor();
       return;
@@ -1396,6 +1467,52 @@
     };
   }
 
+  function getTaskDurationValues() {
+    const hoursValue = getValue("daily-task-time-hours");
+    const minutesValue = getValue("daily-task-time-minutes");
+
+    return {
+      hoursValue,
+      minutesValue,
+      hasValue: hoursValue !== "" || minutesValue !== "",
+      hours: hoursValue === "" ? 0 : Number(hoursValue),
+      minutes: minutesValue === "" ? 0 : Number(minutesValue)
+    };
+  }
+
+  function validateTaskDuration(duration) {
+    if (duration.hoursValue !== "" && (!/^\d+$/.test(duration.hoursValue) || !Number.isInteger(duration.hours) || duration.hours < 0)) {
+      return "Task duration hours must be a non-negative whole number.";
+    }
+
+    if (duration.minutesValue !== "" && (!/^\d+$/.test(duration.minutesValue) || !Number.isInteger(duration.minutes) || duration.minutes < 0 || duration.minutes > 59)) {
+      return "Task duration minutes must be a whole number from 0 through 59.";
+    }
+
+    return "";
+  }
+
+  function syncTaskDurationTotal(duration = getTaskDurationValues()) {
+    const totalMinutes = duration.hours * 60 + duration.minutes;
+    setValue("daily-task-time-spent", duration.hasValue && totalMinutes > 0 ? totalMinutes : "");
+  }
+
+  function setTaskDurationControls(totalMinutes) {
+    const normalizedMinutes = Number(totalMinutes);
+
+    if (!Number.isFinite(normalizedMinutes) || normalizedMinutes <= 0) {
+      setValue("daily-task-time-hours", "");
+      setValue("daily-task-time-minutes", "");
+      setValue("daily-task-time-spent", "");
+      return;
+    }
+
+    const wholeMinutes = Math.floor(normalizedMinutes);
+    setValue("daily-task-time-hours", Math.floor(wholeMinutes / 60));
+    setValue("daily-task-time-minutes", wholeMinutes % 60);
+    setValue("daily-task-time-spent", wholeMinutes);
+  }
+
   function validateTask(task) {
     if (!task.dailyLogId) {
       return "Save the day record before adding tasks.";
@@ -1419,18 +1536,100 @@
   function resetTaskFormFields() {
     setValue("daily-task-id", "");
     setValue("daily-task-description", "");
-    setValue("daily-task-time-spent", "");
+    setTaskDurationControls(0);
     setValue("daily-task-status", "Pending");
     setValue("daily-task-notes", "");
+    setText("daily-task-form-title", "Add Task");
     const saveButton = getElement("save-daily-task-button");
     if (saveButton) {
-      saveButton.textContent = "Save task item";
+      saveButton.textContent = "Save Task";
     }
     const cancelButton = getElement("cancel-daily-task-edit-button");
     if (cancelButton) {
-      cancelButton.hidden = true;
+      cancelButton.hidden = !state.taskEditorMode;
     }
     window.OJTUI.clearFormMessage(getElement("daily-task-form-message"));
+  }
+
+  function refreshTaskListInEditor() {
+    const dailyLog = getActiveDailyLog();
+    const list = getElement("daily-task-list");
+    if (!dailyLog || !list) {
+      return;
+    }
+
+    list.innerHTML = renderTaskBullets(getTasksForDailyLog(dailyLog.id));
+  }
+
+  function openTaskEditor(task, originButton) {
+    const editorBody = getEditorPanel()?.querySelector(".daily-log-editor-body");
+    const mainEditor = editorBody?.querySelector(".daily-log-editor-flow");
+    if (!editorBody || !mainEditor || !getActiveDailyLog()) {
+      return;
+    }
+
+    state.taskEditorMode = task ? "edit" : "add";
+    state.taskEditorTaskId = task?.id || "";
+    state.taskEditorScrollTop = editorBody.scrollTop;
+    state.taskEditorOriginFocusKey = getEditorFocusKey(originButton) || "id:daily-task-add-button";
+
+    editorBody.querySelector("#daily-task-editor-view")?.remove();
+    mainEditor.hidden = true;
+    mainEditor.inert = true;
+    mainEditor.setAttribute("inert", "");
+    editorBody.insertAdjacentHTML("beforeend", renderTaskEditorSubview());
+    editorBody.scrollTop = 0;
+
+    if (task) {
+      startEditTask(task);
+    } else {
+      resetTaskFormFields();
+    }
+
+    window.requestAnimationFrame(() => getElement("daily-task-description")?.focus());
+  }
+
+  function closeTaskEditor(options = {}) {
+    if (!state.taskEditorMode) {
+      return;
+    }
+
+    const editorBody = getEditorPanel()?.querySelector(".daily-log-editor-body");
+    const mainEditor = editorBody?.querySelector(".daily-log-editor-flow");
+    const scrollTop = state.taskEditorScrollTop;
+    const focusKey = options.focusKey || state.taskEditorOriginFocusKey || "id:daily-task-add-button";
+
+    editorBody?.querySelector("#daily-task-editor-view")?.remove();
+    if (mainEditor) {
+      mainEditor.hidden = false;
+      mainEditor.inert = false;
+      mainEditor.removeAttribute("inert");
+    }
+
+    state.taskEditorMode = "";
+    state.taskEditorTaskId = "";
+    state.taskEditorScrollTop = 0;
+    state.taskEditorOriginFocusKey = "";
+
+    if (options.refreshTasks) {
+      refreshTaskListInEditor();
+    }
+    if (options.message) {
+      window.OJTUI.showFormMessage(getElement("daily-task-list-message"), options.message, "success");
+    }
+
+    if (editorBody) {
+      editorBody.scrollTop = scrollTop;
+    }
+    window.requestAnimationFrame(() => {
+      if (editorBody) {
+        editorBody.scrollTop = scrollTop;
+      }
+      const target = findEditorFocusTarget(focusKey) || getElement("daily-task-add-button");
+      if (isVisibleFocusable(target)) {
+        target.focus();
+      }
+    });
   }
 
   function getDailyLogInvalidFieldIds(message) {
@@ -1525,6 +1724,15 @@
     window.OJTUI.clearFieldValidation(form);
     window.OJTUI.clearFormMessage(messageElement);
 
+    const duration = getTaskDurationValues();
+    const durationValidationMessage = validateTaskDuration(duration);
+    if (durationValidationMessage) {
+      const invalidFieldId = /hours/i.test(durationValidationMessage) ? "daily-task-time-hours" : "daily-task-time-minutes";
+      showValidationError(form, durationValidationMessage, [invalidFieldId]);
+      return;
+    }
+
+    syncTaskDurationTotal(duration);
     const task = buildTaskRecord();
     const validationMessage = validateTask(task);
     if (validationMessage) {
@@ -1535,11 +1743,13 @@
     try {
       const savedTask = await window.OJTStorage.saveDailyTask(task);
       state.dailyTasks = state.dailyTasks.filter((existingTask) => existingTask.id !== savedTask.id).concat(savedTask);
-      resetTaskFormFields();
-      renderJournalWeek();
       updateWeekSummary();
       notifyJournalDataChange();
-      window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item saved.", "success");
+      closeTaskEditor({
+        refreshTasks: true,
+        message: "Task item saved.",
+        focusKey: `task:${savedTask.id}:edit`
+      });
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Task item could not be saved. Please try again.", "error");
       console.error(error);
@@ -1548,10 +1758,11 @@
   function startEditTask(task) {
     setValue("daily-task-id", task.id);
     setValue("daily-task-description", task.description);
-    setValue("daily-task-time-spent", Number(task.timeSpentMinutes) > 0 ? task.timeSpentMinutes : "");
+    setTaskDurationControls(task.timeSpentMinutes);
     setValue("daily-task-status", task.status);
     setValue("daily-task-notes", task.notes);
-    setText("save-daily-task-button", "Save task changes");
+    setText("daily-task-form-title", "Edit Task");
+    setText("save-daily-task-button", "Save Task Changes");
     getElement("cancel-daily-task-edit-button").hidden = false;
     window.OJTUI.clearFormMessage(getElement("daily-task-form-message"));
   }
@@ -1570,9 +1781,9 @@
       renderJournalWeek();
       updateWeekSummary();
       notifyJournalDataChange();
-      window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item deleted.", "success");
+      window.OJTUI.showFormMessage(getElement("daily-task-list-message"), "Task item deleted.", "success");
     } catch (error) {
-      window.OJTUI.showFormMessage(getElement("daily-task-form-message"), "Task item could not be deleted. Please try again.", "error");
+      window.OJTUI.showFormMessage(getElement("daily-task-list-message"), "Task item could not be deleted. Please try again.", "error");
       console.error(error);
     }
   }
@@ -1739,7 +1950,7 @@
 
   function handleJournalClick(event) {
     if (event.target.id === "cancel-daily-task-edit-button") {
-      resetTaskFormFields();
+      closeTaskEditor();
       return;
     }
 
@@ -1791,13 +2002,23 @@
       return;
     }
 
+    if (taskButton.dataset.taskAction === "cancel-editor") {
+      closeTaskEditor();
+      return;
+    }
+
+    if (taskButton.dataset.taskAction === "add") {
+      openTaskEditor(null, taskButton);
+      return;
+    }
+
     const task = state.dailyTasks.find((savedTask) => savedTask.id === taskButton.dataset.taskId);
     if (!task) {
       return;
     }
 
     if (taskButton.dataset.taskAction === "edit") {
-      startEditTask(task);
+      openTaskEditor(task, taskButton);
     }
 
     if (taskButton.dataset.taskAction === "delete") {
@@ -1861,6 +2082,12 @@
         }
         if (["daily-log-time-in", "daily-log-time-out", "daily-log-break-minutes"].includes(event.target.id)) {
           updateRenderedPreview();
+        }
+        if (["daily-task-time-hours", "daily-task-time-minutes"].includes(event.target.id)) {
+          const duration = getTaskDurationValues();
+          if (!validateTaskDuration(duration)) {
+            syncTaskDurationTotal(duration);
+          }
         }
       });
       root.addEventListener("change", (event) => {

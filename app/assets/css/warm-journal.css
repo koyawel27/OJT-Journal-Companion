@@ -618,3 +618,86 @@ body {
     background: CanvasText;
   }
 }
+
+/* Phase 5D E2B: Warm Journal Daily Log task and surface simplification. */
+:root[data-theme="light"] .daily-details-heading {
+  border-left: 0;
+  background: transparent;
+  padding: 0;
+}
+
+:root[data-theme="light"] .daily-details-heading .card-label {
+  color: var(--color-focus-ring);
+}
+
+:root[data-theme="light"] .daily-status-field select {
+  border-color: var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-shell) 64%, var(--color-page));
+  font-weight: 600;
+}
+
+:root[data-theme="light"] .time-entry-fieldset {
+  border-color: transparent;
+  background: transparent;
+}
+
+:root[data-theme="light"] .time-entry-fieldset legend {
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="light"] .rendered-time-strip {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 52%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-state-active) 74%, var(--color-page));
+}
+
+:root[data-theme="light"] .rendered-time-strip strong {
+  color: var(--color-focus-ring);
+}
+
+:root[data-theme="light"] .rendered-time-strip p {
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="light"] .daily-log-editor-panel .primary-button {
+  border: 0;
+}
+
+:root[data-theme="light"] .daily-log-editor-panel .primary-button:hover {
+  border: 0;
+}
+
+:root[data-theme="light"] .daily-log-editor-panel .secondary-button {
+  border-color: color-mix(in srgb, var(--color-border-subtle) 54%, transparent);
+  background: color-mix(in srgb, var(--color-shell) 62%, var(--color-page));
+}
+
+:root[data-theme="light"] .daily-log-editor-panel .secondary-button:hover {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 42%, transparent);
+}
+
+:root[data-theme="light"] .task-editor-subview {
+  background: transparent;
+}
+
+:root[data-theme="light"] .task-editor-form {
+  background: color-mix(in srgb, var(--color-shell) 58%, var(--color-page));
+}
+
+:root[data-theme="light"] .daily-tasks-section .task-bullet-item {
+  border-color: color-mix(in srgb, var(--color-border-subtle) 62%, transparent);
+  background: color-mix(in srgb, var(--color-page) 76%, var(--color-shell));
+}
+
+:root[data-theme="light"] .task-duration-fieldset legend,
+:root[data-theme="light"] .task-form-heading .card-label {
+  color: var(--color-text-interactive);
+}
+
+@media (forced-colors: active) {
+  .daily-details-heading,
+  .time-entry-fieldset,
+  .rendered-time-strip,
+  .task-editor-form {
+    border-color: CanvasText;
+  }
+}
