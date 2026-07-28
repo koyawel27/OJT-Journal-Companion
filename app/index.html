@@ -541,29 +541,31 @@
           <header class="journal-page-header">
             <p class="section-kicker">Selected-week workspace</p>
             <h2 id="journal-title">Journal</h2>
-            <p>Manage one selected OJT week, its daily records, and its weekly summary in one workspace.</p>
+            <p>Manage one OJT week and keep your daily progress organized.</p>
           </header>
 
           <div class="journal-layout">
-            <section class="week-panel journal-toolbar" aria-labelledby="journal-toolbar-title">
-              <div class="panel-header journal-toolbar-header">
-                <h3 id="journal-toolbar-title">Week navigation</h3>
-                <p>Choose a saved week or move between weeks.</p>
-              </div>
-
+            <section class="week-panel journal-toolbar" aria-label="Week navigation">
               <div class="journal-toolbar-controls">
                 <div class="selected-week-navigation" id="journal-week-navigation">
-                  <button class="secondary-button week-step-button" type="button" id="journal-previous-week" aria-label="Select previous older week">Previous</button>
+                  <button class="secondary-button week-step-button" type="button" id="journal-previous-week" aria-label="Select previous older week">
+                    <span aria-hidden="true">&lsaquo;</span>
+                  </button>
                   <label class="field journal-week-picker">
                     <select id="journal-week-select" aria-label="Selected OJT week"></select>
                   </label>
-                  <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">Next</button>
+                  <button class="secondary-button week-step-button" type="button" id="journal-next-week" aria-label="Select next newer week">
+                    <span aria-hidden="true">&rsaquo;</span>
+                  </button>
                 </div>
-                <div class="journal-toolbar-actions">
-                  <button class="secondary-button" type="button" id="journal-new-week">New Week</button>
-                  <button class="secondary-button" type="button" id="journal-all-weeks" aria-controls="all-weeks-panel" aria-expanded="false">All Weeks</button>
-                  <button class="primary-button journal-log-today-button" type="button" id="journal-log-today">Log Today</button>
-                </div>
+                <button class="primary-button journal-log-today-button" type="button" id="journal-log-today">Log Today</button>
+                <details class="journal-action-disclosure journal-more-week-actions">
+                  <summary>More week actions</summary>
+                  <div class="journal-toolbar-actions">
+                    <button class="secondary-button" type="button" id="journal-new-week">New Week</button>
+                    <button class="secondary-button" type="button" id="journal-all-weeks" aria-controls="all-weeks-panel" aria-expanded="false">All Weeks</button>
+                  </div>
+                </details>
               </div>
               <p class="form-message" id="journal-message" aria-live="polite" hidden></p>
             </section>
@@ -621,35 +623,60 @@
             </section>
 
             <div class="journal-selected-workspace" id="journal-selected-workspace" hidden>
+              <div class="journal-overview-column">
               <section class="week-panel journal-overview" aria-labelledby="journal-overview-title">
+                <span class="journal-overview-bookmark" aria-hidden="true">
+                  <span>★</span>
+                </span>
                 <div class="panel-header journal-overview-header">
                   <div>
-                    <span class="card-label">Selected-week overview</span>
+                    <span class="card-label">Week Overview</span>
                     <h3 id="journal-overview-title">No week selected</h3>
                     <p id="journal-overview-dates"></p>
                   </div>
-                  <div class="journal-overview-actions">
-                    <button class="secondary-button" type="button" id="journal-edit-week">Edit Week</button>
-                    <button class="secondary-button" type="button" id="journal-focus-weekly-summary">Edit weekly summary</button>
-                    <button class="secondary-button" type="button" id="journal-open-preview">Preview &amp; Export</button>
+                </div>
+                <div class="journal-overview-grid">
+                  <div class="journal-overview-metric journal-overview-metric-rendered">
+                    <span class="journal-metric-icon journal-metric-icon-clock" aria-hidden="true"></span>
+                    <div class="journal-metric-copy">
+                      <span class="journal-metric-label">Rendered Hours</span>
+                      <strong id="journal-overview-rendered">0h 0m</strong>
+                    </div>
+                  </div>
+                  <div class="journal-overview-metric journal-overview-metric-days">
+                    <span class="journal-metric-icon journal-metric-icon-calendar" aria-hidden="true"></span>
+                    <div class="journal-metric-copy">
+                      <span class="journal-metric-label">Days Logged</span>
+                      <strong id="journal-overview-logged-days">0 of 0</strong>
+                    </div>
+                  </div>
+                  <div class="journal-overview-completion">
+                    <div class="journal-completion-status">
+                      <span class="journal-completion-label">Weekly Summary</span>
+                      <strong id="journal-overview-summary-state">Not started</strong>
+                    </div>
+                    <div class="journal-completion-track" aria-hidden="true">
+                      <span id="journal-overview-summary-progress"></span>
+                    </div>
                   </div>
                 </div>
-                <dl class="journal-overview-grid">
-                  <div>
-                    <dt>Rendered total</dt>
-                    <dd id="journal-overview-rendered">0h 0m</dd>
+                <details class="journal-action-disclosure journal-week-actions">
+                  <summary>Week actions</summary>
+                  <div class="journal-overview-actions">
+                    <button class="secondary-button" type="button" id="journal-edit-week">Edit Week</button>
+                    <button class="secondary-button" type="button" id="journal-focus-weekly-summary">Edit Weekly Summary</button>
+                    <button class="secondary-button" type="button" id="journal-open-preview">Preview &amp; Export</button>
                   </div>
-                  <div>
-                    <dt>Logged days</dt>
-                    <dd id="journal-overview-logged-days">0 of 0</dd>
-                  </div>
-                  <div>
-                    <dt>Weekly summary</dt>
-                    <dd id="journal-overview-summary-state">Not started</dd>
-                  </div>
-                </dl>
+                </details>
               </section>
 
+              <aside class="journal-tip-card" aria-labelledby="journal-tip-title">
+                <h3 id="journal-tip-title">Journal Tip</h3>
+                <p>Detailed logs help track your competency progress more effectively.</p>
+              </aside>
+              </div>
+
+              <div class="journal-records-column">
               <section class="week-panel journal-daily-panel" aria-labelledby="journal-daily-records-title">
                 <div class="panel-header">
                   <div>
@@ -662,15 +689,23 @@
               </section>
 
               <section class="week-panel journal-summary-panel" aria-labelledby="journal-weekly-summary-title">
-                <div class="panel-header">
-                  <div>
-                    <span class="card-label">Weekly reflection</span>
-                    <h3 id="journal-weekly-summary-title">Weekly summary</h3>
+                <div class="panel-header journal-summary-header">
+                  <div class="journal-summary-heading">
+                    <span class="journal-summary-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5Z"></path>
+                        <path d="M8 3.5v3M16 3.5v3M4.5 9h15M8 13h2.5M13.5 13H16M8 16.5h2.5"></path>
+                      </svg>
+                    </span>
+                    <div>
+                      <h3 id="journal-weekly-summary-title">Weekly summary</h3>
+                      <p class="journal-summary-helper">Save this summary so Preview &amp; Export reflects your latest changes.</p>
+                    </div>
                   </div>
-                  <p>Save the selected week's summary before Preview &amp; Export can reflect your latest changes.</p>
                 </div>
                 <div id="journal-weekly-summary"></div>
               </section>
+              </div>
             </div>
           </div>
         </section>

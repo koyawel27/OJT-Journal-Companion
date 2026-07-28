@@ -263,3 +263,309 @@ body {
     border-color: CanvasText;
   }
 }
+/* Phase 5D J1A: Warm Journal color and surface finish for the Stitch checkpoint. */
+#journal .journal-toolbar {
+  border-color: var(--color-border-subtle);
+  background: var(--color-shell);
+  box-shadow: var(--shadow-card);
+}
+
+#journal .journal-overview {
+  border-color: var(--color-border-subtle);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+#journal .journal-overview::after {
+  display: none;
+}
+
+#journal .journal-overview-bookmark {
+  background: var(--color-border-strong);
+}
+
+#journal .journal-metric-icon-clock {
+  background: var(--color-state-active);
+  color: var(--color-focus-ring);
+}
+
+#journal .journal-metric-icon-calendar {
+  background: var(--color-border-strong);
+  color: var(--color-text-inverse);
+}
+
+#journal .journal-tip-card {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 42%, var(--color-border-subtle));
+  background: var(--color-state-active);
+  box-shadow: none;
+}
+
+#journal .journal-tip-card h3 {
+  color: var(--color-focus-ring);
+}
+
+:root[data-theme="light"] #journal .journal-toolbar {
+  background: var(--color-shell);
+}
+
+:root[data-theme="light"] #journal .journal-overview {
+  background: var(--color-page);
+}
+
+:root[data-theme="light"] #journal .journal-tip-card p {
+  color: #3c4c10;
+}
+
+@media (forced-colors: active) {
+  #journal .journal-overview-bookmark,
+  #journal .journal-metric-icon-clock,
+  #journal .journal-metric-icon-calendar,
+  #journal .journal-completion-track span {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  #journal .journal-tip-card {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+/* Phase 5D J2A: Warm Journal skin for Daily Record accordions. */
+#journal .daily-record-accordion {
+  border-color: var(--color-border-subtle);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+#journal .daily-record-accordion.is-expanded {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 45%, var(--color-border-subtle));
+}
+
+#journal .daily-record-day-badge {
+  background: var(--color-focus-ring);
+}
+
+#journal .daily-record-panel {
+  background: color-mix(in srgb, var(--color-shell) 68%, var(--color-page));
+}
+
+#journal .daily-record-detail-grid > div {
+  background: color-mix(in srgb, var(--color-page) 82%, var(--color-shell));
+}
+
+#journal .daily-record-task-status {
+  background: var(--color-state-active);
+}
+
+#journal .daily-record-note {
+  background: var(--color-shell);
+}
+
+@media (forced-colors: active) {
+  #journal .daily-record-accordion,
+  #journal .daily-record-detail-grid > div {
+    border-color: CanvasText;
+  }
+
+  #journal .daily-record-day-badge {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+/* Phase 5D J2B: Warm Journal attachment thumbnail treatment. */
+#journal .daily-record-thumbnail {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 24%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-page) 76%, var(--color-shell));
+}
+
+#journal .daily-record-thumbnail-overflow {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 46%, var(--color-border-subtle));
+  background: var(--color-state-active);
+  color: var(--color-focus-ring);
+}
+
+@media (forced-colors: active) {
+  #journal .daily-record-thumbnail,
+  #journal .daily-record-thumbnail-overflow {
+    border-color: CanvasText;
+  }
+}
+/* Phase 5D J2C: quieter Daily Record surfaces and dividers. */
+#journal .daily-record-accordion {
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+#journal .daily-record-panel {
+  background: var(--color-page);
+}
+
+#journal .daily-record-note {
+  background: transparent;
+}
+
+#journal .daily-record-thumbnail {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 18%, var(--color-border-subtle));
+}
+/* Phase 5D J3A: Warm Journal Weekly Summary surface treatment. */
+#journal .journal-summary-panel {
+  border-color: var(--color-border-subtle);
+  background: var(--color-page);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+#journal .journal-summary-icon {
+  background: var(--color-state-active);
+  color: var(--color-focus-ring);
+}
+
+#journal .journal-summary-panel .weekly-summary-form textarea {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 28%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-shell) 72%, var(--color-page));
+}
+
+#journal .journal-summary-panel .weekly-summary-form textarea:hover {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 58%, var(--color-border-subtle));
+}
+
+/* Phase 5D J4A: Warm Journal Dark Mode visual fidelity. */
+:root[data-theme="dark"] #journal .journal-toolbar {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 24%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-shell) 78%, #4e3c3b);
+  box-shadow: 0 8px 24px rgba(10, 10, 10, 0.24);
+}
+
+:root[data-theme="dark"] #journal .journal-week-picker select,
+:root[data-theme="dark"] #journal .journal-toolbar .secondary-button,
+:root[data-theme="dark"] #journal .journal-overview .secondary-button,
+:root[data-theme="dark"] #journal .daily-record-editor-action {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 24%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-inset) 70%, var(--color-page));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] #journal .journal-overview,
+:root[data-theme="dark"] #journal .journal-summary-panel {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 22%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-page) 86%, #4e3c3b);
+  box-shadow: 0 1px 2px rgba(10, 10, 10, 0.32);
+}
+
+:root[data-theme="dark"] #journal .journal-overview-bookmark {
+  background: var(--color-text-interactive);
+  color: var(--color-text-inverse);
+}
+
+:root[data-theme="dark"] #journal .journal-metric-icon-clock,
+:root[data-theme="dark"] #journal .journal-summary-icon {
+  background: color-mix(in srgb, var(--color-inset) 82%, var(--color-page));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] #journal .journal-metric-icon-calendar {
+  background: var(--color-border-strong);
+  color: var(--color-text-inverse);
+}
+
+:root[data-theme="dark"] #journal .journal-completion-track {
+  background: color-mix(in srgb, var(--color-card) 82%, #292929);
+}
+
+:root[data-theme="dark"] #journal .journal-completion-track span {
+  background: var(--color-text-interactive);
+}
+
+:root[data-theme="dark"] #journal .journal-tip-card {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 34%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-inset) 44%, var(--color-page));
+}
+
+:root[data-theme="dark"] #journal .journal-tip-card h3 {
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] #journal .journal-tip-card p {
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] #journal .daily-record-accordion {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 16%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-page) 88%, var(--color-card));
+  box-shadow: 0 1px 2px rgba(10, 10, 10, 0.28);
+}
+
+:root[data-theme="dark"] #journal .daily-record-accordion.is-expanded {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 54%, var(--color-border-subtle));
+}
+
+:root[data-theme="dark"] #journal .daily-log-day-card.daily-record-toggle:hover {
+  background: color-mix(in srgb, var(--color-state-hover) 72%, var(--color-inset));
+}
+
+:root[data-theme="dark"] #journal .daily-record-day-badge {
+  background: var(--color-inset);
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] #journal .daily-record-panel {
+  border-top-color: color-mix(in srgb, var(--color-border-interactive) 18%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-page) 82%, var(--color-shell));
+}
+
+:root[data-theme="dark"] #journal .daily-record-detail-grid > div {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 14%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-card) 76%, var(--color-page));
+}
+
+:root[data-theme="dark"] #journal .daily-record-task-status,
+:root[data-theme="dark"] #journal .daily-record-thumbnail-overflow {
+  background: color-mix(in srgb, var(--color-inset) 72%, var(--color-page));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] #journal .daily-record-note {
+  border-left-color: var(--color-text-interactive);
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] #journal .daily-record-thumbnail {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 34%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-card) 72%, var(--color-page));
+}
+
+:root[data-theme="dark"] #journal .journal-summary-panel .weekly-summary-form textarea {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 30%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-card) 76%, var(--color-page));
+  color: var(--color-text-primary);
+  caret-color: var(--color-text-interactive);
+}
+
+:root[data-theme="dark"] #journal .journal-summary-panel .weekly-summary-form textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.82;
+}
+
+:root[data-theme="dark"] #journal .journal-summary-panel .weekly-summary-form textarea:hover {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 68%, var(--color-border-default));
+}
+
+:root[data-theme="dark"] #journal .journal-summary-panel .weekly-summary-form textarea:focus {
+  border-color: var(--color-border-interactive);
+  background: color-mix(in srgb, var(--color-card) 88%, #292929);
+}
+
+:root[data-theme="dark"] #journal :is(button, select, textarea, summary):focus-visible {
+  outline-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 2px #4e3c3b;
+}
+
+@media (forced-colors: active) {
+  #journal .journal-summary-panel,
+  #journal .journal-summary-panel .weekly-summary-form textarea {
+    border-color: CanvasText;
+  }
+
+  #journal .journal-summary-icon {
+    background: Canvas;
+    color: CanvasText;
+  }
+}

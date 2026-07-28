@@ -4766,3 +4766,1180 @@ body,
     max-width: none;
   }
 }
+/* Phase 5D J1A: compact Stitch Journal transplant checkpoint. */
+#journal .journal-page-header {
+  display: grid;
+  width: min(100%, 680px);
+  max-width: none;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+#journal .journal-page-header .section-kicker,
+#journal .journal-page-header h2,
+#journal .journal-page-header > p:last-child {
+  margin: 0;
+}
+
+#journal .journal-page-header h2 {
+  font-size: clamp(1.7rem, 7vw, 2rem);
+  line-height: 1.15;
+}
+
+#journal .journal-page-header > p:last-child {
+  max-width: 42ch;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+#journal .journal-layout {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+#journal .journal-toolbar,
+#journal .journal-overview,
+#journal .journal-tip-card {
+  box-sizing: border-box;
+  width: min(100%, 680px);
+  margin-inline: auto;
+}
+
+#journal .journal-toolbar,
+#journal .journal-overview {
+  border-top-width: 1px;
+  padding: 16px;
+}
+
+#journal .journal-toolbar-controls {
+  min-width: 0;
+  width: 100%;
+  gap: 12px;
+}
+
+#journal .selected-week-navigation {
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+
+#journal .journal-week-picker {
+  min-width: 0;
+  overflow: hidden;
+}
+
+#journal .journal-week-picker select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+  min-width: 0;
+  padding: 7px 30px 7px 12px;
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#journal .week-step-button,
+#journal .journal-toolbar .week-step-button {
+  display: grid;
+  width: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  padding: 0;
+  place-items: center;
+}
+
+#journal .week-step-button span {
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+#journal .journal-log-today-button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--radius-pill);
+}
+
+#journal .journal-action-disclosure {
+  min-width: 0;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 10px;
+}
+
+#journal .journal-action-disclosure summary {
+  width: fit-content;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+#journal .journal-action-disclosure summary:hover {
+  color: var(--color-text-primary);
+}
+
+#journal .journal-action-disclosure summary:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid var(--color-state-active);
+  outline-offset: 3px;
+}
+
+#journal .journal-toolbar-actions,
+#journal .journal-overview-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#journal .journal-toolbar-actions .secondary-button,
+#journal .journal-overview-actions .secondary-button {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+}
+
+#journal .journal-toolbar .form-message {
+  margin-top: 10px;
+}
+
+#journal #week-form-panel {
+  min-width: 0;
+}
+
+#journal #week-form {
+  box-sizing: border-box;
+  width: min(100%, 800px);
+  margin-inline: auto;
+}
+
+#journal #week-form .field,
+#journal #week-form input {
+  min-width: 0;
+}
+
+#journal .journal-selected-workspace {
+  gap: 16px;
+}
+
+#journal .journal-overview {
+  position: relative;
+  overflow: hidden;
+}
+
+#journal .journal-overview-header {
+  display: block;
+  min-width: 0;
+  margin-bottom: 18px;
+  padding-right: 44px;
+}
+
+#journal .journal-overview-header h3 {
+  margin: 4px 0 0;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+#journal .journal-overview-header p {
+  margin: 3px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+#journal .journal-overview-bookmark {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 24px;
+  display: grid;
+  width: 32px;
+  height: 46px;
+  padding-bottom: 7px;
+  color: var(--color-text-inverse);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%);
+  place-items: center;
+}
+
+#journal .journal-overview-bookmark span {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+#journal .journal-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 0;
+}
+
+#journal .journal-overview-grid div {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+#journal .journal-overview-grid > .journal-overview-metric {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+#journal .journal-metric-icon {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+}
+
+#journal .journal-metric-icon-clock::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+#journal .journal-metric-icon-clock::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 23px;
+  width: 7px;
+  height: 6px;
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+}
+
+#journal .journal-metric-icon-calendar::before {
+  content: "";
+  position: absolute;
+  inset: 14px 13px 12px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+}
+
+#journal .journal-metric-icon-calendar::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 15px;
+  width: 18px;
+  border-top: 2px solid currentColor;
+  box-shadow: 4px 5px 0 -1px currentColor, 10px 5px 0 -1px currentColor;
+}
+
+#journal .journal-metric-copy {
+  display: grid;
+  min-width: 0;
+}
+
+#journal .journal-metric-label {
+  grid-row: 2;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+#journal #journal-overview-rendered,
+#journal #journal-overview-logged-days {
+  grid-row: 1;
+  color: var(--color-text-primary);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+#journal .journal-overview-completion {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 14px;
+}
+
+#journal .journal-completion-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#journal .journal-completion-label {
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+#journal #journal-overview-summary-state {
+  color: var(--color-text-interactive);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+#journal .journal-completion-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-inset);
+}
+
+#journal .journal-completion-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--color-progress-fill);
+}
+
+#journal .journal-week-actions {
+  margin-top: 16px;
+}
+
+#journal .journal-tip-card {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  padding: 15px 16px;
+}
+
+#journal .journal-tip-card h3 {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+#journal .journal-tip-card p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  #journal .journal-layout,
+  #journal .journal-selected-workspace {
+    gap: 14px;
+  }
+
+  #journal .journal-layout {
+    margin-top: 14px;
+  }
+
+  #journal .journal-toolbar,
+  #journal .journal-overview {
+    border-top-width: 1px;
+  }
+
+  #journal .journal-overview-actions {
+    align-items: initial;
+    flex-direction: initial;
+  }
+
+  #journal .journal-overview-actions > button {
+    min-height: 38px;
+  }
+}
+
+@media (max-width: 360px) {
+  #journal .journal-toolbar,
+  #journal .journal-overview {
+    padding: 14px;
+  }
+
+  #journal .selected-week-navigation {
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 6px;
+  }
+
+  #journal .week-step-button,
+  #journal .journal-toolbar .week-step-button {
+    width: 38px;
+    min-width: 38px;
+  }
+}
+/* Phase 5D J1B: Stitch desktop Journal composition. */
+#journal .journal-overview-column,
+#journal .journal-records-column {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 14px;
+}
+
+@media (min-width: 1000px) {
+  #journal .journal-page-header,
+  #journal .journal-toolbar {
+    width: 100%;
+  }
+
+  #journal .journal-toolbar-controls {
+    grid-template-columns: minmax(0, 540px) minmax(24px, 1fr) minmax(180px, 200px);
+    align-items: center;
+    width: 100%;
+    margin-inline: 0;
+    column-gap: 14px;
+  }
+
+  #journal .selected-week-navigation {
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+  }
+
+  #journal .journal-log-today-button {
+    grid-column: 3;
+    grid-row: 1;
+    width: 100%;
+  }
+
+  #journal .journal-more-week-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  #journal .journal-more-week-actions .journal-toolbar-actions {
+    grid-template-columns: repeat(2, minmax(140px, 168px));
+    justify-content: start;
+  }
+
+  #journal #week-form .form-grid {
+    grid-template-columns: minmax(160px, 180px) repeat(2, minmax(220px, 260px));
+    justify-content: start;
+  }
+
+  #journal .journal-selected-workspace {
+    grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+  }
+
+  #journal .journal-overview-column,
+  #journal .journal-records-column {
+    gap: 24px;
+  }
+
+  #journal .journal-overview,
+  #journal .journal-tip-card,
+  #journal .journal-daily-panel,
+  #journal .journal-summary-panel {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  #journal .journal-daily-panel {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  #journal .journal-daily-panel > .panel-header {
+    margin-bottom: 16px;
+  }
+
+  #journal .journal-summary-panel {
+    border-top-width: 1px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 999px) {
+  #journal #week-form .form-grid {
+    grid-template-columns: repeat(2, minmax(220px, 260px));
+    justify-content: start;
+  }
+
+  #journal #week-form .form-grid > .field:first-child {
+    max-width: 180px;
+  }
+}
+/* Phase 5D J2A: accessible single-open Daily Record accordion mechanics. */
+#journal .daily-log-day-list {
+  gap: 10px;
+}
+
+#journal .daily-record-accordion {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+#journal .daily-log-day-card.daily-record-toggle {
+  display: grid;
+  grid-template-columns: 40px minmax(150px, 0.72fr) minmax(0, 1.28fr) 18px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: 12px 14px;
+  text-align: left;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+#journal .daily-log-day-card.daily-record-toggle:hover {
+  border-color: transparent;
+  border-left-color: transparent;
+  background: var(--color-state-hover);
+  transform: none;
+}
+
+#journal .daily-log-day-card.daily-record-toggle:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: -3px;
+}
+
+#journal .daily-record-day-badge {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-inverse);
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  place-items: center;
+}
+
+#journal .daily-record-toggle .day-card-main,
+#journal .daily-record-toggle .day-card-summary {
+  min-width: 0;
+}
+
+#journal .daily-record-toggle .day-card-main {
+  display: grid;
+  gap: 3px;
+}
+
+#journal .daily-record-toggle .day-card-main strong {
+  overflow: hidden;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#journal .daily-record-toggle .day-card-label {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+}
+
+#journal .daily-record-toggle .day-card-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+#journal .daily-record-toggle .day-card-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+#journal .daily-record-toggle .day-card-meta span + span::before {
+  content: "•";
+  margin-right: 10px;
+  color: var(--color-text-muted);
+}
+
+#journal .daily-record-chevron {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  color: var(--color-text-muted);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+#journal .daily-record-toggle[aria-expanded="true"] .daily-record-chevron {
+  transform: rotate(225deg) translate(-1px, -1px);
+}
+
+#journal .daily-record-panel[hidden] {
+  display: none;
+}
+
+#journal .daily-record-panel {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding: 16px;
+}
+
+#journal .daily-record-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#journal .daily-record-detail-grid > div {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 5px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  padding: 10px;
+}
+
+#journal .daily-record-detail-grid strong {
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+#journal .daily-record-detail-label,
+#journal .daily-record-section-label {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+#journal .daily-record-key-tasks {
+  display: grid;
+  gap: 8px;
+}
+
+#journal .daily-record-task-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#journal .daily-record-task-list li {
+  display: flex;
+  min-width: 0;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+#journal .daily-record-task-list li > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#journal .daily-record-task-list li > span:first-child::before {
+  content: "•";
+  margin-right: 8px;
+  color: var(--color-text-interactive);
+}
+
+#journal .daily-record-task-status {
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#journal .daily-record-empty-message,
+#journal .daily-record-note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+#journal .daily-record-note {
+  border-left: 3px solid var(--color-border-interactive);
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  padding: 9px 11px;
+}
+
+#journal .daily-record-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#journal .daily-record-panel-actions .primary-button {
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 760px) {
+  #journal .daily-log-day-card.daily-record-toggle {
+    grid-template-columns: 40px minmax(0, 1fr) 18px;
+    gap: 10px;
+    min-height: 84px;
+    padding: 12px;
+  }
+
+  #journal .daily-record-toggle .day-card-main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #journal .daily-record-toggle .day-card-summary {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  #journal .daily-record-day-badge {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  #journal .daily-record-chevron {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  #journal .daily-record-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #journal .daily-record-panel {
+    gap: 14px;
+    padding: 14px;
+  }
+
+  #journal .daily-record-task-list li {
+    display: grid;
+    gap: 5px;
+  }
+
+  #journal .daily-record-task-status {
+    width: fit-content;
+    margin-left: 16px;
+  }
+
+  #journal .daily-record-panel-actions .primary-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #journal .daily-record-chevron {
+    transition: none;
+  }
+}
+/* Phase 5D J2B: expanded Daily Record attachment thumbnails. */
+#journal .daily-record-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(210px, 0.8fr);
+  align-items: start;
+  gap: 20px;
+}
+
+#journal .daily-record-attachments {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+#journal .daily-record-thumbnail-strip {
+  display: flex;
+  min-height: 54px;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#journal .daily-record-thumbnail {
+  display: grid;
+  flex: 0 0 68px;
+  width: 68px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-shell);
+  color: var(--color-text-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  place-items: center;
+}
+
+#journal .daily-record-thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#journal .daily-record-thumbnail.is-unavailable {
+  padding: 5px;
+}
+
+#journal .daily-record-thumbnail-overflow {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  min-height: 54px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-control);
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  place-items: center;
+}
+
+@media (max-width: 760px) {
+  #journal .daily-record-content-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+/* Phase 5D J2C: compact Stitch-aligned Daily Record presentation. */
+#journal .daily-log-day-list {
+  gap: 8px;
+}
+
+#journal .daily-record-accordion {
+  border-radius: var(--radius-control);
+}
+
+#journal .daily-log-day-card.daily-record-toggle {
+  grid-template-columns: 36px minmax(132px, 0.65fr) minmax(0, 1.35fr) 16px;
+  gap: 10px;
+  min-height: 64px;
+  padding: 9px 12px;
+}
+
+#journal .daily-record-day-badge {
+  width: 36px;
+  height: 36px;
+  font-size: 0.64rem;
+}
+
+#journal .daily-record-toggle .day-card-main {
+  gap: 2px;
+}
+
+#journal .daily-record-toggle .day-card-main strong {
+  font-size: 0.86rem;
+}
+
+#journal .daily-record-toggle .day-card-label {
+  font-size: 0.62rem;
+}
+
+#journal .daily-record-toggle .day-card-summary {
+  gap: 5px 8px;
+}
+
+#journal .daily-record-toggle .day-card-meta {
+  gap: 3px 8px;
+  font-size: 0.72rem;
+}
+
+#journal .daily-record-toggle .day-card-meta span + span::before {
+  margin-right: 8px;
+}
+
+#journal .daily-record-toggle .day-status-badge {
+  padding: 3px 7px;
+  font-size: 0.66rem;
+}
+
+#journal .daily-record-chevron {
+  width: 8px;
+  height: 8px;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+#journal .daily-record-panel {
+  gap: 12px;
+  padding: 14px;
+}
+
+#journal .daily-record-content-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+#journal .daily-record-key-tasks,
+#journal .daily-record-attachments {
+  gap: 7px;
+}
+
+#journal .daily-record-section-label {
+  font-size: 0.64rem;
+}
+
+#journal .daily-record-task-list {
+  gap: 5px;
+}
+
+#journal .daily-record-task-list li {
+  gap: 10px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+#journal .daily-record-task-list li > span:first-child::before {
+  margin-right: 6px;
+}
+
+#journal .daily-record-task-status {
+  padding: 1px 6px;
+  font-size: 0.62rem;
+}
+
+#journal .daily-record-empty-message,
+#journal .daily-record-note {
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+#journal .daily-record-note {
+  padding: 7px 9px;
+}
+
+#journal .daily-record-panel-actions {
+  padding-top: 2px;
+}
+
+#journal .daily-record-panel-actions .daily-record-editor-action {
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  padding: 7px 14px;
+  font-size: 0.76rem;
+}
+
+#journal .daily-record-thumbnail-strip {
+  min-height: 64px;
+  gap: 6px;
+}
+
+#journal .daily-record-thumbnail {
+  flex-basis: 64px;
+  width: 64px;
+  aspect-ratio: 1;
+  border-radius: 8px;
+}
+
+#journal .daily-record-thumbnail-overflow {
+  flex-basis: 42px;
+  width: 42px;
+  min-height: 64px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 760px) {
+  #journal .daily-log-day-card.daily-record-toggle {
+    grid-template-columns: 36px minmax(0, 1fr) 16px;
+    gap: 9px;
+    min-height: 76px;
+    padding: 10px 11px;
+  }
+
+  #journal .daily-record-panel {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  #journal .daily-record-content-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  #journal .daily-record-panel-actions .daily-record-editor-action {
+    width: 100%;
+  }
+}
+/* Phase 5D J3A: Stitch Weekly Summary transplant. */
+#journal .journal-summary-panel {
+  padding: 20px;
+}
+
+#journal .journal-summary-header {
+  display: block;
+  margin-bottom: 18px;
+}
+
+#journal .journal-summary-heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+#journal .journal-summary-heading > div {
+  min-width: 0;
+}
+
+#journal .journal-summary-icon {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-control);
+  place-items: center;
+}
+
+#journal .journal-summary-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#journal .journal-summary-heading h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+#journal .journal-summary-helper {
+  max-width: 54ch;
+  margin: 3px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+#journal .journal-summary-panel .weekly-summary-form {
+  display: grid;
+  gap: 0;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .form-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .field {
+  min-width: 0;
+  gap: 6px;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .field span {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+#journal .journal-summary-panel .weekly-summary-form textarea {
+  min-height: 6.75em;
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .field:nth-child(3) textarea {
+  min-height: 8.25em;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .field:nth-child(4) textarea {
+  min-height: 6.5em;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .form-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 16px;
+}
+
+#journal .journal-summary-panel .weekly-summary-form .form-actions .primary-button {
+  grid-column: 2;
+  min-width: 184px;
+  border-radius: var(--radius-pill);
+  padding-inline: 20px;
+}
+
+#journal .journal-summary-panel #weekly-summary-message {
+  grid-column: 1 / -1;
+  justify-self: end;
+  max-width: 54ch;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  #journal .journal-summary-panel {
+    margin-bottom: 8px;
+    padding: 16px;
+  }
+
+  #journal .journal-summary-header {
+    margin-bottom: 16px;
+  }
+
+  #journal .journal-summary-panel .weekly-summary-form .form-grid {
+    gap: 13px;
+  }
+
+  #journal .journal-summary-panel .weekly-summary-form .form-actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  #journal .journal-summary-panel .weekly-summary-form .form-actions .primary-button,
+  #journal .journal-summary-panel #weekly-summary-message {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #journal .journal-summary-panel #weekly-summary-message {
+    justify-self: stretch;
+    text-align: left;
+  }
+}
+
+@media (forced-colors: active) {
+  #journal .journal-summary-icon {
+    border: 1px solid CanvasText;
+  }
+}

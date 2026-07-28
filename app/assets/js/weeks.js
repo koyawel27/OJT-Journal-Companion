@@ -120,23 +120,28 @@
     return window.OJTCalculations.sumRenderedMinutes(getLogsForWeek(week));
   }
 
-  function getSummaryState(week) {
+  function getSummaryStatus(week) {
     const requiredFields = [
       week?.weeklySkillsLearned,
       week?.problemsEncountered,
       week?.reflectionOrPointsOfLearning
     ];
     const filledCount = requiredFields.filter((value) => String(value || "").trim()).length;
+    const percentage = Math.round((filledCount / requiredFields.length) * 100);
 
     if (filledCount === 0) {
-      return "Not started";
+      return { label: "Not started", percentage };
     }
 
     if (filledCount === requiredFields.length) {
-      return "Complete";
+      return { label: "Complete", percentage };
     }
 
-    return "In progress";
+    return { label: "In progress", percentage };
+  }
+
+  function getSummaryState(week) {
+    return getSummaryStatus(week).label;
   }
 
   function buildWeekRecord() {
@@ -332,11 +337,16 @@
 
     const dates = getWeekDates(week);
     const logs = getLogsForWeek(week);
+    const summaryStatus = getSummaryStatus(week);
     setText("journal-overview-title", "Week " + week.weekNumber);
     setText("journal-overview-dates", formatDisplayDate(week.inclusiveStartDate) + " to " + formatDisplayDate(week.inclusiveEndDate));
     setText("journal-overview-rendered", formatRenderedTime(getWeekRenderedMinutes(week)));
     setText("journal-overview-logged-days", logs.length + " of " + dates.length);
-    setText("journal-overview-summary-state", getSummaryState(week));
+    setText("journal-overview-summary-state", summaryStatus.label);
+    const summaryProgress = getElement("journal-overview-summary-progress");
+    if (summaryProgress) {
+      summaryProgress.style.width = summaryStatus.percentage + "%";
+    }
   }
 
   function renderWeeklySummaryForm() {

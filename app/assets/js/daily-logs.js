@@ -7,11 +7,13 @@
     dailyTasks: [],
     photoAttachments: [],
     selectedWeekId: "",
+    expandedRecordDate: null,
     expandedDate: null,
     activeDailyLogId: null,
     returnFocusElement: null
   };
   let dailyLogKeydownHandler = null;
+  const dailyRecordThumbnailUrls = new Map();
 
   function getElement(id) {
     return document.getElementById(id);
@@ -456,7 +458,65 @@
       });
   }
   function getPhotosForDailyLog(dailyLogId) {
-    return state.photoAttachments.filter((photo) => photo.dailyLogId === dailyLogId);
+    return getPhotoSetsForDailyLog(dailyLogId).flatMap((photoSet) => photoSet.photos);
+  }
+
+  function revokeDailyRecordThumbnailUrls() {
+    dailyRecordThumbnailUrls.forEach((url) => URL.revokeObjectURL(url));
+    dailyRecordThumbnailUrls.clear();
+  }
+
+  function createDailyRecordThumbnailUrl(photo) {
+    if (!(photo?.fileBlob instanceof Blob) || !String(photo.fileBlob.type || photo.fileType || "").startsWith("image/")) {
+      return "";
+    }
+
+    const url = URL.createObjectURL(photo.fileBlob);
+    dailyRecordThumbnailUrls.set(photo.id, url);
+    return url;
+  }
+
+  function renderDailyRecordAttachments(photos, dayLabel) {
+    if (photos.length === 0) {
+      return '<p class="daily-record-empty-message">No photos attached.</p>';
+    }
+
+    const visiblePhotos = photos.slice(0, 3);
+    const remainingCount = Math.max(photos.length - visiblePhotos.length, 0);
+    const thumbnails = visiblePhotos.map((photo, index) => {
+      const thumbnailUrl = createDailyRecordThumbnailUrl(photo);
+      const altText = `Photo attachment ${index + 1} for ${dayLabel}`;
+
+      if (!thumbnailUrl) {
+        return `
+          <span class="daily-record-thumbnail is-unavailable" role="img" aria-label="${escapeHtml(`${altText} unavailable`)}">
+            <span>Unavailable</span>
+          </span>
+        `;
+      }
+
+      return `
+        <span class="daily-record-thumbnail">
+          <img
+            src="${escapeHtml(thumbnailUrl)}"
+            alt="${escapeHtml(altText)}"
+            decoding="async"
+            data-daily-record-thumbnail
+          >
+          <span class="daily-record-thumbnail-unavailable" hidden>Unavailable</span>
+        </span>
+      `;
+    }).join("");
+    const overflowIndicator = remainingCount > 0
+      ? `<span class="daily-record-thumbnail-overflow" aria-hidden="true">+${escapeHtml(String(remainingCount))}</span>`
+      : "";
+
+    return `
+      <div class="daily-record-thumbnail-strip">
+        ${thumbnails}
+        ${overflowIndicator}
+      </div>
+    `;
   }
   function updateWeekSummary() {
     const logs = getLogsForWeek(state.selectedWeekId);
@@ -483,6 +543,7 @@
     window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
     window.OJTSelectedWeek?.selectWeek(weekId, { weeks: state.weeks, source: "journal:daily-records" });
     state.selectedWeekId = window.OJTSelectedWeek?.getSelectedWeekId() || "";
+    state.expandedRecordDate = null;
     state.expandedDate = null;
     state.activeDailyLogId = null;
     renderJournalWeek();
@@ -827,33 +888,124 @@
       ${renderPhotoSection(dailyLog)}
     `;
   }
+  function getDayRecordToggleId(dateText) {
+    return `daily-record-toggle-${dateText}`;
+  }
+
+  function getDayRecordPanelId(dateText) {
+    return `daily-record-panel-${dateText}`;
+  }
+
+  function getWeekdayBadgeLabel(dateText) {
+    return parseDate(dateText).toLocaleDateString(undefined, { weekday: "short" }).replace(".", "").slice(0, 3).toUpperCase();
+  }
+
+  function renderReadOnlyTaskList(tasks) {
+    if (tasks.length === 0) {
+      return '<p class="daily-record-empty-message">No tasks recorded for this day.</p>';
+    }
+
+    return `
+      <ul class="daily-record-task-list">
+        ${tasks.map((task) => `
+          <li>
+            <span>${escapeHtml(task.description)}</span>
+            <span class="daily-record-task-status">${escapeHtml(task.status || "Pending")}</span>
+          </li>
+        `).join("")}
+      </ul>
+    `;
+  }
+
+  function getDayRecordMessage(dailyLog) {
+    if (!dailyLog) {
+      return "No daily log has been created for this day.";
+    }
+
+    const remarks = String(dailyLog.dayRemarks || "").trim();
+    if (remarks) {
+      return remarks;
+    }
+
+    const dayStatus = getDailyLogStatus(dailyLog);
+    if (dayStatus === "Absent") {
+      return "No work was recorded for this absent day.";
+    }
+    if (dayStatus === "No OJT / Rest Day") {
+      return "No OJT work was scheduled for this day.";
+    }
+    return "";
+  }
+
   function renderDayCard(week, dateText, dayNumber, dailyLog) {
     const tasks = dailyLog ? getTasksForDailyLog(dailyLog.id) : [];
     const photos = dailyLog ? getPhotosForDailyLog(dailyLog.id) : [];
-    const dayStatus = dailyLog ? getDailyLogStatus(dailyLog) : "No log yet";
-    const renderedText = dailyLog && getDailyLogStatus(dailyLog) === "Worked"
-      ? getRenderedTimeText(dailyLog)
-      : "";
-    const taskText = tasks.length > 0 ? (tasks.length === 1 ? "1 task" : `${tasks.length} tasks`) : "";
-    const photoText = photos.length > 0 ? (photos.length === 1 ? "1 photo" : `${photos.length} photos`) : "";
-    const metaItems = [renderedText, taskText, photoText].filter(Boolean);
+    const dayStatus = dailyLog ? getDailyLogStatus(dailyLog) : "Not logged yet";
+    const renderedText = dailyLog ? getRenderedTimeText(dailyLog) : "—";
+    const taskText = tasks.length === 1 ? "1 task" : `${tasks.length} tasks`;
+    const photoText = photos.length === 1 ? "1 photo" : `${photos.length} photos`;
+    const metaItems = dailyLog ? [`${renderedText} rendered`, taskText, photoText] : [];
     const statusMarkup = dailyLog
       ? renderDayStatusBadge(dayStatus)
       : '<span class="day-status-badge is-empty">Not logged yet</span>';
-    const actionText = dailyLog ? "Open / Edit" : "Create Log";
+    const actionText = dailyLog ? "Open / Edit full log" : "Create log";
+    const isExpanded = state.expandedRecordDate === dateText;
+    const toggleId = getDayRecordToggleId(dateText);
+    const panelId = getDayRecordPanelId(dateText);
+    const dateLabel = formatDisplayDate(dateText);
+    const dayLabel = `Day ${dayNumber}`;
+    const dayMessage = getDayRecordMessage(dailyLog);
+    const tasksMarkup = dailyLog
+      ? renderReadOnlyTaskList(tasks)
+      : '<p class="daily-record-empty-message">Create a log to add task details.</p>';
+    const attachmentsMarkup = isExpanded ? renderDailyRecordAttachments(photos, dayLabel) : "";
 
     return `
-      <button class="daily-log-day-card" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">
-        <span class="day-card-main">
-          <span class="day-card-label">Day ${escapeHtml(dayNumber)}</span>
-          <strong>${escapeHtml(formatDisplayDate(dateText))}</strong>
-        </span>
-        <span class="day-card-summary">
-          ${statusMarkup}
-          <span class="day-card-meta">${metaItems.length > 0 ? metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("") : "Tap to log this day"}</span>
-        </span>
-        <span class="day-card-action">${escapeHtml(actionText)}</span>
-      </button>
+      <article class="daily-record-accordion${isExpanded ? " is-expanded" : ""}">
+        <button
+          class="daily-log-day-card daily-record-toggle"
+          type="button"
+          id="${escapeHtml(toggleId)}"
+          data-day-action="toggle"
+          data-date="${escapeHtml(dateText)}"
+          aria-expanded="${isExpanded ? "true" : "false"}"
+          aria-controls="${escapeHtml(panelId)}"
+          aria-label="${escapeHtml(`${dayLabel}, ${dateLabel}. ${dayStatus}. ${isExpanded ? "Collapse" : "Expand"} daily record`)}"
+        >
+          <span class="daily-record-day-badge" aria-hidden="true">${escapeHtml(getWeekdayBadgeLabel(dateText))}</span>
+          <span class="day-card-main">
+            <strong>${escapeHtml(dateLabel)}</strong>
+            <span class="day-card-label">${escapeHtml(dayLabel)}</span>
+          </span>
+          <span class="day-card-summary">
+            ${statusMarkup}
+            ${metaItems.length > 0 ? `<span class="day-card-meta">${metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</span>` : ""}
+          </span>
+          <span class="daily-record-chevron" aria-hidden="true"></span>
+        </button>
+        <div
+          class="daily-record-panel"
+          id="${escapeHtml(panelId)}"
+          role="region"
+          aria-labelledby="${escapeHtml(toggleId)}"
+          ${isExpanded ? "" : "hidden"}
+        >
+          <div class="daily-record-content-grid">
+            <div class="daily-record-key-tasks">
+              <span class="daily-record-section-label">Key Tasks</span>
+              ${tasksMarkup}
+            </div>
+            <div class="daily-record-attachments">
+              <span class="daily-record-section-label">Attachments</span>
+              ${attachmentsMarkup}
+            </div>
+          </div>
+          ${dayMessage ? `<p class="daily-record-note">${escapeHtml(dayMessage)}</p>` : ""}
+          <div class="daily-record-panel-actions">
+            <button class="secondary-button daily-record-editor-action" type="button" data-day-action="open" data-date="${escapeHtml(dateText)}">${escapeHtml(actionText)}</button>
+          </div>
+        </div>
+      </article>
     `;
   }
 
@@ -1005,16 +1157,19 @@
     const fallbackKey = options.focusFallbackKey || "";
 
     if (!container) {
+      revokeDailyRecordThumbnailUrls();
       syncDailyLogEditorState();
       return;
     }
 
     container.innerHTML = "";
+    revokeDailyRecordThumbnailUrls();
     if (root) {
       root.innerHTML = "";
     }
 
     if (!week) {
+      state.expandedRecordDate = null;
       state.expandedDate = null;
       state.activeDailyLogId = null;
       syncDailyLogEditorState();
@@ -1048,6 +1203,16 @@
     if (state.expandedDate && focusKey) {
       restoreEditorFocus(focusKey, fallbackKey);
     }
+  }
+
+  function toggleDayRecord(dateText) {
+    if (!dateText) {
+      return;
+    }
+
+    state.expandedRecordDate = state.expandedRecordDate === dateText ? null : dateText;
+    renderJournalWeek();
+    window.requestAnimationFrame(() => getElement(getDayRecordToggleId(dateText))?.focus());
   }
 
   function expandDay(dateText) {
@@ -1583,8 +1748,12 @@
       return;
     }
 
-    const dayButton = event.target.closest("button[data-day-action='open']");
-    if (dayButton) {
+    const dayButton = event.target.closest("button[data-day-action]");
+    if (dayButton?.dataset.dayAction === "toggle") {
+      toggleDayRecord(dayButton.dataset.date);
+      return;
+    }
+    if (dayButton?.dataset.dayAction === "open") {
       openDay(dayButton.dataset.date);
       return;
     }
@@ -1650,7 +1819,11 @@
       state.dailyTasks = dailyTasks;
       state.photoAttachments = photoAttachments;
 
+      const previousSelectedWeekId = state.selectedWeekId;
       state.selectedWeekId = window.OJTSelectedWeek?.initialize(state.weeks) || "";
+      if (previousSelectedWeekId && previousSelectedWeekId !== state.selectedWeekId) {
+        state.expandedRecordDate = null;
+      }
 
       renderJournalWeek();
       updateWeekSummary();
@@ -1668,6 +1841,19 @@
     const roots = [getElement("journal-week-accordions"), getEditorRoot()].filter(Boolean);
     roots.forEach((root) => {
       root.addEventListener("click", handleJournalClick);
+      root.addEventListener("error", (event) => {
+        if (!event.target.matches("[data-daily-record-thumbnail]")) {
+          return;
+        }
+
+        const thumbnail = event.target.closest(".daily-record-thumbnail");
+        const unavailable = thumbnail?.querySelector(".daily-record-thumbnail-unavailable");
+        event.target.remove();
+        thumbnail?.classList.add("is-unavailable");
+        if (unavailable) {
+          unavailable.hidden = false;
+        }
+      }, true);
       root.addEventListener("input", (event) => {
         const form = event.target.closest("form");
         if (form) {
@@ -1722,6 +1908,7 @@
       return;
     }
     state.selectedWeekId = weekId;
+    state.expandedRecordDate = null;
     state.expandedDate = null;
     state.activeDailyLogId = null;
     renderJournalWeek();
