@@ -701,3 +701,67 @@ body {
     border-color: CanvasText;
   }
 }
+
+/* Phase 5D E2D: Warm Journal Light treatment for Photo Documentation. */
+:root[data-theme="light"] .photo-add-button {
+  background: color-mix(in srgb, var(--color-state-active) 82%, var(--color-page));
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="light"] .photo-add-button:hover,
+:root[data-theme="light"] .photo-add-button:active {
+  background: color-mix(in srgb, var(--color-state-hover) 72%, var(--color-state-active));
+}
+
+:root[data-theme="light"] .photo-set-item {
+  border-color: color-mix(in srgb, var(--color-border-subtle) 58%, transparent);
+  background: color-mix(in srgb, var(--color-page) 90%, var(--color-shell));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+}
+
+:root[data-theme="light"] .photo-set-image-list {
+  background: color-mix(in srgb, var(--color-border-subtle) 62%, transparent);
+}
+
+:root[data-theme="light"] .photo-set-image-list .photo-attachment-item {
+  background: var(--color-page);
+}
+
+:root[data-theme="light"] .photo-preview-frame {
+  background: color-mix(in srgb, var(--color-shell) 74%, var(--color-inset));
+}
+
+:root[data-theme="light"] .photo-category {
+  background: color-mix(in srgb, var(--color-state-active) 74%, var(--color-page));
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="light"] .photo-caption-form,
+:root[data-theme="light"] .photo-upload-form {
+  background: color-mix(in srgb, var(--color-shell) 62%, var(--color-page));
+}
+
+:root[data-theme="light"] .photo-caption-form select,
+:root[data-theme="light"] .photo-caption-form textarea,
+:root[data-theme="light"] .photo-upload-form input,
+:root[data-theme="light"] .photo-upload-form select,
+:root[data-theme="light"] .photo-upload-form textarea {
+  background: var(--color-page);
+}
+
+:root[data-theme="light"] .photo-delete-button:hover,
+:root[data-theme="light"] .photo-delete-button:active {
+  background: color-mix(in srgb, var(--color-status-danger-bg) 82%, var(--color-page));
+}
+
+@media (forced-colors: active) {
+  :root[data-theme="light"] .photo-set-item,
+  :root[data-theme="light"] .photo-preview-frame,
+  :root[data-theme="light"] .photo-upload-form,
+  :root[data-theme="light"] .photo-caption-form,
+  :root[data-theme="light"] .photo-add-button,
+  :root[data-theme="light"] .photo-category {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+}

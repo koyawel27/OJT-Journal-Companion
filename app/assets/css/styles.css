@@ -6290,3 +6290,443 @@ body,
     border: 1px solid CanvasText;
   }
 }
+
+/* Phase 5D E2D: focused Photo Documentation hierarchy and responsive grid. */
+.daily-log-editor-flow .photo-documentation-panel {
+  min-width: 0;
+  border: 0;
+  padding-top: 10px;
+}
+
+.photo-section-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.photo-section-header > div,
+.photo-set-summary,
+.photo-attachment-main {
+  min-width: 0;
+}
+
+.photo-section-header h4 {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.photo-section-intro .phase-note {
+  max-width: 62ch;
+  margin: 0 0 14px;
+}
+
+.photo-add-button,
+.photo-quiet-button,
+.photo-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.photo-add-button {
+  flex: 0 0 auto;
+  gap: 7px;
+  min-height: 44px;
+  background: var(--color-state-active);
+  color: var(--color-text-interactive);
+  padding: 9px 14px;
+}
+
+.photo-add-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.photo-add-button:hover,
+.photo-quiet-button:hover {
+  background: var(--color-state-hover);
+  color: var(--color-text-primary);
+}
+
+.photo-add-button:active,
+.photo-quiet-button:active {
+  background: var(--color-inset);
+}
+
+.photo-add-button:disabled,
+.photo-quiet-button:disabled,
+.photo-delete-button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.photo-add-button:focus-visible,
+.photo-quiet-button:focus-visible,
+.photo-delete-button:focus-visible,
+.photo-caption-details summary:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.photo-empty-state {
+  max-width: 54ch;
+  margin: 4px 0 16px;
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.photo-attachment-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-set-item {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border-subtle) 72%, transparent);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  padding: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.photo-set-image-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  background: var(--color-border-subtle);
+  list-style: none;
+}
+
+.photo-set-image-list .photo-attachment-item {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-page);
+  padding: 0;
+  box-shadow: none;
+}
+
+.photo-preview-frame {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+  background: var(--color-inset);
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  place-items: center;
+}
+
+.photo-preview-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview-frame.is-unavailable,
+.photo-preview-unavailable {
+  padding: 16px;
+}
+
+.photo-attachment-main {
+  padding: 10px 12px 0;
+}
+
+.photo-attachment-main strong,
+.photo-attachment-main .item-meta,
+.photo-caption {
+  overflow-wrap: anywhere;
+}
+
+.photo-attachment-main strong {
+  display: block;
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.photo-attachment-main .item-meta {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.photo-item-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 0 12px 12px;
+}
+
+.photo-quiet-button,
+.photo-delete-button {
+  min-height: 40px;
+  background: transparent;
+  padding: 7px 10px;
+}
+
+.photo-quiet-button {
+  color: var(--color-text-secondary);
+}
+
+.photo-delete-button {
+  margin-left: 4px;
+  color: var(--color-status-danger);
+}
+
+.photo-delete-button:hover,
+.photo-delete-button:active {
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger);
+}
+
+.photo-set-header {
+  display: grid;
+  min-width: 0;
+  gap: 10px;
+  padding: 14px;
+}
+
+.photo-set-meta-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+}
+
+.photo-category,
+.photo-image-count {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.photo-category {
+  width: fit-content;
+  border-radius: var(--radius-pill);
+  background: var(--color-state-active);
+  color: var(--color-text-interactive);
+  padding: 4px 8px;
+}
+
+.photo-image-count {
+  color: var(--color-text-muted);
+}
+
+.photo-caption {
+  margin: 8px 0 0;
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.photo-caption-details {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.photo-caption-details summary {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 40px;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  list-style: none;
+  padding: 7px 10px;
+}
+
+.photo-caption-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.photo-caption-details summary:hover,
+.photo-caption-details[open] summary {
+  background: var(--color-state-hover);
+  color: var(--color-text-primary);
+}
+
+.photo-caption-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  border-radius: var(--radius-control);
+  background: var(--color-inset);
+  padding: 12px;
+}
+
+.photo-caption-form .field {
+  min-width: 0;
+  margin: 0;
+}
+
+.photo-caption-form .form-actions {
+  margin-top: 2px;
+}
+
+.photo-upload-form {
+  margin-top: 14px;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  padding: 14px;
+}
+
+.photo-upload-form .form-grid {
+  align-items: start;
+  gap: 12px;
+}
+
+.photo-upload-form .field {
+  min-width: 0;
+  margin: 0;
+}
+
+.photo-upload-form input,
+.photo-upload-form select,
+.photo-upload-form textarea,
+.photo-caption-form select,
+.photo-caption-form textarea {
+  min-width: 0;
+  border-color: var(--color-border-default);
+  background: var(--color-page);
+}
+
+.photo-upload-form .form-actions {
+  margin-top: 12px;
+}
+
+.photo-selection-count {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-set-item:hover {
+    border-color: var(--color-border-interactive);
+  }
+}
+
+@media (max-width: 760px) {
+  .photo-section-header {
+    align-items: center;
+    gap: 12px;
+  }
+
+  .photo-add-button {
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+
+  .photo-attachment-list,
+  .photo-set-image-list,
+  .photo-upload-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .photo-set-image-list .photo-attachment-item {
+    align-items: initial;
+  }
+
+  .photo-item-actions {
+    width: auto;
+    gap: 10px;
+  }
+
+  .photo-item-actions button {
+    width: auto;
+    min-width: 88px;
+    min-height: 44px;
+  }
+
+  .photo-caption-details summary {
+    min-height: 44px;
+  }
+
+  .photo-upload-form .form-actions,
+  .photo-upload-form .form-actions .primary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  .photo-section-header {
+    align-items: flex-start;
+  }
+
+  .photo-add-button {
+    flex-shrink: 0;
+  }
+
+  .photo-item-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photo-item-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .photo-set-item,
+  .photo-preview-frame,
+  .photo-upload-form,
+  .photo-caption-form {
+    border: 1px solid CanvasText;
+  }
+
+  .photo-add-button,
+  .photo-category {
+    border: 1px solid ButtonText;
+  }
+}

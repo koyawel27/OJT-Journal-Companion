@@ -18,6 +18,7 @@
   };
   let dailyLogKeydownHandler = null;
   const dailyRecordThumbnailUrls = new Map();
+  const dailyLogEditorPhotoUrls = new Map();
 
   function getElement(id) {
     return document.getElementById(id);
@@ -478,6 +479,11 @@
     return getPhotoSetsForDailyLog(dailyLogId).flatMap((photoSet) => photoSet.photos);
   }
 
+  function revokeDailyLogEditorPhotoUrls() {
+    dailyLogEditorPhotoUrls.forEach((url) => URL.revokeObjectURL(url));
+    dailyLogEditorPhotoUrls.clear();
+  }
+
   function revokeDailyRecordThumbnailUrls() {
     dailyRecordThumbnailUrls.forEach((url) => URL.revokeObjectURL(url));
     dailyRecordThumbnailUrls.clear();
@@ -490,6 +496,16 @@
 
     const url = URL.createObjectURL(photo.fileBlob);
     dailyRecordThumbnailUrls.set(photo.id, url);
+    return url;
+  }
+
+  function createDailyLogEditorPhotoUrl(photo) {
+    if (!(photo?.fileBlob instanceof Blob) || !String(photo.fileBlob.type || photo.fileType || "").startsWith("image/")) {
+      return "";
+    }
+
+    const url = URL.createObjectURL(photo.fileBlob);
+    dailyLogEditorPhotoUrls.set(photo.id, url);
     return url;
   }
 
@@ -657,11 +673,46 @@
     });
   }
 
+  function buildPhotoPreviewAltText(photo, category, caption, index, total) {
+    const position = total > 1 ? `, image ${index + 1} of ${total}` : "";
+    const description = caption.trim() || photo.fileName || "stored photo";
+    return `${category}${position}: ${description}`;
+  }
+
+  function renderPhotoPreview(photo, category, caption, index, total) {
+    const previewUrl = createDailyLogEditorPhotoUrl(photo);
+    const altText = buildPhotoPreviewAltText(photo, category, caption, index, total);
+
+    if (!previewUrl) {
+      return `
+        <div class="photo-preview-frame is-unavailable" role="img" aria-label="${escapeHtml(`${altText} unavailable`)}">
+          <span>Preview unavailable</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="photo-preview-frame">
+        <img
+          src="${escapeHtml(previewUrl)}"
+          alt="${escapeHtml(altText)}"
+          width="640"
+          height="400"
+          loading="lazy"
+          decoding="async"
+          data-photo-preview
+        >
+        <span class="photo-preview-unavailable" role="img" aria-label="${escapeHtml(`${altText} unavailable`)}" hidden>Preview unavailable</span>
+      </div>
+    `;
+  }
+
   function renderPhotoSet(photoSet) {
     const firstPhoto = photoSet.photos[0];
     const isSharedSet = Boolean(photoSet.photoSetId);
     const category = normalizePhotoCategory(firstPhoto.photoCategory);
     const caption = String(firstPhoto.caption ?? "");
+    const imageCount = photoSet.photos.length;
     const setLabel = isSharedSet ? "Photo set" : "Photo";
     const editForm = isSharedSet
       ? `
@@ -699,10 +750,29 @@
 
     return `
       <li class="photo-set-item">
+        <ul class="photo-set-image-list" aria-label="${escapeHtml(`${setLabel} images`)}">
+          ${photoSet.photos.map((photo, index) => `
+            <li class="photo-attachment-item">
+              ${renderPhotoPreview(photo, category, caption, index, imageCount)}
+              <div class="photo-attachment-main">
+                <strong>${escapeHtml(photo.fileName || "Untitled photo")}</strong>
+                <p class="item-meta">
+                  ${escapeHtml(window.OJTPhotos.formatFileSize(photo.fileSize))} &middot; ${escapeHtml(formatPhotoCreatedAt(photo.createdAt))}
+                </p>
+              </div>
+              <div class="photo-item-actions" aria-label="${escapeHtml(`Actions for ${photo.fileName || "stored photo"}`)}">
+                <button class="photo-quiet-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
+                <button class="photo-delete-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
         <div class="photo-set-header">
-          <div>
-            <strong>${escapeHtml(setLabel)}${photoSet.photos.length > 1 ? ` (${photoSet.photos.length} images)` : ""}</strong>
-            <p class="photo-category">Category: ${escapeHtml(category)}</p>
+          <div class="photo-set-summary">
+            <div class="photo-set-meta-row">
+              <span class="photo-category">${escapeHtml(category)}</span>
+              <span class="photo-image-count">${escapeHtml(imageCount === 1 ? "1 image" : `${imageCount} images`)}</span>
+            </div>
             ${caption ? `<p class="photo-caption">${escapeHtml(caption)}</p>` : '<p class="photo-caption empty-caption">No caption saved.</p>'}
           </div>
           <details class="photo-caption-details">
@@ -710,29 +780,13 @@
             ${editForm}
           </details>
         </div>
-        <ul class="photo-set-image-list">
-          ${photoSet.photos.map((photo) => `
-            <li class="photo-attachment-item">
-              <div class="photo-attachment-main">
-                <strong>${escapeHtml(photo.fileName || "Untitled photo")}</strong>
-                <p class="item-meta">
-                  ${escapeHtml(photo.fileType || "Unknown type")} - ${escapeHtml(window.OJTPhotos.formatFileSize(photo.fileSize))} - ${escapeHtml(formatPhotoCreatedAt(photo.createdAt))}
-                </p>
-              </div>
-              <div class="form-actions photo-item-actions">
-                <button class="secondary-button" type="button" data-photo-action="download" data-photo-id="${escapeHtml(photo.id)}">Download</button>
-                <button class="danger-button" type="button" data-photo-action="delete" data-photo-id="${escapeHtml(photo.id)}">Delete</button>
-              </div>
-            </li>
-          `).join("")}
-        </ul>
       </li>
     `;
   }
 
   function renderPhotoList(photoSets) {
     if (photoSets.length === 0) {
-      return '<p class="empty-state">No photos attached yet. Save the day record first, then add photos below.</p>';
+      return '<p class="photo-empty-state">No photos yet. Add optional work evidence when it helps document this day.</p>';
     }
 
     return `<ul class="photo-attachment-list">${photoSets.map(renderPhotoSet).join("")}</ul>`;
@@ -754,9 +808,21 @@
 
     return `
       <section class="photo-documentation-panel editor-section" aria-labelledby="photo-documentation-title-${escapeHtml(dailyLog.id)}">
-        <div class="journal-col-header">
-          <span class="card-label">Attachments</span>
-          <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Photo Documentation</h4>
+        <div class="photo-section-header">
+          <div>
+            <span class="card-label">Attachments</span>
+            <h4 id="photo-documentation-title-${escapeHtml(dailyLog.id)}">Photo Documentation</h4>
+          </div>
+          <button class="photo-add-button" type="button" data-photo-upload-action="choose" aria-controls="photo-upload-form">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 7.5h3l1.4-2h7.2l1.4 2h3v11H4z"></path>
+              <circle cx="12" cy="13" r="3.25"></circle>
+              <path d="M19 3.5v4M17 5.5h4"></path>
+            </svg>
+            <span>Add Photo</span>
+          </button>
+        </div>
+        <div class="photo-section-intro">
           <p class="phase-note">Optional — attach JPEG, PNG, or WebP up to ${escapeHtml(window.OJTPhotos.formatFileSize(window.OJTPhotos.maxPhotoSizeBytes))}.</p>
         </div>
 
@@ -768,18 +834,18 @@
           <div class="form-grid">
             <label class="field">
               <span>Photo files</span>
-              <input type="file" id="photo-upload-file" accept="image/jpeg,image/png,image/webp" multiple>
+              <input type="file" id="photo-upload-file" name="photoFiles" accept="image/jpeg,image/png,image/webp" aria-describedby="photo-upload-selection" multiple>
               <p class="photo-selection-count" id="photo-upload-selection" aria-live="polite">No photos selected.</p>
             </label>
             <label class="field">
               <span>Category</span>
-              <select id="photo-upload-category">
+              <select id="photo-upload-category" name="photoCategory" autocomplete="off">
                 ${renderOptions(window.OJTPhotos.photoCategories, "General Documentation")}
               </select>
             </label>
             <label class="field field-wide">
               <span>Caption</span>
-              <textarea id="photo-upload-caption" rows="2" placeholder="Optional caption"></textarea>
+              <textarea id="photo-upload-caption" name="caption" rows="2" autocomplete="off" placeholder="Optional caption&#8230;"></textarea>
             </label>
           </div>
 
@@ -1229,12 +1295,14 @@
 
     if (!container) {
       revokeDailyRecordThumbnailUrls();
+      revokeDailyLogEditorPhotoUrls();
       syncDailyLogEditorState();
       return;
     }
 
     container.innerHTML = "";
     revokeDailyRecordThumbnailUrls();
+    revokeDailyLogEditorPhotoUrls();
     if (root) {
       root.innerHTML = "";
     }
@@ -1978,6 +2046,15 @@
       return;
     }
 
+    const photoUploadButton = event.target.closest("button[data-photo-upload-action]");
+    if (photoUploadButton?.dataset.photoUploadAction === "choose") {
+      const photoInput = getElement("photo-upload-file");
+      if (photoInput) {
+        photoInput.click();
+      }
+      return;
+    }
+
     const photoButton = event.target.closest("button[data-photo-action]");
     if (photoButton) {
       const photo = state.photoAttachments.find((attachment) => attachment.id === photoButton.dataset.photoId);
@@ -2063,6 +2140,17 @@
     roots.forEach((root) => {
       root.addEventListener("click", handleJournalClick);
       root.addEventListener("error", (event) => {
+        if (event.target.matches("[data-photo-preview]")) {
+          const preview = event.target.closest(".photo-preview-frame");
+          const unavailable = preview?.querySelector(".photo-preview-unavailable");
+          event.target.remove();
+          preview?.classList.add("is-unavailable");
+          if (unavailable) {
+            unavailable.hidden = false;
+          }
+          return;
+        }
+
         if (!event.target.matches("[data-daily-record-thumbnail]")) {
           return;
         }
@@ -2153,6 +2241,7 @@
 
     state.expandedDate = null;
     state.activeDailyLogId = null;
+    revokeDailyLogEditorPhotoUrls();
     if (getEditorRoot()) {
       getEditorRoot().innerHTML = "";
     }
