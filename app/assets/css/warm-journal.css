@@ -765,3 +765,56 @@ body {
     box-shadow: none;
   }
 }
+
+/* Phase 5D E2E: Warm Journal Light finish for Remarks and final actions. */
+:root[data-theme="light"] .daily-remarks-section textarea {
+  border-color: color-mix(in srgb, var(--color-border-subtle) 76%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-page) 94%, var(--color-shell));
+}
+
+:root[data-theme="light"] .daily-remarks-section textarea:hover {
+  border-color: var(--color-border-interactive);
+}
+
+:root[data-theme="light"] .editor-final-actions .day-record-actions .primary-button {
+  border: 0;
+  background: var(--color-text-interactive);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--color-text-interactive) 15%, transparent);
+}
+
+:root[data-theme="light"] .editor-final-actions .day-record-actions .primary-button:hover {
+  border: 0;
+  background: var(--accent-deep);
+}
+
+:root[data-theme="light"] .editor-final-actions .form-message.success {
+  background: color-mix(in srgb, var(--color-status-success-bg) 82%, var(--color-page));
+}
+
+:root[data-theme="light"] .editor-final-actions .form-message.error {
+  background: color-mix(in srgb, var(--color-status-danger-bg) 86%, var(--color-page));
+}
+
+:root[data-theme="light"] .editor-final-actions .destructive-actions {
+  border-top-color: color-mix(in srgb, var(--color-status-danger-border) 48%, transparent);
+}
+
+:root[data-theme="light"] .editor-final-actions .danger-button {
+  border-color: transparent;
+  background: transparent;
+}
+
+:root[data-theme="light"] .editor-final-actions .danger-button:hover,
+:root[data-theme="light"] .editor-final-actions .danger-button:active {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--color-status-danger-bg) 82%, var(--color-page));
+}
+
+@media (forced-colors: active) {
+  :root[data-theme="light"] .daily-remarks-section textarea,
+  :root[data-theme="light"] .editor-final-actions .primary-button,
+  :root[data-theme="light"] .editor-final-actions .danger-button {
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+}

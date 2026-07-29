@@ -14,7 +14,8 @@
     taskEditorMode: "",
     taskEditorTaskId: "",
     taskEditorScrollTop: 0,
-    taskEditorOriginFocusKey: ""
+    taskEditorOriginFocusKey: "",
+    dailyLogFeedback: null
   };
   let dailyLogKeydownHandler = null;
   const dailyRecordThumbnailUrls = new Map();
@@ -191,7 +192,8 @@
 
   function showValidationError(form, message, fieldIds) {
     window.OJTUI.clearFieldValidation(form);
-    const messageElement = form?.querySelector(".form-message");
+    const messageElement = form?.querySelector(".form-message") ||
+      getElement("daily-log-form-message");
     const validFields = (fieldIds || []).map((id) => getElement(id)).filter(Boolean);
     validFields.forEach((field) => {
       field.setAttribute("aria-invalid", "true");
@@ -934,6 +936,10 @@
         </div>`
       : "";
 
+    const saveFeedback = state.dailyLogFeedback;
+    const saveFeedbackClass = saveFeedback ? ` ${saveFeedback.type}` : "";
+    const saveFeedbackHidden = saveFeedback ? "" : "hidden";
+    const saveFeedbackMessage = saveFeedback ? escapeHtml(saveFeedback.message) : "";
     return `
       <div class="daily-log-editor-flow">
           <form class="day-record-form editor-section editor-details-section" id="daily-log-form" novalidate>
@@ -1009,7 +1015,7 @@
         <div class="editor-final-actions">
           <div class="form-actions day-record-actions">
             <button class="primary-button" type="submit" form="daily-log-form" id="save-daily-log-button">Save day record</button>
-            <p class="form-message" id="daily-log-form-message" hidden></p>
+            <p class="form-message${saveFeedbackClass}" id="daily-log-form-message" ${saveFeedbackHidden}>${saveFeedbackMessage}</p>
           </div>
           ${deleteButton}
         </div>
@@ -1178,6 +1184,7 @@
     state.taskEditorMode = "";
     state.taskEditorTaskId = "";
     state.taskEditorScrollTop = 0;
+    state.dailyLogFeedback = null;
     state.taskEditorOriginFocusKey = "";
 
     try {
@@ -1367,6 +1374,7 @@
       state.returnFocusElement = activeElement;
     }
     window.OJTUI.clearFormMessages(getElement("journal-week-accordions"));
+    state.dailyLogFeedback = null;
     state.expandedDate = dateText;
     const dailyLog = getDailyLogForDate(dateText);
     state.activeDailyLogId = dailyLog?.id || null;
@@ -1720,6 +1728,7 @@
     const form = event.target;
     const messageElement = getElement("daily-log-form-message");
     window.OJTUI.clearFieldValidation(form);
+    state.dailyLogFeedback = null;
     window.OJTUI.clearFormMessage(messageElement);
 
     const dailyLog = buildDailyLogRecord();
@@ -1733,16 +1742,18 @@
       const savedLog = await window.OJTStorage.saveDailyLog(dailyLog);
       state.dailyLogs = state.dailyLogs.filter((log) => log.id !== savedLog.id).concat(savedLog);
       state.activeDailyLogId = savedLog.id;
+      state.dailyLogFeedback = {
+        message: savedLog.renderedMinutes !== null &&
+          savedLog.renderedMinutes !== undefined &&
+          Number.isFinite(Number(savedLog.renderedMinutes))
+          ? `Day saved - ${formatRenderedTime(savedLog.renderedMinutes)} rendered.`
+          : "Day saved. Add time in and time out to calculate rendered hours.",
+        type: "success"
+      };
       renderJournalWeek();
       updateWeekSummary();
       window.OJTUI.updateDailyLogsSummary(state.dailyLogs);
       notifyJournalDataChange();
-      const saveMessage = savedLog.renderedMinutes !== null &&
-        savedLog.renderedMinutes !== undefined &&
-        Number.isFinite(Number(savedLog.renderedMinutes))
-        ? `Day saved - ${formatRenderedTime(savedLog.renderedMinutes)} rendered.`
-        : "Day saved. Add time in and time out to calculate rendered hours.";
-      window.OJTUI.showFormMessage(getElement("daily-log-form-message"), saveMessage, "success");
     } catch (error) {
       window.OJTUI.showFormMessage(messageElement, "Could not save daily log. Try again.", "error");
       console.error(error);

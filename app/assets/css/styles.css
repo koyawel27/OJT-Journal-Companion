@@ -6730,3 +6730,118 @@ body,
     border: 1px solid ButtonText;
   }
 }
+
+/* Phase 5D E2E: Day Remarks and final editor actions. */
+.daily-log-editor-flow > .daily-remarks-section {
+  padding-top: 18px;
+  padding-bottom: 8px;
+  border: 0;
+}
+
+.daily-remarks-section .journal-col-header {
+  margin-bottom: 10px;
+}
+
+.daily-remarks-section .field {
+  gap: 8px;
+}
+
+.daily-remarks-section textarea {
+  min-height: 7rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
+
+.editor-final-actions {
+  gap: 22px;
+  padding: 18px 0 max(26px, env(safe-area-inset-bottom));
+}
+
+.editor-final-actions .day-record-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.editor-final-actions .day-record-actions .primary-button {
+  min-width: 190px;
+  justify-self: end;
+}
+
+.editor-final-actions .form-message {
+  grid-column: 1 / -1;
+  width: 100%;
+  line-height: 1.45;
+}
+
+.editor-final-actions .form-message:not([hidden]) {
+  border-radius: var(--radius-control);
+  padding: 10px 12px;
+}
+
+.editor-final-actions .form-message.success {
+  border-left: 4px solid var(--color-status-success);
+  background: var(--color-status-success-bg);
+}
+
+.editor-final-actions .form-message.error {
+  border-left: 4px solid var(--color-status-danger);
+  background: var(--color-status-danger-bg);
+}
+
+.editor-final-actions .destructive-actions {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-status-danger-border) 62%, transparent);
+  padding-top: 18px;
+}
+
+.editor-final-actions .destructive-label {
+  line-height: 1.35;
+}
+
+.editor-final-actions .danger-button {
+  min-height: 44px;
+}
+
+@media (max-width: 760px) {
+  .daily-log-editor-flow > .daily-remarks-section {
+    padding-top: 16px;
+  }
+
+  .daily-remarks-section textarea {
+    min-height: 8rem;
+  }
+
+  .editor-final-actions {
+    gap: 24px;
+    padding-top: 16px;
+    padding-bottom: max(30px, env(safe-area-inset-bottom));
+  }
+
+  .editor-final-actions .day-record-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-final-actions .day-record-actions .primary-button,
+  .editor-final-actions .destructive-actions .danger-button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .editor-final-actions .day-record-actions .primary-button {
+    justify-self: stretch;
+  }
+}
+
+@media (forced-colors: active) {
+  .editor-final-actions .form-message:not([hidden]),
+  .editor-final-actions .destructive-actions {
+    border-color: CanvasText;
+  }
+}
