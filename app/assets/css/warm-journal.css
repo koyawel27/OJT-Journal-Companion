@@ -818,3 +818,322 @@ body {
     box-shadow: none;
   }
 }
+
+/* Phase 5D E2F: Dark-mode visual fidelity for the focused Daily Log Editor. */
+:root[data-theme="dark"] .daily-log-editor-overlay {
+  background: color-mix(in srgb, var(--color-overlay) 92%, #161616);
+  backdrop-filter: blur(4px);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel {
+  border-color: color-mix(in srgb, var(--color-border-strong) 48%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-modal) 92%, var(--color-canvas));
+  box-shadow:
+    0 24px 64px rgba(10, 10, 10, 0.64),
+    0 0 0 1px rgba(240, 234, 210, 0.04);
+}
+
+:root[data-theme="dark"] .daily-log-editor-header {
+  border-bottom-color: color-mix(in srgb, var(--color-border-default) 58%, transparent);
+  background: color-mix(in srgb, var(--color-shell) 54%, var(--color-modal));
+}
+
+:root[data-theme="dark"] .daily-log-editor-header .card-label,
+:root[data-theme="dark"] .daily-details-heading .card-label,
+:root[data-theme="dark"] .daily-log-editor-panel .journal-col-header .card-label,
+:root[data-theme="dark"] .task-form-heading .card-label {
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="dark"] .daily-log-editor-header h3,
+:root[data-theme="dark"] .daily-details-heading h4,
+:root[data-theme="dark"] .daily-log-editor-panel .journal-col-header h4,
+:root[data-theme="dark"] .task-editor-subview-header h4 {
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .editor-close-button {
+  border-color: color-mix(in srgb, var(--color-border-default) 76%, transparent);
+  background: color-mix(in srgb, var(--color-page) 82%, var(--color-shell));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .editor-close-button:hover {
+  border-color: var(--color-border-interactive);
+  background: var(--color-state-hover);
+}
+
+:root[data-theme="dark"] .daily-log-editor-body {
+  background: color-mix(in srgb, var(--color-modal) 90%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .field input,
+:root[data-theme="dark"] .daily-log-editor-panel .field textarea,
+:root[data-theme="dark"] .daily-log-editor-panel .field select {
+  border-color: color-mix(in srgb, var(--color-border-default) 86%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-card) 84%, var(--color-canvas));
+  color: var(--color-text-primary);
+  caret-color: var(--color-focus-ring);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .field input:hover,
+:root[data-theme="dark"] .daily-log-editor-panel .field textarea:hover,
+:root[data-theme="dark"] .daily-log-editor-panel .field select:hover {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 68%, var(--color-border-default));
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .field input:focus,
+:root[data-theme="dark"] .daily-log-editor-panel .field textarea:focus,
+:root[data-theme="dark"] .daily-log-editor-panel .field select:focus {
+  border-color: var(--color-border-interactive);
+  background: color-mix(in srgb, var(--color-card) 92%, var(--color-canvas));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-interactive) 30%, transparent);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel ::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.78;
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel :is(button, input, select, textarea, summary):focus-visible {
+  outline-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-canvas) 84%, transparent);
+}
+
+:root[data-theme="dark"] .daily-status-field select {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 36%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-inset) 38%, var(--color-card));
+  font-weight: 600;
+}
+
+:root[data-theme="dark"] .time-entry-fieldset {
+  border-color: transparent;
+  background: transparent;
+}
+
+:root[data-theme="dark"] .time-entry-fieldset legend,
+:root[data-theme="dark"] .task-duration-fieldset legend {
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="dark"] .time-field.is-muted {
+  opacity: 0.7;
+}
+
+:root[data-theme="dark"] .rendered-time-strip {
+  border-color: color-mix(in srgb, var(--color-border-interactive) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--color-inset) 44%, var(--color-card));
+}
+
+:root[data-theme="dark"] .rendered-time-strip strong {
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .rendered-time-strip p {
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .rendered-time-strip .time-reference {
+  border-top-color: color-mix(in srgb, var(--color-border-interactive) 34%, transparent);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .primary-button {
+  border-color: var(--color-border-interactive);
+  background: var(--color-text-interactive);
+  color: var(--color-text-inverse);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .primary-button:hover {
+  border-color: var(--accent-deep);
+  background: var(--accent-deep);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .secondary-button {
+  border-color: color-mix(in srgb, var(--color-border-default) 80%, transparent);
+  background: color-mix(in srgb, var(--color-page) 78%, var(--color-shell));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .daily-log-editor-panel .secondary-button:hover {
+  border-color: var(--color-border-interactive);
+  background: var(--color-state-hover);
+}
+
+:root[data-theme="dark"] .daily-tasks-section .task-bullet-item {
+  border-color: color-mix(in srgb, var(--color-border-default) 62%, transparent);
+  background: color-mix(in srgb, var(--color-card) 84%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .daily-tasks-section .task-bullet-content::before {
+  color: var(--color-text-interactive);
+}
+
+:root[data-theme="dark"] .daily-tasks-section .status-pill {
+  border-color: var(--color-status-info-border);
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info);
+}
+
+:root[data-theme="dark"] .task-editor-subview {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .task-editor-form {
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 54%, transparent);
+  background: color-mix(in srgb, var(--color-card) 90%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .photo-add-button {
+  border: 1px solid color-mix(in srgb, var(--color-border-interactive) 54%, transparent);
+  background: color-mix(in srgb, var(--color-state-active) 78%, var(--color-card));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .photo-add-button:hover,
+:root[data-theme="dark"] .photo-add-button:active {
+  border-color: var(--color-border-interactive);
+  background: color-mix(in srgb, var(--color-inset) 72%, var(--color-card));
+}
+
+:root[data-theme="dark"] .photo-set-item {
+  border-color: color-mix(in srgb, var(--color-border-default) 58%, transparent);
+  background: color-mix(in srgb, var(--color-card) 88%, var(--color-canvas));
+  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.22);
+}
+
+:root[data-theme="dark"] .photo-set-image-list {
+  background: color-mix(in srgb, var(--color-border-default) 54%, transparent);
+}
+
+:root[data-theme="dark"] .photo-set-image-list .photo-attachment-item {
+  background: color-mix(in srgb, var(--color-page) 88%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .photo-preview-frame {
+  background: color-mix(in srgb, var(--color-inset) 48%, var(--color-canvas));
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .photo-category {
+  border: 1px solid color-mix(in srgb, var(--color-border-interactive) 42%, transparent);
+  background: color-mix(in srgb, var(--color-state-active) 76%, var(--color-card));
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .photo-image-count,
+:root[data-theme="dark"] .photo-attachment-main .item-meta,
+:root[data-theme="dark"] .photo-selection-count {
+  color: var(--color-text-muted);
+}
+
+:root[data-theme="dark"] .photo-caption-details summary {
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .photo-caption-details summary:hover,
+:root[data-theme="dark"] .photo-caption-details[open] summary {
+  background: var(--color-state-hover);
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .photo-caption-form,
+:root[data-theme="dark"] .photo-upload-form {
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 52%, transparent);
+  background: color-mix(in srgb, var(--color-card) 90%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .photo-quiet-button {
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .photo-quiet-button:hover {
+  background: var(--color-state-hover);
+  color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"] .photo-delete-button {
+  color: var(--color-status-danger);
+}
+
+:root[data-theme="dark"] .photo-delete-button:hover,
+:root[data-theme="dark"] .photo-delete-button:active {
+  background: var(--color-status-danger-bg-strong);
+  color: var(--color-status-danger);
+}
+
+:root[data-theme="dark"] .daily-remarks-section textarea {
+  border-color: color-mix(in srgb, var(--color-border-default) 82%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-card) 86%, var(--color-canvas));
+}
+
+:root[data-theme="dark"] .daily-remarks-section textarea:hover {
+  border-color: var(--color-border-interactive);
+}
+
+:root[data-theme="dark"] .editor-final-actions .day-record-actions .primary-button {
+  box-shadow: 0 8px 20px rgba(10, 10, 10, 0.3);
+}
+
+:root[data-theme="dark"] .editor-final-actions .form-message.success {
+  border-color: var(--color-status-success);
+  background: color-mix(in srgb, var(--color-status-success-bg) 88%, var(--color-card));
+  color: var(--color-status-success);
+}
+
+:root[data-theme="dark"] .editor-final-actions .form-message.error {
+  border-color: var(--color-status-danger);
+  background: color-mix(in srgb, var(--color-status-danger-bg-strong) 54%, var(--color-card));
+  color: var(--color-status-danger);
+}
+
+:root[data-theme="dark"] .editor-final-actions .destructive-actions {
+  border-top-color: color-mix(in srgb, var(--color-status-danger-border) 46%, transparent);
+}
+
+:root[data-theme="dark"] .editor-final-actions .danger-button {
+  border-color: var(--color-status-danger-border);
+  background: transparent;
+  color: var(--color-status-danger);
+}
+
+:root[data-theme="dark"] .editor-final-actions .danger-button:hover,
+:root[data-theme="dark"] .editor-final-actions .danger-button:active {
+  border-color: var(--color-status-danger);
+  background: var(--color-status-danger-bg-strong);
+}
+
+@media (max-width: 760px) {
+  :root[data-theme="dark"] .daily-log-editor-panel {
+    border-color: color-mix(in srgb, var(--color-border-strong) 52%, var(--color-border-subtle));
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -14px 42px rgba(10, 10, 10, 0.58);
+  }
+
+  :root[data-theme="dark"] .daily-log-editor-panel::before {
+    content: "";
+    display: block;
+    flex: 0 0 auto;
+    width: 48px;
+    height: 5px;
+    margin: 10px auto 0;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--color-text-muted) 78%, transparent);
+  }
+}
+
+@media (forced-colors: active) {
+  :root[data-theme="dark"] .daily-log-editor-overlay {
+    backdrop-filter: none;
+  }
+
+  :root[data-theme="dark"] .daily-log-editor-panel,
+  :root[data-theme="dark"] .task-editor-form,
+  :root[data-theme="dark"] .photo-set-item,
+  :root[data-theme="dark"] .photo-upload-form,
+  :root[data-theme="dark"] .photo-caption-form,
+  :root[data-theme="dark"] .photo-add-button,
+  :root[data-theme="dark"] .photo-category {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+}
