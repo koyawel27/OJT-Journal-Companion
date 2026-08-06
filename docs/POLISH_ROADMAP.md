@@ -18,7 +18,7 @@ Completed pre-v1.1 polish—backup safety, Preview & Export formatting, Dashboar
 | Capabilities | Profiles/settings, week management, daily records, tasks, photos, weekly summaries, preview/copy, JSON backup/restore/reset, and Official DOCX Export. |
 | DOCX | Client-side `docx-templates` v2 export with a private-first official template and tracked sanitized fallback. |
 | Strengths | Mature single-user feature set, offline-first data ownership, official rendered-hours rules, editable output, responsive foundations, and no server dependency. |
-| Main weakness | The shared selected-week Journal architecture, batch photo documentation, data/recovery hardening, and accessible responsive foundation are complete. Phase 5D is reopened and in progress because the initial Warm Journal checkpoint is not yet a high-fidelity or visually approved Stitch translation. |
+| Main weakness | The selected-week Journal architecture, batch photo documentation, data/recovery hardening, accessible responsive foundation, and accepted Journal/Daily Log Editor Warm Journal translation are complete. Remaining work is broader application-wide regression, later screen-body refinement, and release preparation. |
 
 ## 3. Product Principles
 
@@ -59,7 +59,7 @@ These decisions are approved and must not be reopened unless the current code re
 | 2 | Batch Photo Documentation | Support one or multiple related images per upload with one shared category and caption. | Additive optional metadata fields on existing PhotoAttachment records; no new object store, IndexedDB version increase, migration, or backup-version increase | Phase 1 | Batch upload/export acceptance | Complete |
 | 3 | Data and Recovery Hardening | Make restore and browser-storage risks safer and visible. | Validation; format change only if reviewed | Phase 2 | Recovery drill passes | Complete |
 | 4 | Accessible Responsive Visual Redesign | Apply the accessible responsive shell and visual system. | None | Phases 1-3 | Accessibility/responsive acceptance | Complete |
-| 5 | Brand Architecture | Establish and apply the generic Warm Journal identity through approval-gated translation. | None for current translation | Phase 4 and approved generic assets | Journal approval, Editor approval, then Phase 5E | Current: Phase 5C complete; initial Phase 5D checkpointed; Phase 5D reopened/in progress |
+| 5 | Brand Architecture | Establish and apply the generic Warm Journal identity through approval-gated translation. | None for current translation | Phase 4 and approved generic assets | Phase 5D E3A accepted; Phase 5E documentation synchronized | Phase 5C Journal workspace and Phase 5D Daily Log Editor redesign complete; Phase 5E documentation synchronization complete |
 | 6 | Static Deployment and PWA | Provide one hosted, installable, offline-capable URL. | None expected | Phases 3–5 | Hosted/PWA readiness | Planned |
 | 7 | Friend Beta | Validate workflows, recovery, offline use, and DOCX. | None by default | Phase 6 | Beta success criteria met | Planned |
 | 8 | Official DOCX Template Import | Safely manage a local private template. | Local template storage likely | Phase 7 and security review | Import/fallback acceptance | Planned |
@@ -216,7 +216,7 @@ No new object store, IndexedDB version increase, migration, backup-format change
 **Exit criteria:** The stable Journal is usable at target sizes; critical dialogs/sheets meet the accessibility contract; responsive/accessibility review passes.
 
 **Dependencies on earlier phases:** Phase 1 architecture, Phase 2 batch-photo behavior, and known Phase 3 feedback requirements.
-**Completion status:** Complete and merged into `master`. Phase 4 delivered the accessible responsive shell, including its historical desktop sidebar and fixed four-item mobile navigation, Journal redesign, accessible Daily Log dialog/mobile sheet, Dashboard and Preview & Export refinements, Settings and Recovery improvements, System/Dark/Light appearance, top Light/Dark quick switch, warm Light and Urban Earth Dark identities, responsive/focus improvements, final regression, restored-ID rendering safety correction, and documentation synchronization. The Phase 4 sidebar remains regression history but is intentionally superseded by the Phase 5D presentation contract. No permanent institutional branding or formal WCAG conformance claim was introduced.
+**Completion status:** Complete and merged into `master`. Phase 4 delivered the accessible responsive shell, including its historical desktop sidebar and fixed four-item mobile navigation, Journal redesign, accessible Daily Log dialog/mobile sheet, Dashboard and Preview & Export refinements, Settings and Recovery improvements, System/Dark/Light appearance, top Light/Dark quick switch, warm Light and Urban Earth Dark identities, responsive/focus improvements, final regression, restored-ID rendering safety correction, and documentation synchronization. The Phase 4 sidebar remains regression history but is intentionally superseded by the Phase 5C Journal presentation contract. No permanent institutional branding or formal WCAG conformance claim was introduced.
 **Phase 4 subphase closeout:**
 
 - Phase 4A — UI, Responsive, and Accessibility Audit: Complete.
@@ -227,25 +227,20 @@ No new object store, IndexedDB version increase, migration, backup-format change
 
 ### Phase 5 — Brand Architecture
 
-**Current status:** Phase 5A and Phase 5B are complete. Phase 5C is complete: it selected the Stitch Warm Journal direction as a refinement of Concept A and prepared the canonical local mark and favicon. The initial Phase 5D integration is safely checkpointed at `d5411e0`, but it is not visually accepted or Phase 5D-complete. The first Journal J1 experiment was rejected because it retained the permanent desktop sidebar and was restored completely. Phase 5D is reopened and in progress for high-fidelity translation: establish the accepted app shell, then restart Journal, followed by Daily Log Editor under separate approval gates. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` is the implementation contract. Phase 5E has not started and must wait for the revised Phase 5D work. No merge, release, tag, or v1.2 is implied.
+**Current status:** Phase 5A and Phase 5B are complete. The Phase 5C Journal workspace redesign, including the responsive shell, accessible Daily Record summaries, and accepted Journal checkpoints, is complete. The Phase 5D Daily Log Editor redesign is complete through E1A, E2A, and E3A without changing data or export contracts. The initial integration remains safely checkpointed at `d5411e0`, and the rejected sidebar-constrained J1 experiment remains historical. Phase 5E Journal and Daily Log Editor documentation synchronization is complete. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` remains the implementation record. No merge, release, tag, or v1.2 is implied.
 
-**Required Phase 5D approval sequence:**
+**Completed Phase 5C and Phase 5D sequence, followed by Phase 5E:**
 
 ```text
-primary responsive shell translation
-→ Journal static composition
-→ accessible read-only day summaries
-→ Journal visual and functional review
-→ explicit owner approval
-→ Daily Log Editor shell and lifecycle
-→ editor form/task/photo presentation
-→ Editor visual and functional review
-→ explicit owner approval
-→ remaining screens
-→ Phase 5E regression and closeout
+Phase 5C — accepted responsive shell and Journal workspace
+→ Phase 5D — accepted Daily Log Editor shell, tasks, photos, actions, and E1A through E3A
+→ Phase 5D — focused E3A regression and acceptance
+→ Phase 5E — Journal and Daily Log Editor documentation synchronization
+→ broader application-wide regression and closeout
+→ remaining screen-body visual refinement
 ```
 
-The accepted shell uses one compact top app bar, one centered responsive canvas, a full-width fixed compact/mobile bottom bar, and a centered floating wider-screen bottom dock. It has no permanent desktop sidebar. Navigation remains exactly Dashboard, Journal, Preview & Export, and Settings with existing functional contracts preserved. Do not begin Daily Log Editor translation before Journal approval. Do not translate the Dashboard, Preview & Export, or Settings page bodies before both approval gates.
+The accepted shell uses one compact top app bar, one centered responsive canvas, a full-width fixed compact/mobile bottom bar, and a centered floating wider-screen bottom dock. It has no permanent desktop sidebar. Navigation remains exactly Dashboard, Journal, Preview & Export, and Settings with existing functional contracts preserved. Journal and Daily Log Editor approval gates are complete; later Dashboard, Preview & Export, and Settings page-body refinement remains separately scoped.
 
 **Objective:** Make identity configurable while retaining a safe generic open-source default.
 
@@ -370,8 +365,8 @@ The accepted shell uses one compact top app bar, one centered responsive canvas,
 - Phase 4 must build on the settled Phase 1 Journal architecture and must not reopen it without a documented direct conflict.
 - Batch-photo behavior is settled before Phase 3 finalizes current backup validation.
 - Data hardening before broad public reliance.
-- Phase 5D Journal approval must precede Daily Log Editor implementation; both approvals precede remaining-screen translation.
-- Phase 5E regression and closeout begin only after the revised Phase 5D translation; Phase 6 waits for Phase 5 completion.
+- Phase 5C Journal approval gates and Phase 5D Daily Log Editor approval gates are complete before remaining-screen translation.
+- Phase 5D E3A regression is complete for the accepted editor surface, and Phase 5E Journal and Daily Log Editor documentation synchronization is complete; broader application-wide closeout remains separate.
 - Responsive/accessibility and generic or authorized branding readiness before public-facing beta material.
 - PWA before friend beta.
 - Friend beta before template import unless evidence identifies a blocker.
@@ -422,7 +417,7 @@ Only these remain unresolved:
 ## 11. Roadmap Change Control
 
 - v1.1 remains the stable rollback/regression baseline.
-- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation, Phase 3 Data and Recovery Hardening, and Phase 4 Accessible Responsive Visual Redesign are complete post-v1.1 roadmap work. **Phase 5C is complete; the initial Phase 5D integration is checkpointed; the rejected J1 runtime experiment is fully restored; Phase 5D now requires the accepted responsive shell before Journal then Daily Log Editor; Phase 5E has not started and must wait for revised Phase 5D approval.** No merge, release, tag, or v1.2 is implied.
+- Phase 1 Journal architecture is settled. Phase 2 Batch Photo Documentation, Phase 3 Data and Recovery Hardening, Phase 4 Accessible Responsive Visual Redesign, Phase 5C Journal workspace redesign, and Phase 5D Daily Log Editor redesign through E3A are complete post-v1.1 roadmap work. **The initial Warm Journal integration is retained as a recovery checkpoint; the rejected J1 runtime experiment remains historical; Phase 5E Journal and Daily Log Editor documentation synchronization is complete; broader application-wide closeout remains separate.** No merge, release, tag, or v1.2 is implied.
 - Review phase scope, current code, likely files, risks, and tests before coding.
 - Data-model phases require explicit IndexedDB migration, backup-version, restore-compatibility, and rollback/recovery review.
 - Keep changes phase-scoped; do not combine opportunistic framework/platform work.

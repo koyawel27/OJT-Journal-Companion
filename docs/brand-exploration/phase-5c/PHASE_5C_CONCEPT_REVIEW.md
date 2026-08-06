@@ -8,7 +8,7 @@ Selected direction: Stitch Warm Journal refinement of Concept A — Rising Rule
 
 Local SVG mark and favicon approved for integration
 
-Phase 5D application integration completed; Phase 5E visual regression remains
+Phase 5C Journal workspace redesign accepted; Phase 5D Daily Log Editor redesign accepted through E3A; Phase 5E Journal and Daily Log Editor documentation synchronization is complete
 
 ## 2. Source of truth
 

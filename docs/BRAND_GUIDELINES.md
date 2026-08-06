@@ -4,17 +4,17 @@ Source file: docs/BRAND_GUIDELINES.md
 
 ## 1. Document status
 
-Purpose: This document is the source of truth for the product brand strategy, visual direction, product-facing copy, future local brand assets, Phase 5C exploration, and Phase 5D integration.
+Purpose: This document is the source of truth for the product brand strategy, visual direction, product-facing copy, future local brand assets, Phase 5C Journal workspace presentation, Phase 5D Daily Log Editor presentation, and Phase 5E documentation synchronization.
 
-Current phase: Phase 5C - Logo, Brand Mark, and Icon Asset Exploration: Complete. The initial Phase 5D integration is checkpointed at `d5411e0`; the rejected sidebar-constrained J1 experiment was restored completely. Phase 5D is reopened for the accepted responsive shell, then Journal and Daily Log Editor under separate owner approval gates. Phase 5E has not started and must wait for the revised Phase 5D work.
+Current phase: Phase 5C Journal workspace redesign: Complete and accepted. Phase 5D Daily Log Editor redesign: Complete and accepted through E3A. The initial Warm Journal integration remains checkpointed at `d5411e0`, and the rejected sidebar-constrained J1 experiment remains historical. Phase 5E Journal and Daily Log Editor documentation synchronization is complete; broader application-wide closeout remains separate.
 
 Authority: This document governs generic product identity decisions for OJT Journal Companion. The current application source, protected data contracts, official DOCX template, and explicit institutional permissions remain higher-priority constraints where applicable.
 
-Version/status: Stitch Warm Journal direction selected as a refinement of Concept A. Local SVG mark, favicon, SVG navigation family, Light tokens, and component treatment are preserved in the initial checkpoint but are not yet visually accepted. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` governs the reopened Phase 5D translation and approval gates. No merge, release, tag, or v1.2 is implied.
+Version/status: Stitch Warm Journal direction selected as a refinement of Concept A. Local SVG mark, favicon, SVG navigation family, Light tokens, component treatment, accepted responsive shell, Journal workspace, and Daily Log Editor presentation are documented as the current production refinement. `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` records the translation and acceptance boundaries. No merge, release, tag, or v1.2 is implied.
 
 Controls: Product naming, brand position, promise, tagline, personality, anti-traits, visual principles, symbol direction, color philosophy, typography, icon direction, voice, placement rules, DOCX and backup boundaries, and later asset/integration requirements.
 
-Pending in Phase 5D: primary responsive shell translation, Journal composition and accessible read-only day summaries, Journal review and explicit owner approval, Daily Log Editor shell/lifecycle and content presentation, Editor review and explicit owner approval, then remaining page bodies. Phase 5E has not started; its later gate includes responsive browser review, Light/Dark/System comparison, small-size mark confirmation, keyboard/focus review, and final regression.
+Completed in Phase 5C: primary responsive shell, Journal composition, accessible read-only day summaries, and Journal review/approval. Completed in Phase 5D: Daily Log Editor shell/lifecycle, content presentation, Editor review/approval, and E1A through E3A. Phase 5E documentation synchronization records the responsive Light/Dark review, keyboard/focus behavior, validation, photo workflows, backup, Preview, and browser DOCX evidence. Remaining work is broader application-wide regression, later screen-body refinement, and release preparation.
 
 ## 2. Product identity
 
@@ -269,9 +269,9 @@ Use live text for the wordmark where practical. Retain the system-font identity.
 - Use a centered floating bottom-navigation dock on wider tablet and desktop screens.
 - Keep navigation exactly Dashboard, Journal, Preview & Export, and Settings while preserving targets, labels, `aria-current`, and `data-section` values.
 - Preserve bottom clearance, safe areas, keyboard access, visible focus, touch targets, zoom, and reduced motion.
-- Do not use a permanent desktop sidebar in the accepted Phase 5D translation.
+- Do not use a permanent desktop sidebar in the accepted Phase 5C Journal translation.
 
-The desktop sidebar remains historical Phase 4 behavior and is intentionally superseded for Phase 5D presentation only. This shell decision does not authorize functional or data changes.
+The desktop sidebar remains historical Phase 4 behavior and is intentionally superseded for Phase 5C Journal presentation only. This shell decision does not authorize functional or data changes.
 
 ## 16. Color philosophy
 
@@ -435,7 +435,7 @@ These roles must not be mixed. The tagline is not a form label, the promise is n
 | Settings and Recovery | Prioritize clarity, safety, and honest storage guidance over decoration. |
 | README | Approved future use includes product name, mark, tagline, and a concise product promise. |
 
-The checkpointed sticky mobile header and permanent desktop sidebar are historical Phase 4 runtime behavior. The accepted Phase 5D presentation intentionally supersedes both with the compact top app bar and responsive bottom-navigation system.
+The checkpointed sticky mobile header and permanent desktop sidebar are historical Phase 4 runtime behavior. The accepted Phase 5C Journal presentation intentionally supersedes both with the compact top app bar and responsive bottom-navigation system.
 
 ## 28. Favicon and app-icon strategy
 
@@ -520,9 +520,9 @@ Future exploration requirements:
 - 128px documentation mark; and
 - 512px source master.
 
-The scalable master and simplified favicon are prepared. Phase 5E must finish browser-based small-size and Light/Dark visual confirmation before closeout.
+The scalable master and simplified favicon are prepared. Journal and Daily Log Editor Light/Dark acceptance is recorded; any broader small-size mark confirmation remains a separate closeout check and is not claimed here.
 
-## 36. Phase 5D integration boundaries
+## 36. Phase 5C Journal and Phase 5D Daily Log Editor integration boundaries
 
 `docs/STITCH_FRONTEND_INTEGRATION_PLAN.md` is the implementation contract. The locked boundaries are:
 
@@ -533,8 +533,8 @@ The scalable master and simplified favicon are prepared. Phase 5E must finish br
 - `warm-journal.css` owns the Warm Journal visual skin, approved brand relationships, restrained decorative treatment, non-mechanical radius/shadow refinement, and product lockup/mark presentation.
 - Do not maintain competing complete layouts in both stylesheets, broad late overrides, or unnecessary `!important`.
 - Stored photo Blobs may produce runtime-only thumbnail object URLs. Revoke them when replaced, rerendered, closed, or unused; never persist them to IndexedDB, backups, or DOCX payloads.
-- Establish the compact top app bar, centered canvas, fixed compact/mobile bottom bar, and centered floating wider-screen dock before restarting Journal composition. Do not retain a permanent desktop sidebar.
-- Journal must receive visual and functional review plus explicit owner approval before Daily Log Editor implementation begins. Editor must receive its own approval before Dashboard, Preview & Export, Settings, or remaining page bodies are translated.
+- The accepted implementation establishes the compact top app bar, centered canvas, fixed compact/mobile bottom bar, and centered floating wider-screen dock. It does not retain a permanent desktop sidebar.
+- Journal and Daily Log Editor visual and functional approval gates are complete. Dashboard, Preview & Export, Settings, and remaining page bodies require separately scoped reuse of the accepted system.
 
 No selected-week, Journal ownership, Log Today, handoff, Settings, Daily Log Editor, database, backup, photo-set, DOCX, appearance-persistence, deployment, framework, font, icon-library, or product-boundary change is authorized by this visual translation.
 
@@ -543,7 +543,7 @@ No selected-week, Journal ownership, Log Today, handoff, Settings, Daily Log Edi
 Before brand integration is accepted:
 
 - The product name remains OJT Journal Companion, and production navigation remains Preview & Export.
-- The Journal and Daily Log Editor pass their separate approval gates before remaining screens.
+- The Journal and Daily Log Editor passed their separate approval gates; remaining screens are not marked complete by this checkpoint.
 - The mark works at 16px and in one color.
 - The mark works in Light and Dark.
 - No external dependency is required.
@@ -572,7 +572,7 @@ Before brand integration is accepted:
 | Anti-traits | Locked | No childish, gamified, corporate HR, surveillance, rustic/vintage, scrapbook, government-form, or unauthorized institutional identity |
 | Primary symbol | Locked and implemented | Stitch Warm Journal refinement of Concept A: structured journal page + subtle rising progress line |
 | Canonical mark source | Locked | `app/assets/brand/brand-mark.svg`; inline use must match canonical or an approved documented variant |
-| Fallback symbol | Retained as exploration history | Page corner + subtle milestone remains available only if Phase 5E small-size testing rejects the primary mark |
+| Fallback symbol | Retained as exploration history | Page corner + subtle milestone remains available only if a separately scoped future small-size test rejects the primary mark |
 | Palette family | Locked foundation | Existing Light and Dark earth-toned families; semantic roles remain authoritative |
 | Dark-mode authority | Locked | Existing semantic theme tokens control production colors and contrast; Stitch Dark is not authoritative |
 | Primary shell | Locked | Compact top app bar; centered canvas; fixed full-width compact/mobile bottom bar; centered floating wider-screen dock; no permanent desktop sidebar |

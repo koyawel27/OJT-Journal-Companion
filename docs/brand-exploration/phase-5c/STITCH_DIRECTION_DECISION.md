@@ -2,7 +2,7 @@
 
 ## Status
 
-Selected visual direction for Phase 5C and Phase 5D.
+Selected visual direction for the accepted Phase 5C Journal workspace and Phase 5D Daily Log Editor redesigns.
 
 The reviewed source package was `stitch_ojt_journal_companion.zip`, dated July 22, 2026. It contained Dashboard, Journal, Daily Log Editor, Preview & Export, Settings, logo, and Warm Journal design-system references.
 
@@ -30,7 +30,7 @@ The official product name remains **OJT Journal Companion**. The official taglin
 The production app will translate the direction into its existing HTML, CSS, and vanilla JavaScript architecture.
 
 - Preserve all existing IDs, data attributes, form names, accessibility relationships, and script wiring.
-- Preserve the desktop sidebar and four-item mobile navigation.
+- Preserve the four production destinations and their functional contracts; the accepted Phase 5C Journal presentation uses a compact responsive shell, mobile bottom navigation, and a floating wider-screen dock rather than a permanent desktop sidebar.
 - Preserve System, Dark, and Light appearance behavior.
 - Preserve the complete accepted Dark theme; the Stitch Light palette informs Light-theme refinement.
 - Keep the approved system font stack.

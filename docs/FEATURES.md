@@ -2,7 +2,7 @@
 
 ## Current status
 
-The latest tagged stable release is **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected the Stitch Warm Journal direction on `feature/brand-architecture`; Phase 5D is reopened for the accepted responsive shell, Journal, and Daily Log Editor approval gates. Phase 5E remains blocked. It is not a new release or tag. No v1.2 release is implied.
+The latest tagged stable release is **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. On `feature/brand-architecture`, the Phase 5C Journal workspace redesign and accepted Journal checkpoints are complete, and the Phase 5D Daily Log Editor redesign is complete through E3A. Phase 5E Journal and Daily Log Editor documentation synchronization is complete. This is not a new release or tag. No v1.2 release is implied.
 
 The app is a local, offline-first companion for one student on one browser/device. It has no account/login, backend, cloud sync, online submission, coordinator/admin dashboard, or formal accessibility certification.
 
@@ -10,15 +10,15 @@ The app is a local, offline-first companion for one student on one browser/devic
 
 ### Responsive app shell
 
-- The completed Phase 4 runtime uses desktop sidebar navigation; this is historical behavior and is intentionally superseded by the accepted Phase 5D presentation contract.
-- Phase 5D uses one compact top app bar, one centered responsive content canvas, a full-width fixed bottom bar on compact/mobile screens, and a centered floating bottom-navigation dock on wider tablet and desktop screens.
+- The completed Phase 4 runtime uses desktop sidebar navigation; this is historical behavior and is intentionally superseded by the accepted Phase 5C Journal presentation contract.
+- Phase 5C uses one compact top app bar, one centered responsive content canvas, a full-width fixed bottom bar on compact/mobile screens, and a centered floating bottom-navigation dock on wider tablet and desktop screens.
 - Primary navigation remains exactly Dashboard, Journal, Preview & Export, and Settings, with existing targets, labels, `aria-current` behavior, and `data-section` values unchanged.
 - The full accessible product name and top-app-bar theme control remain available; the tagline is not persistently repeated.
-- Safe-area support, bottom-navigation clearance, keyboard access, visible focus, touch targets, zoom, reduced motion, and responsive desktop/tablet/mobile layouts remain required.
+- Safe-area support, bottom-navigation clearance, keyboard access, visible focus, touch targets, zoom, reduced motion, and responsive desktop/tablet/mobile layouts are part of the accepted implementation.
 - The mobile drawer navigation is not part of the accepted interface.
 - Local brand assets remain dependency-free.
 
-This is the accepted Phase 5D presentation contract, not a claim that the runtime shell has already been translated.
+This is the accepted Phase 5C Journal presentation implementation; it preserves the existing navigation destinations and functional contracts.
 
 ### Journal and dashboard
 
@@ -30,9 +30,19 @@ This is the accepted Phase 5D presentation contract, not a claim that the runtim
 - Daily Tasks with description, optional time, notes, personal status, and ordering.
 - Weekly Summary fields for skills learned, problems encountered, reflection, and additional notes.
 
+The Journal workspace presents the selected week through a centered responsive canvas, single-open accessible Daily Record accordions, real photo thumbnails, Daily Record summaries, Weekly Summary content, and Light/Dark behavior. Daily Log editing remains an explicit action from each record.
+
+### Daily Log Editor
+
+- Compact/mobile uses a rounded bottom sheet; wider screens use a contained desktop dialog with a fixed header and independently scrolling editor body.
+- The continuous editor flow preserves date/day identity, Worked, Absent, and No OJT / Rest Day states, Time In, Time Out, Break Minutes, and Rendered Time.
+- Daily Tasks support focused Add/Edit Task subviews, Hours and Minutes entry, status, notes, deletion, and total-minute `timeSpentMinutes` storage that remains independent from official rendered hours.
+- Photo Documentation uses a card grid with real Blob-backed thumbnails, shared category/caption metadata editing, individual download, individual deletion, and object-URL cleanup.
+- Day Remarks, Save feedback, and the separated Delete Day danger action remain available.
+
 ### Accessible interaction improvements
 
-The current interface includes visible focus treatment, Daily Log dialog/sheet focus containment, Escape close, opener-focus restoration, background inertness, Settings keyboard tabs, first-invalid focus, field-level validation semantics, and controlled status announcements. These are implementation features, not a formal WCAG conformance claim.
+The current interface includes visible focus treatment, Daily Log dialog/sheet semantics, accessible title and close control, focus containment, Escape close, opener-focus restoration, background inertness, Settings keyboard tabs, first-invalid focus, associated labels and validation messages, touch-friendly controls, no duplicate IDs, no horizontal overflow, and usable 200% text sizing at 390px. These are verified implementation behaviors, not a formal WCAG conformance claim.
 
 ### Appearance
 
@@ -52,6 +62,7 @@ The current interface includes visible focus treatment, Daily Log dialog/sheet f
 - Display grouped photos once per set in Journal.
 - Preserve legacy photos without set metadata as singleton groups.
 - Use set-aware Official DOCX layouts without a new store, migration, or DB-version increase.
+- Stored-photo replacement is not present in the current baseline and is not documented as completed. The existing add-photo flow, Blob-backed rendering, metadata editing, download, deletion, object-URL cleanup, JPEG/PNG/WebP validation, and 5 MB limit remain supported.
 
 ### Preview and export
 
@@ -59,6 +70,7 @@ The current interface includes visible focus treatment, Daily Log dialog/sheet f
 - Copy Weekly Journal for convenient text transfer.
 - Official DOCX Export retains the official journal layout, remains editable, and is independent of the browser Preview layout.
 - DOCX output is not a restorable backup.
+- The focused acceptance pass generated a browser DOCX and passed structural inspection for media assets, content types, and template-marker safety. It did not establish a new native Word or LibreOffice render.
 
 ### Recovery
 

@@ -4,7 +4,7 @@ A lightweight, offline-first personal browser app for one student or intern. Rec
 
 ## Current status
 
-The latest tagged stable release remains **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. Phase 5 — Brand Architecture has selected and initially integrated the Stitch Warm Journal direction on `feature/brand-architecture`. A higher-fidelity translation of the supplied Stitch Journal and Daily Log Editor is planned before Phase 5E visual regression and closeout. This work has not created a new release or tag. No v1.2 release is implied.
+The latest tagged stable release remains **v1.1**. Post-v1.1 Phases 1–4 are complete and merged into master. On `feature/brand-architecture`, the Phase 5C Journal workspace redesign and accepted Journal checkpoints are complete, and the Phase 5D Daily Log Editor redesign is complete through E3A. Phase 5E Journal and Daily Log Editor documentation synchronization is complete. This work has not created a new release or tag. No v1.2 release is implied.
 
 ## What this app is
 
@@ -18,12 +18,23 @@ Browser storage can be cleared by the browser, device maintenance, or the user. 
 
 - Dashboard progress, current-week status, and backup reminders
 - Journal workspace with week management, Daily Logs, day statuses, rendered-hour calculations, Daily Tasks, weekly summaries, and day handoffs
-- Responsive desktop sidebar navigation and fixed mobile bottom navigation with four destinations: Dashboard, Journal, Preview & Export, and Settings
+- Responsive compact app shell with a centered content canvas, fixed mobile bottom navigation, and a floating wider-screen navigation dock for four destinations: Dashboard, Journal, Preview & Export, and Settings
 - Local Warm Journal identity with the full product name, official tagline, scalable mark/favicon, shared SVG navigation icons, and no remote brand dependency
 - System, Dark, and Light appearance preferences, plus a top Light/Dark quick switch; the preference persists and System remains available in Settings
 - Batch Photo Documentation for JPEG, PNG, and WebP files
 - JSON backup, Restore Review, replace-style restore, Storage Health, and guarded local-data reset
 - Official DOCX Export for the selected week
+
+
+### Journal workspace and Daily Log Editor
+
+The accepted Journal workspace uses the selected-week workflow, single-open accessible Daily Record accordions, real stored-photo thumbnails, Daily Record summaries, a Weekly Summary section, and Light/Dark responsive behavior. The shell uses a compact top app bar, centered content canvas, mobile bottom navigation, and a floating desktop/tablet navigation dock.
+
+The Daily Log Editor is a rounded mobile bottom sheet and contained desktop dialog with a fixed header and independently scrolling document-like body. It preserves date/day identity, Worked/Absent/No OJT / Rest Day status, time and rendered-time fields, existing validation and focus behavior, Daily Tasks with Hours and Minutes controls, total-minute task storage independent of rendered hours, focused Add/Edit Task subviews, Photo Documentation cards, metadata editing, download/deletion, Day Remarks, save feedback, and a separated Delete Day danger action.
+
+The editor behavior is documented as verified interaction behavior, not formal WCAG certification. Verified controls include dialog semantics, focus trap, Escape close, background inertness, focus restoration, visible focus, associated labels and validation messages, touch-friendly targets, no horizontal overflow, and usable 200% text sizing at 390px.
+
+Stored-photo replacement is not present in the current baseline. Existing add-photo, Blob-backed rendering, metadata editing, download, deletion, object-URL cleanup, JPEG/PNG/WebP validation, and the existing 5 MB limit remain supported.
 
 ### Photo groups
 

@@ -45,7 +45,7 @@ The top switch does not expose System. System remains available in Settings. The
 
 ## Responsive navigation
 
-Accepted Phase 5D presentation flow:
+Accepted Phase 5C Journal presentation flow:
 
 Compact/mobile:
 
@@ -63,7 +63,7 @@ Compact top app bar with reachable theme control
 
 Navigation keeps the existing targets, labels, `aria-current` behavior, and `data-section` values. The full accessible product name remains available, the tagline is not persistently repeated in the top app bar, and bottom clearance plus safe-area behavior remain required. Keyboard access, visible focus, touch targets, zoom, and reduced motion remain part of the workflow contract. There is no mobile drawer, separate appearance destination, or permanent desktop sidebar.
 
-The completed Phase 4 desktop sidebar remains historical runtime behavior and is intentionally superseded by this Phase 5D presentation contract. This documentation update does not change navigation destinations or application workflows.
+The completed Phase 4 desktop sidebar remains historical runtime behavior and is intentionally superseded by this Phase 5C Journal presentation contract. This documentation update does not change navigation destinations or application workflows.
 ## Journal and week workflow
 
 1. Open Journal.
@@ -89,9 +89,16 @@ Selected-week state is a small local UI preference. The week records themselves 
 
 Worked rendered time is calculated from DailyLog time fields. Absent and rest-day records save zero rendered minutes. Task time is documentation only and does not change official rendered hours.
 
+### Daily Log Editor presentation and interaction
+
+On compact/mobile screens the editor opens as a rounded bottom sheet; on wider screens it opens as a contained dialog. The header remains stable while the document-like body scrolls independently. The editor preserves date/day identity, status selection, time fields, rendered-time feedback, Daily Tasks, Photo Documentation, Day Remarks, Save feedback, and the separated Delete Day danger action.
+
+The existing interaction contract includes dialog semantics, an accessible title and close control, initial focus, focus trapping, Escape close, background inertness, body scroll locking, visible focus, validation-message associations, and opener focus restoration. The focused Task Editor is a subview for Add/Edit Task and supports Hours and Minutes entry while storing total `timeSpentMinutes` independently from rendered hours.
+
 ## Photo workflow
 
 Attach one/multiple photos
+
 → one photo group for multi-select
 → shared category/caption
 → save normal PhotoAttachment records
@@ -99,7 +106,10 @@ Attach one/multiple photos
 
 The picker accepts JPEG, PNG, and WebP. One upload action can create one or multiple records sharing one photoSetId. photoSetIndex preserves native selection order. Each photo remains independently downloadable and deletable. Existing records without set metadata remain supported as singleton groups.
 
+Stored-photo replacement is not present in the current baseline. Existing add-photo, real Blob-backed thumbnail rendering, category/caption editing, download, deletion, object-URL cleanup, and the existing 5 MB validation limit are the supported photo behaviors.
+
 ## Preview workflow
+
 
 Select week
 → review reading-optimized Preview
@@ -107,6 +117,8 @@ Select week
 → Copy Weekly Journal or Export Official DOCX
 
 Browser Preview is optimized for responsive reading, accessibility, and correction. Official DOCX Export keeps the official journal layout and remains editable. The Preview explanatory note is not included in Copy or DOCX output.
+
+The focused acceptance pass generated a browser DOCX and passed structural package inspection for media assets, content types, and template-marker safety. It did not establish a new native Microsoft Word or LibreOffice render.
 
 ## Backup workflow
 

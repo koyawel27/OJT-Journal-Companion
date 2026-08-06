@@ -42,7 +42,7 @@ The current state was confirmed as:
 - latest tagged stable release: `v1.1`;
 - post-v1.1 Phases 1 through 4: complete and merged into `master`;
 - current branch: `feature/brand-architecture`;
-- current roadmap phase: Phase 5, Brand Architecture;
+- Phase 5E Journal and Daily Log Editor documentation synchronization: complete;
 - no v1.2 release, tag, or merge was created in this chat.
 
 The existing roadmap and handoff documents were updated to reflect the active brand work. The accepted application behavior and the existing private DOCX-template protections were preserved.
@@ -112,7 +112,7 @@ After seeing the distinction between the Stitch prototype and the conservative i
 
 > Use the Stitch output much more literally as the frontend direction. Reproduce the complete design and smooth interaction feel where practical, especially on the Journal page and Daily Log Editor, while keeping the application's real functionality.
 
-Therefore, Phase 5D should be treated as **reopened for a fidelity expansion**. Phase 5E closeout should wait until the closer Journal and Daily Log Editor translation is implemented and reviewed.
+Therefore, Phase 5C is recorded as the accepted high-fidelity Journal workspace redesign, and Phase 5D is recorded as the accepted Daily Log Editor redesign through E1A, E2A, and E3A. Phase 5E Journal and Daily Log Editor documentation synchronization is complete while broader application-wide closeout remains separate.
 
 ## 4. Current checkpoint state
 
@@ -120,10 +120,22 @@ The initial integration is preserved on `feature/brand-architecture` in the push
 
 `d5411e0 chore(brand): checkpoint initial Warm Journal integration`
 
-That checkpoint contains the local mark and favicon, Warm Journal stylesheet, application-shell integration, and synchronized brand/roadmap/handoff material. It is a recovery point only. It does not mean Phase 5D is complete or visually accepted.
+That checkpoint contains the local mark and favicon, Warm Journal stylesheet, application-shell integration, and synchronized brand/roadmap/handoff material. It remains a recovery point for the initial integration; the accepted Phase 5C Journal workspace and Phase 5D Daily Log Editor redesign are represented by the current implementation commits through `2283403`.
 
-Phase 5C is complete. Phase 5D is reopened and in progress for the high-fidelity Stitch translation. The first Journal J1 experiment was rejected because it retained the permanent desktop sidebar and was restored completely. The next runtime target is the primary responsive shell, then Journal and Daily Log Editor under separate approval gates. Phase 5E has not started and must wait for the revised Phase 5D work. No merge, release, tag, or v1.2 is implied.
+Phase 5C is complete for the accepted responsive shell, Journal workspace, accessible Daily Record summaries, and Journal checkpoints. Phase 5D is complete for the Daily Log Editor redesign through E3A. The first Journal J1 experiment remains historical because it retained the permanent desktop sidebar. Phase 5E Journal and Daily Log Editor documentation synchronization is complete; broader application-wide regression and release preparation remain separate. No merge, release, tag, or v1.2 is implied.
 
+
+### 4.1 Accepted Phase 5C Journal and Phase 5D Daily Log Editor implementation evidence
+
+The accepted Journal workspace uses the selected-week workflow, centered responsive canvas, compact top app bar, mobile bottom navigation, floating wider-screen dock, single-open accessible Daily Record accordions, real photo thumbnails, Daily Record summaries, Weekly Summary content, and Light/Dark behavior.
+
+The accepted Daily Log Editor uses a rounded mobile bottom sheet and contained desktop dialog with a fixed header and independently scrolling body. It preserves date/day identity, Worked/Absent/No OJT / Rest Day statuses, Time In, Time Out, Break Minutes, Rendered Time, validation and focus behavior, Daily Tasks, Hours and Minutes task-duration entry, total-minute task storage independent of rendered hours, focused Add/Edit Task subviews, Photo Documentation metadata editing/download/deletion, Day Remarks, Save feedback, and the separated Delete Day danger action.
+
+Verified accessibility behavior includes dialog semantics, accessible title and close control, focus trap, Escape, background inertness, focus restoration, visible focus, associated labels and validation messages, touch-friendly controls, no duplicate IDs, no horizontal overflow, and usable 200% text sizing at 390px. This is not formal WCAG certification.
+
+Existing photo behavior remains bounded to add, Blob-backed rendering, category/caption editing, download, deletion, object-URL cleanup, JPEG/PNG/WebP validation, and the existing 5 MB limit. Stored-photo replacement is not present in the current baseline.
+
+The focused acceptance pass generated a browser DOCX and passed structural inspection for media assets, content types, and template-marker safety. It did not establish a new native Microsoft Word or LibreOffice render. Private-first and sanitized fallback template paths remain protected.
 ## 5. Verification already completed
 
 The initial integration passed the available non-rendered checks:
@@ -223,7 +235,7 @@ system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
 - There is no Google Fonts runtime request.
 - There is no new bundled font dependency.
 - Stitch typography must be approximated through size, weight, spacing, line height, and layout.
-- Plus Jakarta Sans and Work Sans are rejected prototype dependencies, not active Phase 5D implementation options.
+- Plus Jakarta Sans and Work Sans are rejected prototype dependencies, not active Phase 5C or Phase 5D implementation options.
 - Changing this policy requires a separate explicit brand decision.
 
 ### 9.2 Product identity and navigation wording
@@ -239,7 +251,7 @@ The Stitch prototype strings `OJT Companion` and standalone navigation label `Ex
 
 ### 9.2.1 Primary responsive shell
 
-The accepted Phase 5D presentation shell is mobile-first and expands responsively without introducing a permanent navigation column:
+The accepted Phase 5C Journal presentation shell is mobile-first and expands responsively without introducing a permanent navigation column:
 
 - use one compact top app bar at every supported width;
 - keep the theme control reachable from the top app bar;
@@ -252,7 +264,7 @@ The accepted Phase 5D presentation shell is mobile-first and expands responsivel
 - preserve the existing navigation targets, labels, `aria-current` behavior, and `data-section` values; and
 - preserve keyboard access, visible focus, touch targets, zoom behavior, and reduced-motion support.
 
-There is no permanent desktop sidebar in the accepted Stitch translation. The sidebar remains historical Phase 4 runtime behavior, but Phase 5D intentionally supersedes it for presentation. Desktop width may expand the Journal's internal columns inside the centered content canvas; navigation must not consume a permanent left column.
+There is no permanent desktop sidebar in the accepted Stitch translation. The sidebar remains historical Phase 4 runtime behavior, but Phase 5C intentionally supersedes it for Journal presentation. Desktop width may expand the Journal's internal columns inside the centered content canvas; navigation must not consume a permanent left column.
 
 This presentation contract does not authorize changes to selected-week architecture, Journal ownership, Log Today, Dashboard handoffs, Preview & Export handoffs, Settings, Daily Log Editor behavior, database or backup contracts, photo-set behavior, DOCX behavior, or appearance persistence.
 
@@ -356,7 +368,7 @@ Existing photo-set grouping, metadata, individual download and deletion, backup,
 
 ### 9.11 Protected application boundaries
 
-Phase 5D must preserve:
+Phase 5C and Phase 5D must preserve:
 
 ```text
 DB_VERSION = 4
@@ -421,11 +433,11 @@ For Daily Log Editor, map:
 
 Resolve differences in favor of the locked production contracts and real application capabilities.
 
-### Stage 2 — Primary responsive shell and faithful Journal page translation
+### Stage 2 — Phase 5C primary responsive shell and faithful Journal page translation (complete)
 
-Do not continue polishing the rejected sidebar-constrained J1 experiment. Establish the accepted Phase 5D shell first: compact top app bar, centered content canvas, fixed full-width mobile bottom navigation, and centered floating bottom-navigation dock on wider screens. Preserve the four production destinations and their existing functional contracts.
+Implementation record: the accepted Phase 5C Journal shell established a compact top app bar, centered content canvas, fixed full-width mobile bottom navigation, and centered floating bottom-navigation dock on wider screens. The rejected sidebar-constrained J1 experiment remains historical, and the four production destinations and their functional contracts are preserved.
 
-Then reshape the current Journal workspace inside that centered canvas to follow the Stitch composition:
+Implementation record: the Journal workspace was reshaped inside that centered canvas to follow the Stitch composition:
 
 - use the Stitch content width, vertical rhythm, card hierarchy, and twelve-column desktop composition;
 - reproduce the Week Overview card and its bookmark/progress signature;
@@ -447,9 +459,9 @@ Likely implementation areas:
 
 Do not change stored record shapes for this visual work.
 
-### Stage 3 — Faithful Daily Log Editor translation
+### Stage 3 — Phase 5D faithful Daily Log Editor translation through E3A (complete)
 
-Reshape the working editor into a Stitch-style rounded bottom sheet on compact/mobile screens and a contained responsive dialog on desktop:
+Implementation record: the working editor was reshaped into a Stitch-style rounded bottom sheet on compact/mobile screens and a contained responsive dialog on desktop:
 
 - centralized entrance and exit motion with reduced-motion bypass and timeout fallback;
 - fixed backdrop;
@@ -474,7 +486,7 @@ Primary implementation areas:
 - related focus and event helpers in the same file; and
 - the Daily Log Editor sections of `app/assets/css/styles.css` and `app/assets/css/warm-journal.css`.
 
-### Stage 4 — Shared smoothness and visual system
+### Stage 4 — Shared smoothness and visual system (complete for accepted Journal and Daily Log Editor surfaces)
 
 Create a small, deliberate interaction system instead of scattered animation:
 
@@ -499,7 +511,7 @@ Typography contract:
 
 ### Stage 5 — Extend the direction to remaining screens
 
-Only after separate owner approval of Journal and Daily Log Editor, apply the same system to:
+The Journal and Daily Log Editor approval gates are complete. The same system may be applied to remaining screen bodies only through separately scoped work:
 
 - Dashboard;
 - Preview & Export;
@@ -531,7 +543,7 @@ Run:
 - `git diff --check`; and
 - final `git status --short`.
 
-Do not close Phase 5 until rendered visual review and core workflow regression pass.
+The focused Journal and Daily Log Editor visual/interaction review and E3A core workflow regression passed. Broader application-wide regression, remaining screen-body refinement, and release preparation are not claimed complete here.
 
 ## 11. Acceptance criteria
 
@@ -572,23 +584,18 @@ Any of these requires a separate decision and scope.
 
 ## 13. Approval-gated execution order
 
-The required order is:
+The completed order and current continuation are:
 
 ```text
-primary responsive shell translation
-→ Journal static composition
-→ accessible read-only day summaries
-→ Journal visual and functional review
-→ explicit owner approval
-→ Daily Log Editor shell and lifecycle
-→ editor form/task/photo presentation
-→ Editor visual and functional review
-→ explicit owner approval
-→ remaining screens
-→ Phase 5E regression and closeout
+Phase 5C — accepted responsive shell and Journal workspace
+→ Phase 5D — accepted Daily Log Editor shell, tasks, photos, and actions
+→ Phase 5D — focused E3A regression and acceptance
+→ Phase 5E — Journal and Daily Log Editor documentation synchronization
+→ broader application-wide regression and closeout
+→ remaining screen-body visual refinement
 ```
 
-Do not begin the editor translation before the Journal approval gate. The primary shell is the shared presentation prerequisite, not a redesign of navigation destinations or other page workflows. Do not translate the Dashboard, Preview & Export, or Settings page bodies before Journal and Editor approval.
+The Journal and Daily Log Editor approval gates are complete. The primary shell remains the shared presentation foundation, not a redesign of navigation destinations or other page workflows. Dashboard, Preview & Export, and Settings page-body translation remains separately scoped.
 
 ## 14. Handoff instruction for the next agent
 
@@ -618,5 +625,5 @@ The mentor review should verify:
 - compact/mobile bottom-sheet and contained desktop-dialog behavior;
 - the centralized editor exit lifecycle and complete accessibility cleanup;
 - semantic-token authority for Dark mode and the `styles.css`/`warm-journal.css` ownership boundary;
-- separate Journal and Daily Log Editor approval gates; and
-- the rendered browser and device evidence required before Phase 5E closeout.
+- the completed separate Journal and Daily Log Editor approval gates; and
+- the focused rendered browser evidence recorded for E3A, with broader application-wide evidence remaining separate.
