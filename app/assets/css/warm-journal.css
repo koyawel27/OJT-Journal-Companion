@@ -205,6 +205,61 @@ body {
   color: #546526;
 }
 
+/* Phase 5D: Preview & Export document-and-utility-rail skin. */
+.preview-context-panel {
+  border-color: var(--color-border-subtle);
+  background: var(--color-shell);
+  box-shadow: none;
+}
+
+.journal-preview-card {
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+.journal-preview-card::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -1px;
+  right: -1px;
+  width: 46px;
+  height: 46px;
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  background: var(--color-progress-fill);
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.journal-preview-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.preview-export-panel {
+  border-color: var(--color-border-subtle);
+  border-top: 3px solid var(--color-text-interactive);
+  background: var(--color-shell);
+}
+
+.preview-review-panel {
+  border-color: var(--color-border-subtle);
+  background: var(--color-card);
+}
+
+.preview-day-section::before {
+  border-color: var(--color-page);
+}
+
+@media (forced-colors: active) {
+  .journal-preview-card::after,
+  .preview-review-list li::before,
+  .preview-day-section::before {
+    background: Highlight;
+  }
+}
+
 @media (max-width: 760px) {
   .brand-mark {
     flex-basis: 36px;

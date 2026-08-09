@@ -714,49 +714,60 @@
           <header class="preview-page-header">
             <p class="section-kicker">Prepared journal content</p>
             <h2 id="weekly-preview-title">Preview &amp; Export</h2>
-            <p>Pick a saved week to review, correct, copy, or export. Save summary changes in Journal first.</p>
-            <p class="phase-note preview-purpose-note">This screen preview is optimized for reading. The exported DOCX keeps the official journal layout.</p>
+            <p>Review one saved week, correct missing details, then copy or export the prepared journal.</p>
           </header>
 
           <div class="weekly-preview-layout">
-            <section class="week-panel preview-context-panel" aria-labelledby="weekly-preview-controls-title">
-              <div class="panel-header">
-                <div>
-                  <span class="card-label">Selected-week context</span>
-                  <h3 id="weekly-preview-controls-title">Choose a saved week</h3>
+            <div class="preview-document-region">
+              <section class="week-panel preview-context-panel" aria-labelledby="weekly-preview-controls-title">
+                <div class="preview-context-heading">
+                  <div>
+                    <span class="card-label">Selected-week context</span>
+                    <h3 id="weekly-preview-controls-title">Selected week</h3>
+                  </div>
+                  <p id="weekly-preview-help">Choose a week to preview, copy, or export the journal.</p>
                 </div>
-                <p id="weekly-preview-help">Choose a week to preview, copy, or export the journal.</p>
+
+                <div class="preview-context-controls">
+                  <label class="field">
+                    <span>OJT week</span>
+                    <select id="weekly-preview-week-select"></select>
+                  </label>
+                  <button class="secondary-button" type="button" id="preview-edit-selected-week">Edit selected week in Journal</button>
+                </div>
+              </section>
+
+              <div class="weekly-preview-output" id="weekly-preview-output">
+                <p class="empty-state">Choose a saved week to preview your weekly journal.</p>
               </div>
-
-              <div class="preview-context-controls">
-                <label class="field">
-                  <span>OJT week</span>
-                  <select id="weekly-preview-week-select"></select>
-                </label>
-                <button class="secondary-button" type="button" id="preview-edit-selected-week">Edit selected week in Journal</button>
-              </div>
-            </section>
-
-            <p class="form-message preview-status-region" id="weekly-preview-message" hidden></p>
-
-            <div class="weekly-preview-output" id="weekly-preview-output">
-              <p class="empty-state">Choose a saved week to preview your weekly journal.</p>
             </div>
 
-            <section class="week-panel preview-export-panel" aria-labelledby="weekly-preview-export-actions-title">
-              <div class="panel-header">
-                <div>
+            <aside class="preview-utility-rail" aria-label="Preview and export tools">
+              <div class="preview-utility-sticky">
+                <section class="week-panel preview-export-panel" aria-labelledby="weekly-preview-export-actions-title">
                   <span class="card-label">Export actions</span>
-                  <h3 id="weekly-preview-export-actions-title">Prepare the journal for submission</h3>
-                </div>
-                <p>Use DOCX for the editable formal document. Copy is a secondary convenience action.</p>
+                  <h3 id="weekly-preview-export-actions-title">Prepare your journal</h3>
+                  <p>Keep the export actions beside the document while you review it.</p>
+                  <div class="weekly-preview-actions">
+                    <button class="primary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" aria-busy="false" disabled>Export Official DOCX</button>
+                    <button class="secondary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
+                  </div>
+                  <p class="phase-note weekly-preview-export-note" id="weekly-preview-export-note">Downloads an editable Word file for manual review, signing, and submission.</p>
+                </section>
+
+                <p class="form-message preview-status-region" id="weekly-preview-message" role="status" aria-live="polite" hidden></p>
+
+                <section class="week-panel preview-review-panel" aria-labelledby="preview-review-guide-title">
+                  <span class="card-label">Review guide</span>
+                  <h3 id="preview-review-guide-title">Before you export</h3>
+                  <ul class="preview-review-list">
+                    <li>The browser preview is optimized for reading and correction.</li>
+                    <li>The Official DOCX keeps its separate formal template layout.</li>
+                    <li>DOCX cannot restore app data. Keep a JSON backup for recovery.</li>
+                  </ul>
+                </section>
               </div>
-              <div class="weekly-preview-actions">
-                <button class="primary-button" type="button" id="export-official-docx-button" aria-describedby="weekly-preview-export-note" aria-busy="false" disabled>Export Official DOCX</button>
-                <button class="secondary-button" type="button" id="copy-weekly-journal-button" disabled>Copy Weekly Journal</button>
-              </div>
-              <p class="phase-note weekly-preview-export-note" id="weekly-preview-export-note">Downloads an editable Word file for manual review, signing, and submission. DOCX cannot restore app data.</p>
-            </section>
+            </aside>
           </div>
         </section>
 

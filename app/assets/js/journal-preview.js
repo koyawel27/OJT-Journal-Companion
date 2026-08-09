@@ -351,7 +351,13 @@
 
     output.innerHTML = `
       ${renderProfileWarnings(payload)}
-      <article class="journal-preview-card">
+      <article class="journal-preview-card" aria-labelledby="preview-document-title">
+        <header class="preview-document-header">
+          <span class="card-label">Weekly journal</span>
+          <h3 id="preview-document-title">Week ${escapeHtml(payload.weekNumber || "Not set")}</h3>
+          <p>${escapeHtml(payload.inclusiveStartDate || "Not set")} to ${escapeHtml(payload.inclusiveEndDate || "Not set")}</p>
+        </header>
+
         <dl class="preview-info-grid">
           <div>
             <dt>Student Name</dt>
@@ -360,14 +366,6 @@
           <div>
             <dt>Company</dt>
             <dd>${escapeHtml(payload.companyName || "Not set")}</dd>
-          </div>
-          <div>
-            <dt>Week Number</dt>
-            <dd>${escapeHtml(payload.weekNumber || "Not set")}</dd>
-          </div>
-          <div>
-            <dt>Inclusive Dates</dt>
-            <dd>${escapeHtml(payload.inclusiveStartDate || "Not set")} to ${escapeHtml(payload.inclusiveEndDate || "Not set")}</dd>
           </div>
         </dl>
 
