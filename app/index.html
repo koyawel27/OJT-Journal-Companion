@@ -134,119 +134,164 @@
             </div>
           </header>
 
-          <div id="dashboard-backup-reminder" class="dashboard-reminder-card" hidden>
-            <p class="reminder-text">
-              <strong>Backup reminder:</strong> You have not exported a backup in over 7 days. Your journal is stored only in this browser. Export a JSON backup regularly so your app data can be restored if needed. DOCX exports are editable journal documents and cannot restore the app.
-            </p>
-            <button class="secondary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
-          </div>
-
-          <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title">
-            <div class="dashboard-ojt-progress-header">
-              <div>
-                <span class="card-label">OJT Progress</span>
-                <h3 id="dashboard-ojt-progress-title">Overall completion</h3>
-              </div>
-              <strong class="dashboard-ojt-percent" id="dashboard-ojt-percent" aria-hidden="true">—</strong>
-            </div>
-            <div
-              class="dashboard-ojt-progress-bar-wrap"
-              id="dashboard-ojt-progress-bar-wrap"
-              role="progressbar"
-              aria-labelledby="dashboard-ojt-progress-title"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow="0"
-              hidden
-            >
-              <div class="dashboard-ojt-progress-bar" id="dashboard-ojt-progress-bar"></div>
-            </div>
-            <dl class="dashboard-ojt-stats" id="dashboard-ojt-stats" hidden>
-              <div>
-                <dt>Rendered</dt>
-                <dd id="dashboard-ojt-rendered">0h 0m</dd>
-              </div>
-              <div>
-                <dt>Required</dt>
-                <dd id="dashboard-ojt-required">0 hours</dd>
-              </div>
-              <div>
-                <dt>Remaining</dt>
-                <dd id="dashboard-ojt-remaining">0h 0m</dd>
-              </div>
-            </dl>
-            <p class="dashboard-ojt-empty" id="dashboard-ojt-empty">
-              Add your required OJT hours in Settings to track overall progress here.
-            </p>
-          </section>
-
-          <section class="dashboard-identity-strip" aria-labelledby="dashboard-identity-heading">
-            <h3 class="dashboard-identity-heading" id="dashboard-identity-heading">Journal identity</h3>
-            <div class="dashboard-identity-grid">
-              <article class="summary-card summary-card--identity">
-                <span class="card-label">Student</span>
-                <strong id="summary-student-name">Not set yet</strong>
-                <p id="summary-student-detail">Add your student details in Settings so they appear on your journal.</p>
-              </article>
-              <article class="summary-card summary-card--identity">
-                <span class="card-label">Company</span>
-                <strong id="summary-company-name">Not set yet</strong>
-                <p id="summary-company-detail">Add your company details in Settings so they appear on your weekly journal preview.</p>
-              </article>
-            </div>
-          </section>
-
-          <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
-            <header class="dashboard-week-band dashboard-week-band--header">
-              <div class="dashboard-week-intro">
-                <span class="card-label">Selected week</span>
-                <h3 id="dashboard-week-title">No OJT week yet</h3>
-                <p id="dashboard-week-dates">Create your first OJT week to see progress here.</p>
-              </div>
-              <div class="dashboard-week-highlight">
-                <span class="dashboard-week-highlight-label">Weekly rendered</span>
-                <strong id="dashboard-week-rendered">0h 0m</strong>
-              </div>
-            </header>
-
-            <div class="dashboard-week-band dashboard-week-band--stats" aria-label="Selected week progress summary">
-              <div class="dashboard-week-stat">
-                <span>Days logged</span>
-                <strong id="dashboard-week-logged-days">0 of 0</strong>
-              </div>
-              <div class="dashboard-week-stat">
-                <span>Worked days</span>
-                <strong id="dashboard-week-worked-days">0</strong>
-              </div>
-              <div class="dashboard-week-stat dashboard-week-stat--action">
-                <span>Open days</span>
-                <strong id="dashboard-week-open-days">0</strong>
-              </div>
-            </div>
-
-            <div class="dashboard-week-body">
-              <section class="dashboard-week-panel dashboard-week-progress" aria-labelledby="dashboard-week-progress-title">
-                <div class="dashboard-block-heading">
-                  <span class="card-label">Daily check-in</span>
-                  <h4 id="dashboard-week-progress-title">Daily progress</h4>
+          <div class="dashboard-layout">
+            <aside class="dashboard-support-rail" aria-label="Journal identity and overall OJT progress">
+              <section class="dashboard-identity-strip" aria-labelledby="dashboard-identity-heading">
+                <h3 class="dashboard-identity-heading" id="dashboard-identity-heading">Journal identity</h3>
+                <div class="dashboard-identity-grid">
+                  <article class="summary-card summary-card--identity">
+                    <span class="dashboard-identity-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <circle cx="12" cy="8" r="3.5"></circle>
+                        <path d="M5.5 19.5c.6-3.2 3-5 6.5-5s5.9 1.8 6.5 5"></path>
+                      </svg>
+                    </span>
+                    <span class="dashboard-identity-copy">
+                      <span class="card-label">Student</span>
+                      <strong id="summary-student-name">Not set yet</strong>
+                      <span id="summary-student-detail">Add your student details in Settings so they appear on your journal.</span>
+                    </span>
+                  </article>
+                  <article class="summary-card summary-card--identity">
+                    <span class="dashboard-identity-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4.5 20V7.5h9V20M13.5 11h6v9M8 11h2M8 14.5h2M8 18h2M16.5 14.5h1M16.5 18h1M3 20.5h18"></path>
+                      </svg>
+                    </span>
+                    <span class="dashboard-identity-copy">
+                      <span class="card-label">Company</span>
+                      <strong id="summary-company-name">Not set yet</strong>
+                      <span id="summary-company-detail">Add your company details in Settings so they appear on your weekly journal preview.</span>
+                    </span>
+                  </article>
                 </div>
-                <ul class="dashboard-day-list" id="dashboard-week-days">
-                  <li class="empty-state">Create an OJT week, then log each day in Journal.</li>
-                </ul>
               </section>
-              <section class="dashboard-week-panel dashboard-week-side" aria-labelledby="dashboard-week-summary-title">
+
+              <section class="dashboard-ojt-progress-card" aria-labelledby="dashboard-ojt-progress-title">
+                <div class="dashboard-ojt-progress-header">
+                  <div>
+                    <span class="card-label">OJT progress</span>
+                    <h3 id="dashboard-ojt-progress-title">Overall completion</h3>
+                  </div>
+                  <div class="dashboard-ojt-percent-wrap">
+                    <strong class="dashboard-ojt-percent" id="dashboard-ojt-percent" aria-hidden="true">—</strong>
+                    <span>Complete</span>
+                  </div>
+                </div>
+                <div
+                  class="dashboard-ojt-progress-bar-wrap"
+                  id="dashboard-ojt-progress-bar-wrap"
+                  role="progressbar"
+                  aria-labelledby="dashboard-ojt-progress-title"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  hidden
+                >
+                  <div class="dashboard-ojt-progress-bar" id="dashboard-ojt-progress-bar"></div>
+                </div>
+                <dl class="dashboard-ojt-stats" id="dashboard-ojt-stats" hidden>
+                  <div>
+                    <dt>Rendered</dt>
+                    <dd id="dashboard-ojt-rendered">0h 0m</dd>
+                  </div>
+                  <div>
+                    <dt>Required</dt>
+                    <dd id="dashboard-ojt-required">0 hours</dd>
+                  </div>
+                  <div>
+                    <dt>Remaining</dt>
+                    <dd id="dashboard-ojt-remaining">0h 0m</dd>
+                  </div>
+                </dl>
+                <p class="dashboard-ojt-empty" id="dashboard-ojt-empty">
+                  Add your required OJT hours in Settings to track overall progress here.
+                </p>
+              </section>
+            </aside>
+
+            <div class="dashboard-workspace">
+              <section class="dashboard-week-card" aria-labelledby="dashboard-week-title">
+                <header class="dashboard-week-band dashboard-week-band--header">
+                  <div class="dashboard-week-intro">
+                    <span class="card-label">Selected week</span>
+                    <h3 id="dashboard-week-title">No OJT week yet</h3>
+                    <p id="dashboard-week-dates">Create your first OJT week to see progress here.</p>
+                  </div>
+                  <div class="dashboard-week-highlight">
+                    <span class="dashboard-week-highlight-label">Weekly rendered</span>
+                    <strong id="dashboard-week-rendered">0h 0m</strong>
+                  </div>
+                </header>
+
+                <div class="dashboard-week-band dashboard-week-band--stats" aria-label="Selected week progress summary">
+                  <div class="dashboard-week-stat">
+                    <strong id="dashboard-week-logged-days">0 of 0</strong>
+                    <span>Days logged</span>
+                  </div>
+                  <div class="dashboard-week-stat">
+                    <strong id="dashboard-week-worked-days">0</strong>
+                    <span>Worked days</span>
+                  </div>
+                  <div class="dashboard-week-stat dashboard-week-stat--action">
+                    <strong id="dashboard-week-open-days">0</strong>
+                    <span>Open days</span>
+                  </div>
+                </div>
+
+                <div class="dashboard-week-body">
+                  <section class="dashboard-week-panel dashboard-week-progress" aria-labelledby="dashboard-week-progress-title">
+                    <div class="dashboard-block-heading">
+                      <span class="card-label">Daily activity</span>
+                      <h4 id="dashboard-week-progress-title">Daily progress</h4>
+                    </div>
+                    <ul class="dashboard-day-list" id="dashboard-week-days">
+                      <li class="empty-state">Create an OJT week, then log each day in Journal.</li>
+                    </ul>
+                  </section>
+                </div>
+              </section>
+
+              <section class="dashboard-readiness-card" aria-labelledby="dashboard-week-summary-title">
                 <div class="dashboard-block-heading">
-                  <span class="card-label">Journal readiness</span>
-                  <h4 id="dashboard-week-summary-title">Weekly summary</h4>
+                  <span class="card-label">Weekly summary readiness</span>
+                  <h3 id="dashboard-week-summary-title">Review the selected week</h3>
                 </div>
                 <ul class="dashboard-summary-status" id="dashboard-week-summary-status">
-                  <li>Skills Learned: missing</li>
-                  <li>Problems Encountered: missing</li>
-                  <li>Reflection: missing</li>
+                  <li class="is-missing">Skills Learned: missing</li>
+                  <li class="is-missing">Problems Encountered: missing</li>
+                  <li class="is-missing">Reflection: missing</li>
                 </ul>
+                <button class="secondary-button" type="button" id="dashboard-summary-journal">Open Journal</button>
               </section>
             </div>
-          </section>
+
+            <section
+              id="dashboard-backup-reminder"
+              class="dashboard-reminder-card"
+              data-backup-state="pending"
+              aria-labelledby="dashboard-backup-title"
+              hidden
+            >
+              <div class="dashboard-reminder-heading">
+                <span class="dashboard-reminder-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M6 3.5h8l4 4v13H6Z"></path>
+                    <path d="M14 3.5v4h4M12 10.5v6M9.5 14l2.5 2.5 2.5-2.5"></path>
+                  </svg>
+                </span>
+                <div>
+                  <span class="card-label">Local recovery</span>
+                  <h3 id="dashboard-backup-title">Backup status</h3>
+                </div>
+              </div>
+              <p class="reminder-text" id="dashboard-backup-detail">
+                Checking the most recent JSON backup saved by this browser.
+              </p>
+              <p class="dashboard-backup-meta" id="dashboard-backup-meta"></p>
+              <button class="secondary-button" type="button" id="dashboard-reminder-recovery">Open Data &amp; Recovery</button>
+            </section>
+          </div>
         </section>
 
         <section class="app-section" id="settings" aria-labelledby="settings-title" hidden>

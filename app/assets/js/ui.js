@@ -94,6 +94,60 @@
     return window.OJTCalculations?.sumRenderedMinutes(dailyLogs) || 0;
   }
 
+  function isValidDate(date) {
+    return date instanceof Date && !Number.isNaN(date.getTime());
+  }
+
+  function formatDashboardDate(dateText, options) {
+    const date = parseDate(dateText);
+    if (!isValidDate(date)) {
+      return String(dateText || "Not set");
+    }
+
+    return new Intl.DateTimeFormat("en-US", options || {
+      month: "short",
+      day: "numeric"
+    }).format(date);
+  }
+
+  function formatDashboardWeekRange(startDateText, endDateText) {
+    const startDate = parseDate(startDateText);
+    const endDate = parseDate(endDateText);
+
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      return `${startDateText || "Not set"} to ${endDateText || "Not set"}`;
+    }
+
+    const sameYear = startDate.getFullYear() === endDate.getFullYear();
+    const startLabel = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      ...(sameYear ? {} : { year: "numeric" })
+    }).format(startDate);
+    const endLabel = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    }).format(endDate);
+
+    return `${startLabel} – ${endLabel}`;
+  }
+
+  function formatBackupTimestamp(value) {
+    const date = new Date(value);
+    if (!isValidDate(date)) {
+      return "Date unavailable";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(date);
+  }
+
   function parseDate(dateText) {
     const [year, month, day] = String(dateText || "").split("-").map(Number);
     return new Date(year, month - 1, day);
@@ -145,8 +199,17 @@
 
   function renderSummaryStatusItem(label, value) {
     const filled = Boolean(String(value || "").trim());
-    const statusText = filled ? "filled" : "missing";
-    return `<li class="${filled ? "is-filled" : "is-missing"}">${escapeHtml(label)}: ${statusText}</li>`;
+    const statusText = filled ? "Complete" : "Missing";
+    const iconPath = filled
+      ? '<path d="m7 12.5 3.1 3.1L17.5 8"></path><circle cx="12" cy="12" r="9"></circle>'
+      : '<path d="M12 8v5M12 16.5v.1"></path><path d="M10.6 4.4 3.8 17a1.5 1.5 0 0 0 1.3 2.2h13.8a1.5 1.5 0 0 0 1.3-2.2L13.4 4.4a1.6 1.6 0 0 0-2.8 0Z"></path>';
+    return `
+      <li class="${filled ? "is-filled" : "is-missing"}">
+        <span class="dashboard-readiness-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${iconPath}</svg></span>
+        <span>${escapeHtml(label)}</span>
+        <strong>${statusText}</strong>
+      </li>
+    `;
   }
 
   function normalizeDayStatus(value) {
@@ -169,12 +232,13 @@
       setText("dashboard-week-logged-days", "0 of 0");
       setText("dashboard-week-worked-days", "0");
       setText("dashboard-week-open-days", "0");
+      setText("dashboard-summary-journal", "Open Journal");
       daysElement.innerHTML = '<li class="empty-state">Create an OJT week, then log each day in Journal.</li>';
-      summaryElement.innerHTML = `
-        <li class="is-missing">Skills Learned: missing</li>
-        <li class="is-missing">Problems Encountered: missing</li>
-        <li class="is-missing">Reflection: missing</li>
-      `;
+      summaryElement.innerHTML = [
+        renderSummaryStatusItem("Skills learned", ""),
+        renderSummaryStatusItem("Problems encountered", ""),
+        renderSummaryStatusItem("Reflection", "")
+      ].join("");
       return;
     }
 
@@ -187,15 +251,21 @@
     const today = todayText();
 
     setText("dashboard-week-title", `Week ${week.weekNumber || "Not set"}`);
-    setText("dashboard-week-dates", `${week.inclusiveStartDate || "Not set"} to ${week.inclusiveEndDate || "Not set"}`);
+    setText("dashboard-week-dates", formatDashboardWeekRange(week.inclusiveStartDate, week.inclusiveEndDate));
     setText("dashboard-week-rendered", formatRenderedTime(weeklyRenderedMinutes));
     setText("dashboard-week-logged-days", `${loggedDayCount} of ${weekDates.length}`);
     setText("dashboard-week-worked-days", String(workedDayCount));
     setText("dashboard-week-open-days", String(openDayCount));
+    setText("dashboard-summary-journal", `Open Week ${week.weekNumber || ""} in Journal`.replace(/\s+/g, " ").trim());
 
     daysElement.innerHTML = weekDates.length > 0
       ? weekDates.map((dateText, index) => {
         const log = getDailyLogForDate(week.id, dateText);
+        const date = parseDate(dateText);
+        const weekdayLabel = isValidDate(date)
+          ? new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date).toUpperCase()
+          : `DAY ${index + 1}`;
+        const displayDate = formatDashboardDate(dateText);
         const isToday = dateText === today;
         const todayClass = isToday ? " is-today" : "";
         const todayLabel = isToday ? " · Today" : "";
@@ -204,14 +274,22 @@
           return `
             <li class="dashboard-day-row is-empty${todayClass}">
               <button class="dashboard-day-action" type="button" data-dashboard-day-date="${escapeHtml(dateText)}" data-dashboard-week-id="${escapeHtml(week.id)}" aria-label="Open Day ${index + 1}${todayLabel}, ${escapeHtml(dateText)}: Not logged yet in Journal Daily Log">
-                <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
-                <strong class="dashboard-day-result">Not logged yet</strong>
+                <span class="dashboard-day-identity">
+                  <strong>${escapeHtml(weekdayLabel)}</strong>
+                  <small>${escapeHtml(displayDate)}${todayLabel}</small>
+                </span>
+                <span class="dashboard-day-status is-open">Open</span>
+                <span class="dashboard-day-meta"><strong>—</strong><small>Not logged</small></span>
+                <span class="dashboard-day-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m9 5 7 7-7 7"></path></svg></span>
               </button>
             </li>
           `;
         }
 
         const dayStatus = normalizeDayStatus(log.dayStatus);
+        const statusClass = dayStatus === "Worked"
+          ? "is-worked"
+          : (dayStatus === "Absent" ? "is-absent" : "is-off");
         const taskCount = getTaskCount(log.id);
         const taskText = taskCount > 0 ? (taskCount === 1 ? "1 task" : `${taskCount} tasks`) : "No tasks";
         const renderedText = dayStatus === "Worked" ? formatRenderedTime(log.renderedMinutes) : formatRenderedTime(0);
@@ -219,12 +297,13 @@
         return `
           <li class="dashboard-day-row${todayClass}">
             <button class="dashboard-day-action" type="button" data-dashboard-day-date="${escapeHtml(dateText)}" data-dashboard-week-id="${escapeHtml(week.id)}" aria-label="Open Day ${index + 1}${todayLabel}, ${escapeHtml(dateText)}: ${escapeHtml(dayStatus)}, ${escapeHtml(renderedText)}, ${escapeHtml(taskText)} in Journal Daily Log">
-              <span class="dashboard-day-main">Day ${index + 1}${todayLabel} <small>${escapeHtml(dateText)}</small></span>
-              <strong class="dashboard-day-result">
-                <span class="dashboard-day-status">${escapeHtml(dayStatus)}</span>
-                <span>${escapeHtml(renderedText)}</span>
-                <small>${escapeHtml(taskText)}</small>
-              </strong>
+              <span class="dashboard-day-identity">
+                <strong>${escapeHtml(weekdayLabel)}</strong>
+                <small>${escapeHtml(displayDate)}${todayLabel}</small>
+              </span>
+              <span class="dashboard-day-status ${statusClass}">${escapeHtml(dayStatus)}</span>
+              <span class="dashboard-day-meta"><strong>${escapeHtml(renderedText)}</strong><small>${escapeHtml(taskText)}</small></span>
+              <span class="dashboard-day-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m9 5 7 7-7 7"></path></svg></span>
             </button>
           </li>
         `;
@@ -232,8 +311,8 @@
       : '<li class="empty-state">This week has no dates saved. Edit the week in Journal to fix the date range.</li>';
 
     summaryElement.innerHTML = [
-      renderSummaryStatusItem("Skills Learned", week.weeklySkillsLearned),
-      renderSummaryStatusItem("Problems Encountered", week.problemsEncountered),
+      renderSummaryStatusItem("Skills learned", week.weeklySkillsLearned),
+      renderSummaryStatusItem("Problems encountered", week.problemsEncountered),
       renderSummaryStatusItem("Reflection", week.reflectionOrPointsOfLearning)
     ].join("");
 
@@ -325,6 +404,40 @@
     updateOjtProgressCard();
   }
 
+  function updateDashboardBackupStatus(appSettings) {
+    const reminderElement = document.getElementById("dashboard-backup-reminder");
+    if (!reminderElement) {
+      return;
+    }
+
+    const lastBackup = appSettings?.lastBackupDate;
+    const lastBackupTime = lastBackup ? new Date(lastBackup).getTime() : Number.NaN;
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    let state = "missing";
+    let title = "No backup yet";
+    let detail = "Your journal is stored only in this browser. Export a JSON backup so your records can be restored if this browser data is lost.";
+    let meta = "JSON backup is the recovery path. DOCX files cannot restore app data.";
+
+    if (Number.isFinite(lastBackupTime)) {
+      meta = `Last backup: ${formatBackupTimestamp(lastBackup)}.`;
+      if (lastBackupTime < sevenDaysAgo) {
+        state = "attention";
+        title = "Backup needs attention";
+        detail = "Your latest JSON backup is more than 7 days old. Export a fresh backup to keep your recoverable copy current.";
+      } else {
+        state = "current";
+        title = "Backup current";
+        detail = "Your latest JSON backup is recent. Records are still stored only in this browser, so keep exporting backups regularly.";
+      }
+    }
+
+    reminderElement.dataset.backupState = state;
+    setText("dashboard-backup-title", title);
+    setText("dashboard-backup-detail", detail);
+    setText("dashboard-backup-meta", meta);
+    reminderElement.hidden = false;
+  }
+
   function updateDashboardSummary(studentProfile, companyProfile, appSettings) {
     dashboardState.studentProfile = studentProfile;
     dashboardState.companyProfile = companyProfile;
@@ -342,21 +455,7 @@
       companyProfile?.departmentOrAssignedArea || "Add your company details in Settings so they appear on your weekly journal preview."
     );
 
-    const reminderElement = document.getElementById("dashboard-backup-reminder");
-    if (reminderElement) {
-      const lastBackup = appSettings?.lastBackupDate;
-      let showReminder = false;
-      if (!lastBackup) {
-        showReminder = true;
-      } else {
-        const lastBackupTime = new Date(lastBackup).getTime();
-        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        if (lastBackupTime < sevenDaysAgo) {
-          showReminder = true;
-        }
-      }
-      reminderElement.hidden = !showReminder;
-    }
+    updateDashboardBackupStatus(appSettings);
 
     updateRenderedProgressSummary();
     renderDashboardWeekProgress();
@@ -438,9 +537,18 @@
     }));
   }
 
+  function openDashboardJournal() {
+    const week = chooseCurrentWeek(dashboardState.weeks);
+    if (week) {
+      window.OJTSelectedWeek?.selectWeek(week.id, { weeks: dashboardState.weeks, source: "dashboard:summary" });
+    }
+    window.OJTApp?.showSection("journal");
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     refreshDashboardWeekProgress();
     document.getElementById("dashboard-week-days")?.addEventListener("click", openDashboardDay);
+    document.getElementById("dashboard-summary-journal")?.addEventListener("click", openDashboardJournal);
     document.getElementById("dashboard-reminder-recovery")?.addEventListener("click", () => {
       document.dispatchEvent(new CustomEvent("ojt:focus-settings-section", { detail: { target: "recovery" } }));
     });

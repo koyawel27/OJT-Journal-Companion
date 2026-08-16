@@ -307,6 +307,108 @@ body {
   }
 }
 
+/* Phase 5D: Dashboard Warm Journal surface treatment. */
+#dashboard .dashboard-reminder-card,
+#dashboard .dashboard-identity-strip,
+#dashboard .dashboard-ojt-progress-card,
+#dashboard .dashboard-week-card,
+#dashboard .dashboard-readiness-card {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--color-page);
+  box-shadow: var(--shadow-card);
+}
+
+#dashboard .dashboard-reminder-card {
+  border-left-width: 4px;
+}
+
+#dashboard .dashboard-reminder-card[data-backup-state="current"] {
+  border-color: var(--color-border-subtle);
+  border-left-color: var(--color-border-interactive);
+  background: color-mix(in srgb, var(--color-shell) 58%, var(--color-page));
+}
+
+#dashboard .dashboard-reminder-card[data-backup-state="current"] .dashboard-reminder-icon {
+  border-color: var(--color-border-interactive);
+  background: var(--color-state-active);
+  color: var(--color-border-interactive);
+}
+
+:root[data-theme="dark"] #dashboard .dashboard-reminder-card[data-backup-state="current"] {
+  border-left-color: color-mix(in srgb, var(--color-inset) 74%, var(--color-status-success));
+}
+
+:root[data-theme="dark"] #dashboard .dashboard-reminder-card[data-backup-state="current"] .dashboard-reminder-icon {
+  border-color: color-mix(in srgb, var(--color-inset) 70%, var(--color-status-success));
+  background: color-mix(in srgb, var(--color-inset) 76%, var(--color-page));
+  color: color-mix(in srgb, var(--color-inset) 56%, var(--color-status-success));
+}
+
+#dashboard .dashboard-reminder-card[data-backup-state="attention"],
+#dashboard .dashboard-reminder-card[data-backup-state="missing"] {
+  border-color: var(--color-status-warning-border);
+  border-left-color: var(--color-status-warning);
+  background: var(--color-status-warning-bg);
+}
+
+#dashboard .dashboard-identity-strip {
+  background: color-mix(in srgb, var(--color-shell) 72%, var(--color-page));
+}
+
+#dashboard .summary-card--identity {
+  border-color: var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--color-page);
+  box-shadow: none;
+}
+
+#dashboard .dashboard-identity-icon {
+  background: var(--color-state-active);
+}
+
+#dashboard .dashboard-ojt-progress-card,
+#dashboard .dashboard-week-card,
+#dashboard .dashboard-readiness-card {
+  position: relative;
+  overflow: hidden;
+}
+
+#dashboard .dashboard-week-band--header {
+  background: color-mix(in srgb, var(--color-shell) 82%, var(--color-page));
+}
+
+#dashboard .dashboard-week-stat {
+  background: color-mix(in srgb, var(--color-shell) 72%, var(--color-page));
+}
+
+:root[data-theme="light"] #dashboard .dashboard-day-status.is-worked {
+  border-color: var(--color-border-interactive);
+  background: var(--color-state-active);
+  color: var(--color-focus-ring);
+}
+
+:root[data-theme="dark"] #dashboard .dashboard-day-status.is-worked {
+  border-color: color-mix(in srgb, var(--color-inset) 72%, var(--color-text-interactive));
+  background: color-mix(in srgb, var(--color-inset) 68%, var(--color-page));
+  color: var(--color-text-primary);
+}
+
+#dashboard .dashboard-readiness-card .secondary-button,
+#dashboard .dashboard-reminder-card .secondary-button {
+  border-color: var(--color-border-strong);
+}
+
+@media (max-width: 760px) {
+  #dashboard .dashboard-reminder-card,
+  #dashboard .dashboard-identity-strip,
+  #dashboard .dashboard-ojt-progress-card,
+  #dashboard .dashboard-week-card,
+  #dashboard .dashboard-readiness-card {
+    border-radius: var(--radius-card);
+  }
+}
+
 @media (forced-colors: active) {
   .brand-mark-frame,
   .brand-mark-progress {
